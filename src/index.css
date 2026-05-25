@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+/* -----------------------------------------------------------------------------
+   Bowled — Design Tokens
+   A Sree Krishna Catering venture (since 2006).
+   Tiffit-style subscription flow wrapped in Cookr-style premium ambiance.
+   Palette: warm saffron, cream, muted leaf-green, deep ink, earthy clay.
+----------------------------------------------------------------------------- */
+@theme {
+  /* Cream — primary background, calm and warm */
+  --color-cream-50:  #fffaf2;
+  --color-cream-100: #fdf3e2;
+  --color-cream-200: #f7e6cb;
+  --color-cream-300: #efd5ad;
+
+  /* Saffron — primary brand, warm orange */
+  --color-saffron-50:  #fff5ec;
+  --color-saffron-100: #ffe7d2;
+  --color-saffron-200: #ffcfa3;
+  --color-saffron-300: #ffae6b;
+  --color-saffron-400: #ff8c3a;
+  --color-saffron-500: #f56a1b;
+  --color-saffron-600: #d8540f;
+  --color-saffron-700: #ad400d;
+  --color-saffron-800: #7a2d09;
+
+  /* Spice — deep clay accent (used sparingly for emphasis) */
+  --color-spice-500: #b9421a;
+  --color-spice-700: #6f240a;
+
+  /* Leaf — muted, earthy green for health/veg cues */
+  --color-leaf-50:  #f1f6ef;
+  --color-leaf-100: #dbe9d3;
+  --color-leaf-300: #9bbd87;
+  --color-leaf-500: #5a8a4a;
+  --color-leaf-700: #3a5f2e;
+
+  /* Ink — text and structure */
+  --color-ink-400: #8b7e6f;
+  --color-ink-500: #6e6354;
+  --color-ink-700: #3e3528;
+  --color-ink-900: #1f1a12;
+
+  /* Surfaces */
+  --color-paper:   #ffffff;
+  --color-mist:    #faf4ea;
+
+  /* Type */
+  --font-sans:    'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display: 'Fraunces', 'Plus Jakarta Sans', serif;
+
+  /* Radius — softer corners for that warm, cozy card feel */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
+
+  /* Shadow — calm, ambient, slightly warm */
+  --shadow-soft: 0 1px 2px rgba(31, 26, 18, 0.04), 0 8px 24px -8px rgba(176, 92, 31, 0.08);
+  --shadow-card: 0 1px 2px rgba(31, 26, 18, 0.05), 0 16px 40px -16px rgba(176, 92, 31, 0.18);
+  --shadow-glow: 0 30px 80px -30px rgba(245, 106, 27, 0.35);
+}
+
+/* -----------------------------------------------------------------------------
+   Base styles
+----------------------------------------------------------------------------- */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink-900);
+  background: var(--color-cream-50);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-saffron-200);
+  color: var(--color-ink-900);
+}
+
+/* -----------------------------------------------------------------------------
+   Utilities
+----------------------------------------------------------------------------- */
+@utility font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  letter-spacing: -0.02em;
+}
+
+@utility text-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+
+@utility text-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-saffron-600);
+}
+
+@utility bg-grain {
+  background-image:
+    radial-gradient(rgba(176, 92, 31, 0.06) 1px, transparent 1px),
+    radial-gradient(rgba(176, 92, 31, 0.04) 1px, transparent 1px);
+  background-size: 22px 22px, 11px 11px;
+  background-position: 0 0, 11px 11px;
+}
+
+/* Premium glassy card */
+@utility card-glass {
+  background: color-mix(in oklab, var(--color-paper) 86%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--color-cream-300) 60%, transparent);
+}
+
+/* Subtle dotted hairline divider */
+@utility divider-dotted {
+  background-image: radial-gradient(circle, var(--color-cream-300) 1px, transparent 1.5px);
+  background-size: 8px 8px;
+  background-repeat: repeat-x;
+  background-position: center;
+  height: 8px;
+}
+
+/* Marquee track helper */
+@keyframes marquee-x {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@utility animate-marquee {
+  animation: marquee-x 40s linear infinite;
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+@utility animate-float {
+  animation: float-y 6s ease-in-out infinite;
+}
+
+@keyframes shine {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+@utility text-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-ink-900) 0%,
+    var(--color-saffron-600) 45%,
+    var(--color-spice-500) 55%,
+    var(--color-ink-900) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine 8s linear infinite;
+}

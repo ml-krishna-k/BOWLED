@@ -1,0 +1,34 @@
+{
+  "name": "bowled",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:server": "npm --prefix server run dev",
+    "dev:all": "concurrently -n web,api -c blue,magenta \"npm:dev\" \"npm:dev:server\"",
+    "build": "tsc && vite build",
+    "build:server": "npm --prefix server run build",
+    "preview": "vite preview",
+    "seed": "npm --prefix server run seed",
+    "check:db": "npm --prefix server run check:db",
+    "server:install": "npm --prefix server install"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "concurrently": "^9.1.2",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.4"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.0",
+    "@vitejs/plugin-react": "^6.0.2",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.15.1",
+    "tailwindcss": "^4.3.0"
+  }
+}
