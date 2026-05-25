@@ -1,0 +1,55 @@
+# Render Blueprint — deploys the Bowled API as a Web Service.
+#
+# After your first push to GitHub:
+#   1. https://render.com → New + → Blueprint → pick your repo
+#   2. Render reads this file and provisions the service
+#   3. Fill in the secret env vars (the ones marked `sync: false`) in the UI
+#
+# Re-deploys happen automatically on every push to `main` (autoDeploy below).
+# Edit any of these values + push → next deploy picks them up.
+
+services:
+  - type: web
+    name: bowled-api
+    runtime: node
+    rootDir: server
+    plan: free                  # bump to "starter" ($7/mo) to remove cold starts
+    region: singapore           # closest to Chennai users
+    branch: main
+    autoDeploy: true
+    buildCommand: npm install && npm run build
+    startCommand: node dist/index.js
+    healthCheckPath: /api/health
+    envVars:
+      # Non-secret, baked into the blueprint
+      - key: NODE_ENV
+        value: production
+      - key: ADMIN_PHONES
+        value: "9360113501"
+      - key: MSG91_SENDER_ID
+        value: BOWLED
+      - key: MSG91_COUNTRY_CODE
+        value: "91"
+      - key: CLOUDINARY_FOLDER
+        value: bowled
+      - key: JWT_EXPIRES_IN
+        value: 30d
+      # Secrets — set these in the Render dashboard after first deploy
+      - key: mongo_db_uri
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: MSG91_API_KEY
+        sync: false
+      - key: MSG91_TEMPLATE_ID
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      # Set this AFTER you know your Vercel URL — comma-separated origins
+      # e.g. "https://bowled.vercel.app,https://bowled.app"
+      - key: CORS_ORIGIN
+        sync: false
