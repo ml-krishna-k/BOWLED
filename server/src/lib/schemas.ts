@@ -38,6 +38,12 @@ export const otpVerifySchema = z.object({
   name: z.string().trim().min(2, 'Name is too short').max(80).optional(),
 })
 
+/** Widget flow — server only sees the signed access-token from MSG91. */
+export const widgetVerifySchema = z.object({
+  accessToken: z.string().trim().min(20).max(4000),
+  name: z.string().trim().min(2, 'Name is too short').max(80).optional(),
+})
+
 /* ---------- Me ---------- */
 
 export const updateMeSchema = z

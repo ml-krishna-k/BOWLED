@@ -41,6 +41,10 @@ services:
         sync: false
       - key: MSG91_API_KEY
         sync: false
+      # Widget mode (recommended) — set this OR MSG91_TEMPLATE_ID, not both
+      - key: MSG91_WIDGET_ID
+        sync: false
+      # Legacy mode — only needed if you skip the widget
       - key: MSG91_TEMPLATE_ID
         sync: false
       - key: CLOUDINARY_CLOUD_NAME
@@ -52,4 +56,8 @@ services:
       # Set this AFTER you know your Vercel URL — comma-separated origins
       # e.g. "https://bowled.vercel.app,https://bowled.app"
       - key: CORS_ORIGIN
+        sync: false
+      # Optional test-phone bypass — "9360113501:3501,6380825525:5525"
+      # Lets you log in without SMS during testing. Remove for real launch.
+      - key: TEST_PHONES
         sync: false

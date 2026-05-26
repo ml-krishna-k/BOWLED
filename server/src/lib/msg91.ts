@@ -80,6 +80,43 @@ export async function sendOtp(phone: string): Promise<{ requestId?: string; otp:
 }
 
 /**
+ * Verify an MSG91 OTP-Widget access-token. The widget runs in the browser,
+ * handles the SMS round-trip itself, and on success hands the client a signed
+ * JWT (the "access-token"). The client POSTs it to our /api/auth/widget/verify
+ * which calls this function.
+ *
+ * Returns the mobile number MSG91 verified.
+ * Reference: https://docs.msg91.com/p/tf9GTextN/e/tHpoTOpcRq/MSG91
+ */
+export async function verifyWidgetAccessToken(accessToken: string): Promise<string> {
+  const url = 'https://api.msg91.com/api/v5/widget/verifyAccessToken'
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      authkey: config.msg91.apiKey,
+      'access-token': accessToken,
+    }),
+  })
+  const text = await res.text()
+  let body: Msg91Response & { mobile?: string } = {}
+  try { body = text ? JSON.parse(text) : {} } catch { /* keep empty */ }
+
+  if (config.nodeEnv !== 'production') {
+    console.log(`[msg91:widget] ← ${res.status} ${text}`)
+  }
+
+  if (!res.ok || body.type === 'error') {
+    throw new Error(`MSG91 widget verify failed (${res.status}): ${body.message ?? text}`)
+  }
+  // Successful responses include the verified mobile either as `message`
+  // (legacy widget responses) or `mobile` (newer ones). Try both.
+  const mobile = body.mobile ?? body.message
+  if (!mobile) throw new Error('MSG91 widget verify returned no mobile number')
+  return mobile
+}
+
+/**
  * Verify an OTP against MSG91's record. Throws on error.
  * Returns true if the OTP matched.
  */
