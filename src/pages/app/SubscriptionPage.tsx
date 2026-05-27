@@ -400,12 +400,12 @@ function Onboarding() {
             const isGroup = groupSize > 1
             return (
               <Card variant="outline" className="mt-8 p-5 sm:p-6">
-                <div className="flex flex-wrap items-end justify-between gap-4">
-                  <div>
+                <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+                  <div className="min-w-0">
                     <p className="text-eyebrow text-ink-500">
                       {isGroup ? "Per person, you'll pay" : "You'll pay"}
                     </p>
-                    <p className="mt-1 font-display text-3xl sm:text-4xl text-ink-900">
+                    <p className="mt-1 font-display text-2xl sm:text-3xl lg:text-4xl text-ink-900 break-words">
                       {inr(perPerson)}
                       <span className="ml-2 text-sm text-ink-500 font-sans">/ {cycle.cadence.toLowerCase()}</span>
                     </p>
@@ -416,6 +416,7 @@ function Onboarding() {
                   <Button
                     variant="secondary"
                     size="lg"
+                    className="w-full sm:w-auto"
                     onClick={start}
                     disabled={submitting}
                   >

@@ -9,7 +9,12 @@ export function AppContainer({
   className?: string
 }) {
   return (
-    <div className={cn('mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-10 py-6 lg:py-10', className)}>
+    <div
+      className={cn(
+        'mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-10 py-5 sm:py-6 lg:py-10',
+        className,
+      )}
+    >
       {children}
     </div>
   )

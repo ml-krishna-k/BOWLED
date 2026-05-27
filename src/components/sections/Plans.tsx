@@ -108,8 +108,8 @@ export function Plans() {
                   )}
                 </div>
 
-                <div className="mt-6 flex items-baseline gap-2">
-                  <span className="font-display text-5xl text-ink-900">
+                <div className="mt-6 flex items-baseline flex-wrap gap-x-2 gap-y-1">
+                  <span className="font-display text-4xl sm:text-5xl text-ink-900 leading-none">
                     {inr(total)}
                   </span>
                   <span className="text-ink-500 text-sm">

@@ -42,18 +42,16 @@ export function Dashboard() {
   return (
     <AppContainer>
       {/* Greeting */}
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="text-eyebrow">{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' })}</p>
-          <h1 className="mt-2 text-display text-3xl sm:text-4xl text-ink-900">
-            {greeting()}, <span className="text-saffron-600">{user?.name?.split(' ')[0]}</span>
-          </h1>
-          <p className="mt-1 text-ink-500">
-            {nextSlot
-              ? <>Your <span className="font-medium text-ink-900">{SLOT_META[nextSlot].label.toLowerCase()}</span> is up next — {todayDay.meals[nextSlot].name}.</>
-              : 'All meals served for today. See you tomorrow.'}
-          </p>
-        </div>
+      <div>
+        <p className="text-eyebrow">{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' })}</p>
+        <h1 className="mt-2 text-display text-2xl sm:text-3xl lg:text-4xl text-ink-900">
+          {greeting()}, <span className="text-saffron-600">{user?.name?.split(' ')[0]}</span>
+        </h1>
+        <p className="mt-1 text-sm sm:text-base text-ink-500">
+          {nextSlot
+            ? <>Your <span className="font-medium text-ink-900">{SLOT_META[nextSlot].label.toLowerCase()}</span> is up next — {todayDay.meals[nextSlot].name}.</>
+            : 'All meals served for today. See you tomorrow.'}
+        </p>
       </div>
 
       {/* Today's meal cards */}
@@ -153,7 +151,7 @@ export function Dashboard() {
           <p className="mt-2 text-sm text-ink-500 max-w-xs">
             Browse 21 meals across the week. Flag favourites, rate what you ate.
           </p>
-          <div className="mt-5 flex gap-2">
+          <div className="mt-5 flex flex-col sm:flex-row gap-2">
             <Button variant="outline" size="md" onClick={() => navigate('/app/menu')}>Browse menu →</Button>
             <Button variant="ghost" size="md" onClick={() => navigate('/app/subscription')}>Manage plan</Button>
           </div>
@@ -162,16 +160,21 @@ export function Dashboard() {
 
       {/* Skip allowance — monthly subscribers only */}
       {isMonthly && (
-        <Card variant="soft" className="mt-6 p-6">
-          <div className="flex flex-wrap items-start justify-between gap-4">
+        <Card variant="soft" className="mt-6 p-5 sm:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
             <div className="min-w-0">
               <p className="text-eyebrow">Plan around your week</p>
-              <h3 className="mt-1 font-display text-2xl text-ink-900">Skip allowance</h3>
+              <h3 className="mt-1 font-display text-xl sm:text-2xl text-ink-900">Skip allowance</h3>
               <p className="mt-1 text-sm text-ink-500 max-w-md">
                 Going home this weekend? Mark the meals or days you'll be away — kitchen stops cooking, your plan extends.
               </p>
             </div>
-            <Button variant="secondary" size="md" onClick={() => navigate('/app/skip')}>
+            <Button
+              variant="secondary"
+              size="md"
+              className="w-full sm:w-auto"
+              onClick={() => navigate('/app/skip')}
+            >
               Skip a meal →
             </Button>
           </div>
@@ -225,11 +228,11 @@ export function Dashboard() {
         const pct = Math.min(100, Math.round((sub.groupSize / plan.groupMin) * 100))
         const unlocked = needed === 0
         return (
-          <Card variant="outline" className="mt-6 p-6 bg-saffron-50/40 border-saffron-200">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
+          <Card variant="outline" className="mt-6 p-5 sm:p-6 bg-saffron-50/40 border-saffron-200">
+            <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+              <div className="min-w-0">
                 <p className="text-eyebrow text-saffron-700">Your group</p>
-                <p className="mt-1 font-display text-xl text-ink-900">
+                <p className="mt-1 font-display text-lg sm:text-xl text-ink-900 break-words">
                   {sub.groupSize} of {plan.groupMin} {sub.groupSize === 1 ? 'member' : 'members'} · code{' '}
                   <span className="font-mono text-saffron-700">{sub.groupCode}</span>
                 </p>
@@ -239,7 +242,12 @@ export function Dashboard() {
                     : <>Add <span className="font-semibold text-ink-900">{needed} more</span> on the same code to unlock the full ₹{plan.savingPerMeal}/meal saving.</>}
                 </p>
               </div>
-              <Button variant="outline" size="md" onClick={() => navigator.clipboard?.writeText(sub.groupCode)}>
+              <Button
+                variant="outline"
+                size="md"
+                className="w-full sm:w-auto"
+                onClick={() => navigator.clipboard?.writeText(sub.groupCode)}
+              >
                 Copy code
               </Button>
             </div>
@@ -253,17 +261,22 @@ export function Dashboard() {
       })()}
 
       {plan.id === 'solo' && (
-        <Card variant="outline" className="mt-6 p-6 flex flex-wrap items-center justify-between gap-4">
-          <div>
+        <Card variant="outline" className="mt-6 p-5 sm:p-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div className="min-w-0">
             <p className="text-eyebrow">Want to save more?</p>
-            <p className="mt-1 font-display text-xl text-ink-900">
+            <p className="mt-1 font-display text-lg sm:text-xl text-ink-900">
               Switch to Squad — save {inr(PLANS.find((p) => p.id === 'squad')!.savingPerMonth)} / month
             </p>
             <p className="mt-1 text-sm text-ink-500">
               Get 5 roommates on the same code, drop to ₹69/meal. We'll handle the rest.
             </p>
           </div>
-          <Button variant="primary" size="md" onClick={() => navigate('/app/subscription')}>
+          <Button
+            variant="primary"
+            size="md"
+            className="w-full sm:w-auto"
+            onClick={() => navigate('/app/subscription')}
+          >
             Upgrade plan →
           </Button>
         </Card>

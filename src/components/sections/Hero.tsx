@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/Badge'
 export function Hero() {
   const navigate = useNavigate()
   return (
-    <section className="relative overflow-hidden pt-28 sm:pt-32 lg:pt-36 pb-20 lg:pb-28">
+    <section className="relative overflow-hidden pt-24 sm:pt-32 lg:pt-36 pb-14 sm:pb-20 lg:pb-28">
       {/* Warm ambient glow */}
       <div
         aria-hidden
@@ -29,13 +29,13 @@ export function Hero() {
               <Badge tone="cream">Backed by Sree Krishna Catering · since 2006</Badge>
             </div>
 
-            <h1 className="text-display text-[2.4rem] sm:text-5xl lg:text-[4.2rem] leading-[1.02]">
+            <h1 className="text-display text-[2rem] sm:text-5xl lg:text-[4.2rem] leading-[1.05] sm:leading-[1.02]">
               Home-style daily meals,
-              <br />
-              <span className="text-shimmer">for your PG life.</span>
+              <br className="hidden sm:block" />
+              <span className="text-shimmer"> for your PG life.</span>
             </h1>
 
-            <p className="text-ink-500 text-lg leading-relaxed max-w-xl">
+            <p className="text-ink-500 text-base sm:text-lg leading-relaxed max-w-xl">
               Bowled is a meal subscription built for students in hostels,
               PGs and rented rooms — three balanced, home-cooked meals a day,
               a weekly rotating menu, and the kind of taste that reminds you of
@@ -43,10 +43,11 @@ export function Hero() {
               who&apos;ve been feeding Chennai since 2006.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 pt-2">
               <Button
                 variant="secondary"
                 size="lg"
+                className="w-full sm:w-auto"
                 onClick={() => navigate('/auth/signup')}
                 trailing={
                   <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -57,7 +58,12 @@ export function Hero() {
               >
                 Subscribe from ₹89 / meal
               </Button>
-              <Button variant="outline" size="lg" onClick={() => { document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' }) }}>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto"
+                onClick={() => { document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' }) }}
+              >
                 See this week's menu
               </Button>
             </div>

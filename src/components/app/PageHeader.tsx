@@ -11,15 +11,22 @@ interface PageHeaderProps {
 
 export function PageHeader({ eyebrow, title, description, action, className }: PageHeaderProps) {
   return (
-    <div className={cn('flex items-start justify-between gap-4', className)}>
+    <div
+      className={cn(
+        'flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between',
+        className,
+      )}
+    >
       <div className="min-w-0">
         {eyebrow && <p className="text-eyebrow">{eyebrow}</p>}
-        <h1 className="mt-1.5 text-display text-3xl sm:text-4xl text-ink-900">{title}</h1>
+        <h1 className="mt-1.5 text-display text-2xl sm:text-3xl lg:text-4xl text-ink-900 break-words">
+          {title}
+        </h1>
         {description && (
-          <p className="mt-2 text-ink-500 max-w-2xl">{description}</p>
+          <p className="mt-2 text-sm sm:text-base text-ink-500 max-w-2xl">{description}</p>
         )}
       </div>
-      {action && <div className="shrink-0">{action}</div>}
+      {action && <div className="sm:shrink-0">{action}</div>}
     </div>
   )
 }

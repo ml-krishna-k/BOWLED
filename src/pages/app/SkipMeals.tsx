@@ -159,9 +159,9 @@ export function SkipMealsPage() {
       </div>
 
       {/* Skip form */}
-      <Card className="mt-8 p-6 sm:p-8">
+      <Card className="mt-8 p-5 sm:p-8">
         {/* Tabs */}
-        <div className="inline-flex rounded-full bg-cream-100 p-1">
+        <div className="inline-flex w-full sm:w-auto rounded-full bg-cream-100 p-1">
           <TabButton active={tab === 'meal'} onClick={() => { setTab('meal'); setBanner(null) }}>
             Skip one meal
           </TabButton>
@@ -265,10 +265,11 @@ export function SkipMealsPage() {
           </div>
         )}
 
-        <div className="mt-6 flex flex-wrap items-center gap-3">
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <Button
             variant="secondary"
             size="lg"
+            className="w-full sm:w-auto"
             onClick={tab === 'meal' ? onSkipMeal : onSkipDay}
             disabled={tab === 'meal' ? mealSkipsLeft === 0 : daySkipsLeft === 0}
           >
@@ -391,7 +392,7 @@ function TabButton({
     <button
       onClick={onClick}
       className={cn(
-        'rounded-full px-4 sm:px-5 py-2 text-sm font-medium transition-all',
+        'flex-1 sm:flex-initial rounded-full px-4 sm:px-5 py-2 text-sm font-medium transition-all whitespace-nowrap',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron-400',
         active
           ? 'bg-ink-900 text-cream-50 shadow-soft'

@@ -80,8 +80,8 @@ export function AdminSubscribers() {
 
       {/* Table */}
       <Card className="mt-6 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto -mx-px">
+          <table className="w-full min-w-[820px] text-sm">
             <thead className="bg-cream-100">
               <tr className="text-left text-xs uppercase tracking-wider text-ink-500">
                 <th className="px-5 py-3 font-semibold">Subscriber</th>
