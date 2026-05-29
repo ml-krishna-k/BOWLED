@@ -85,6 +85,22 @@ export function Hero() {
                 {' '}eating with us every day across Chennai
               </p>
             </div>
+
+            {/* Mobile-only food photo — the decorative card stack (right column)
+                is hidden below md, so phones get a real appetising visual here. */}
+            <div className="md:hidden relative mt-2 overflow-hidden rounded-3xl shadow-card">
+              <img
+                src="/hero-spread.jpg"
+                alt="A spread of home-style dishes — dal, rice, greens and sides"
+                loading="eager"
+                decoding="async"
+                className="h-60 w-full object-cover"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink-900/70 to-transparent p-4">
+                <p className="text-cream-50 font-display text-lg leading-tight">Today's lunch · Dal Tadka Thali</p>
+                <p className="text-cream-50/80 text-xs mt-0.5">Jeera rice · phulka · poriyal · curd · gulab jamun · ★ 4.8</p>
+              </div>
+            </div>
           </div>
 
           {/* Hero visual: stacked plate cards — decorative; hidden on mobile
@@ -99,16 +115,15 @@ export function Hero() {
                   <span className="h-1.5 w-1.5 rounded-full bg-leaf-500" /> Veg
                 </span>
               </div>
-              <div
-                aria-hidden
-                className="my-4 h-44 rounded-2xl bg-gradient-to-br from-saffron-200 via-saffron-100 to-cream-100 relative overflow-hidden"
-              >
-                <div className="absolute inset-0 grid place-items-center">
-                  <div className="h-32 w-32 rounded-full bg-cream-50 shadow-inner grid place-items-center">
-                    <div className="h-24 w-24 rounded-full bg-gradient-to-br from-saffron-400 to-spice-500" />
-                  </div>
-                </div>
-                <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-paper/90 px-2.5 py-1 text-[11px] font-semibold text-saffron-700">
+              <div className="my-4 h-44 rounded-2xl bg-cream-100 relative overflow-hidden">
+                <img
+                  src="/hero-spread.jpg"
+                  alt="A spread of home-style dishes — dal, rice, greens and sides"
+                  loading="eager"
+                  decoding="async"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+                <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-paper/90 px-2.5 py-1 text-[11px] font-semibold text-saffron-700 shadow-soft">
                   ❤ Most loved
                 </span>
               </div>
