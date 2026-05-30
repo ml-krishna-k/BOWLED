@@ -53,6 +53,11 @@ export async function connectDb(): Promise<void> {
   const options: Parameters<typeof mongoose.connect>[1] = {
     autoIndex: config.nodeEnv !== 'production',
     serverSelectionTimeoutMS: 15_000,
+    // Force the target DB name regardless of what the URI does or doesn't
+    // contain. Avoids the silent "defaults to test DB" trap on Atlas, where
+    // a user scoped to readWrite@bowled then 500s with "user is not allowed
+    // to do action find on test.users".
+    dbName: config.mongoDb,
   }
 
   if (config.mongoUser && config.mongoPass) {
@@ -69,6 +74,7 @@ export async function connectDb(): Promise<void> {
     console.log(`[db] auth via mongo_db_uri (user='${userFromUri}')`)
   }
 
+  console.log(`[db] target database: ${config.mongoDb}`)
   await mongoose.connect(uri, options)
   console.log(`✓ Mongo connected · ${mongoose.connection.name}`)
 }

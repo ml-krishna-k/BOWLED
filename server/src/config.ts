@@ -52,6 +52,11 @@ export const config = {
   // without worrying about URI encoding.
   mongoUser: process.env.MONGO_USER ?? '',
   mongoPass: process.env.MONGO_PASS ?? '',
+  // Target database name. Driver defaults to Mongo's "test" DB when the URI
+  // has no database path segment — Atlas users with role scoped to a specific
+  // DB then get "user is not allowed to do action find on [test.X]". Set
+  // MONGO_DB to your real Atlas DB name (or include /<dbname> in the URI).
+  mongoDb: (process.env.MONGO_DB ?? 'bowled').trim(),
   jwtSecret: process.env.JWT_SECRET ?? 'bowled-dev-secret-change-me',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '30d',
   // Accept a comma-separated list so one .env can cover dev + prod
