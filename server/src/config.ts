@@ -56,10 +56,10 @@ export const config = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '30d',
   // Accept a comma-separated list so one .env can cover dev + prod
   // (e.g. "http://localhost:5173,https://bowled.app"). Trailing slashes
-  // are normalised so "https://x/" and "https://x" both match.
+  // and casing are normalised — "https://X/" and "https://x" both match.
   corsOrigins: (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
     .split(',')
-    .map((s) => s.trim().replace(/\/$/, ''))
+    .map((s) => s.trim().replace(/\/$/, '').toLowerCase())
     .filter(Boolean),
   adminPhones: (process.env.ADMIN_PHONES ?? '9360113501').split(',').map((s) => s.trim()).filter(Boolean),
   // Test-phone allowlist — phone → otp. These bypass MSG91 entirely so QA /

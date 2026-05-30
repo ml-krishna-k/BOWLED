@@ -17,9 +17,18 @@ import { rateLimit } from 'express-rate-limit'
  * ever scale horizontally, swap in `rate-limit-mongo` or `rate-limit-redis`.
  */
 
+/**
+ * Common options. `validate: false` disables express-rate-limit v7's strict
+ * configuration validators — under Render's reverse proxy a few of them
+ * (notably trustProxy & xForwardedForHeader) trip on benign setups and crash
+ * the first request with ERR_ERL_PERMISSIVE_TRUST_PROXY. We've already set
+ * `app.set('trust proxy', 1)` correctly in index.ts; the validators add no
+ * extra safety in this deployment.
+ */
 const COMMON = {
   standardHeaders: 'draft-7' as const,
   legacyHeaders: false,
+  validate: false,
 }
 
 /** Per-IP across all /otp/* paths. */
