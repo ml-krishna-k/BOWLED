@@ -67,18 +67,12 @@ router.post('/otp/verify', otpVerifyPhoneLimiter, async (req, res) => {
   }
   if (!ok) throw new HttpError(401, 'Invalid OTP')
 
-  let user = await User.findOne({ phone })
-  let isNewUser = false
-
-  if (!user) {
-    if (!name) {
-      throw new HttpError(404, 'No account found. Please sign up first.')
-    }
-    const shouldBeAdmin = config.adminPhones.includes(phone)
-    user = await User.create({ phone, name, isAdmin: shouldBeAdmin })
-    isNewUser = true
+  const result = await findOrCreateUser(phone, name)
+  if (result.kind === 'not-found') {
+    throw new HttpError(404, 'No account found. Please sign up first.')
   }
 
+  const { user, isNewUser } = result
   const token = signToken({ uid: String(user._id), phone: user.phone, isAdmin: user.isAdmin })
 
   res.json({
@@ -87,6 +81,37 @@ router.post('/otp/verify', otpVerifyPhoneLimiter, async (req, res) => {
     user: serializeUser(user),
   })
 })
+
+/**
+ * Atomically find an existing user by phone, or create one when a name is
+ * provided. Handles the race where two concurrent verify requests both pass
+ * the `findOne` check and then both try to `create` — the second one would
+ * get a duplicate-key error (E11000) on the unique `phone` index. We catch
+ * that and re-read the row so the caller still gets a User.
+ */
+type FindOrCreateResult =
+  | { kind: 'found'; user: InstanceType<typeof User>; isNewUser: false }
+  | { kind: 'created'; user: InstanceType<typeof User>; isNewUser: true }
+  | { kind: 'not-found' }
+
+async function findOrCreateUser(phone: string, name: string | undefined): Promise<FindOrCreateResult> {
+  let user = await User.findOne({ phone })
+  if (user) return { kind: 'found', user, isNewUser: false }
+  if (!name) return { kind: 'not-found' }
+
+  const shouldBeAdmin = config.adminPhones.includes(phone)
+  try {
+    user = await User.create({ phone, name, isAdmin: shouldBeAdmin })
+    return { kind: 'created', user, isNewUser: true }
+  } catch (err) {
+    // E11000 = duplicate key (concurrent verify created the same phone).
+    if (err && typeof err === 'object' && (err as { code?: number }).code === 11000) {
+      user = await User.findOne({ phone })
+      if (user) return { kind: 'found', user, isNewUser: false }
+    }
+    throw err
+  }
+}
 
 /* POST /api/auth/widget/verify { accessToken, name? }
  *
@@ -119,18 +144,12 @@ router.post('/widget/verify', async (req, res) => {
     throw new HttpError(502, `MSG91 returned an unexpected mobile format: ${mobile}`)
   }
 
-  let user = await User.findOne({ phone })
-  let isNewUser = false
-
-  if (!user) {
-    if (!name) {
-      throw new HttpError(404, 'No account found. Please sign up first.')
-    }
-    const shouldBeAdmin = config.adminPhones.includes(phone)
-    user = await User.create({ phone, name, isAdmin: shouldBeAdmin })
-    isNewUser = true
+  const result = await findOrCreateUser(phone, name)
+  if (result.kind === 'not-found') {
+    throw new HttpError(404, 'No account found. Please sign up first.')
   }
 
+  const { user, isNewUser } = result
   const token = signToken({ uid: String(user._id), phone: user.phone, isAdmin: user.isAdmin })
 
   res.json({
