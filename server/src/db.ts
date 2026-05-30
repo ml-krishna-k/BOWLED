@@ -77,6 +77,28 @@ export async function connectDb(): Promise<void> {
   console.log(`[db] target database: ${config.mongoDb}`)
   await mongoose.connect(uri, options)
   console.log(`✓ Mongo connected · ${mongoose.connection.name}`)
+
+  // Ask Mongo who we authenticated as. The startup-log line above tries to
+  // parse the user from the URI but fails when the password contains URL-
+  // encoded characters; this is the authoritative answer. Useful for
+  // diagnosing "user is not allowed to do action" errors — those mean the
+  // user named here doesn't have the right role in Atlas.
+  try {
+    const db = mongoose.connection.db
+    if (db) {
+      const status = (await db.admin().command({ connectionStatus: 1 })) as {
+        authInfo?: { authenticatedUsers?: Array<{ user: string; db: string }> }
+      }
+      const u = status.authInfo?.authenticatedUsers?.[0]
+      if (u) {
+        console.log(`[db] authenticated as: ${u.user}@${u.db}`)
+      } else {
+        console.warn('[db] WARNING: connected without authenticating — Atlas will deny most reads')
+      }
+    }
+  } catch (err) {
+    console.warn(`[db] could not query auth status: ${err instanceof Error ? err.message : String(err)}`)
+  }
 }
 
 mongoose.connection.on('disconnected', () => {
