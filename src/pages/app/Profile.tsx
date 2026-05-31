@@ -55,23 +55,28 @@ export function Profile() {
     <AppContainer>
       <PageHeader
         eyebrow="Profile"
-        title="You & your preferences"
+        chapter="You"
+        title={<>You &amp; your <span className="italic font-light text-saffron-600">preferences.</span></>}
         description="Update your delivery details, allergens and notifications."
       />
 
-      {/* Profile header */}
-      <Card className="mt-8 p-6 sm:p-8 flex items-center gap-5">
-        <div className="grid h-16 w-16 sm:h-20 sm:w-20 place-items-center rounded-full bg-saffron-500 text-cream-50 text-2xl font-display shadow-glow">
+      {/* Profile portrait — editorial */}
+      <div className="mt-10 flex items-center gap-6">
+        <div className="grid h-20 w-20 sm:h-24 sm:w-24 place-items-center rounded-full bg-saffron-500 text-cream-50 text-3xl font-display shadow-glow ring-4 ring-paper">
           {user.name[0]}
         </div>
         <div className="min-w-0">
-          <h2 className="font-display text-2xl text-ink-900 truncate">{user.name}</h2>
-          <p className="text-sm text-ink-500">{maskPhone(user.phone)}</p>
-          <p className="text-xs text-ink-400 mt-1">
-            Member since {new Date(user.createdAt).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
+          <p className="text-eyebrow text-ink-500">Subscriber</p>
+          <h2 className="mt-1 text-display text-3xl sm:text-4xl text-ink-900 tracking-tight truncate">
+            {user.name}
+          </h2>
+          <p className="caption text-ink-500 mt-1">
+            {maskPhone(user.phone)} &nbsp;·&nbsp; member since {new Date(user.createdAt).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
           </p>
         </div>
-      </Card>
+      </div>
+
+      <div className="mt-8 hairline" />
 
       {/* Personal */}
       <Card variant="soft" className="mt-6 p-6 space-y-5">

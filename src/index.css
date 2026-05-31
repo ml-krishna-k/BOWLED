@@ -58,9 +58,11 @@
   --radius-2xl: 36px;
 
   /* Shadow — calm, ambient, slightly warm */
-  --shadow-soft: 0 1px 2px rgba(31, 26, 18, 0.04), 0 8px 24px -8px rgba(176, 92, 31, 0.08);
-  --shadow-card: 0 1px 2px rgba(31, 26, 18, 0.05), 0 16px 40px -16px rgba(176, 92, 31, 0.18);
-  --shadow-glow: 0 30px 80px -30px rgba(245, 106, 27, 0.35);
+  --shadow-soft:    0 1px 2px rgba(31, 26, 18, 0.04), 0 8px 24px -8px rgba(176, 92, 31, 0.08);
+  --shadow-card:    0 1px 2px rgba(31, 26, 18, 0.05), 0 16px 40px -16px rgba(176, 92, 31, 0.18);
+  --shadow-card-hover: 0 1px 2px rgba(31, 26, 18, 0.06), 0 28px 60px -22px rgba(176, 92, 31, 0.28);
+  --shadow-glow:    0 30px 80px -30px rgba(245, 106, 27, 0.35);
+  --shadow-ring:    inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 0 0 1px rgba(247, 230, 203, 0.5);
 }
 
 /* -----------------------------------------------------------------------------
@@ -83,8 +85,17 @@ body {
   color: var(--color-ink-900);
 }
 
+/* Reduce motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* -----------------------------------------------------------------------------
-   Utilities
+   Utilities — Typography
 ----------------------------------------------------------------------------- */
 @utility font-display {
   font-family: var(--font-display);
@@ -108,6 +119,18 @@ body {
   color: var(--color-saffron-600);
 }
 
+/* Editorial display — tighter tracking, refined italic accent */
+@utility text-editorial {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+/* -----------------------------------------------------------------------------
+   Utilities — Surfaces & textures
+----------------------------------------------------------------------------- */
 @utility bg-grain {
   background-image:
     radial-gradient(rgba(176, 92, 31, 0.06) 1px, transparent 1px),
@@ -116,12 +139,41 @@ body {
   background-position: 0 0, 11px 11px;
 }
 
+/* Soft mesh gradient for editorial backgrounds */
+@utility bg-mesh {
+  background-image:
+    radial-gradient(at 18% 12%, rgba(255, 174, 107, 0.30) 0px, transparent 50%),
+    radial-gradient(at 82% 18%, rgba(255, 207, 163, 0.28) 0px, transparent 45%),
+    radial-gradient(at 50% 88%, rgba(245, 106, 27, 0.12) 0px, transparent 55%);
+}
+
+/* Hairline cream divider for editorial breaks */
+@utility hairline {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--color-cream-300) 70%, transparent) 18%,
+    color-mix(in oklab, var(--color-cream-300) 90%, transparent) 50%,
+    color-mix(in oklab, var(--color-cream-300) 70%, transparent) 82%,
+    transparent 100%
+  );
+  height: 1px;
+}
+
 /* Premium glassy card */
 @utility card-glass {
   background: color-mix(in oklab, var(--color-paper) 86%, transparent);
   backdrop-filter: blur(14px) saturate(140%);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
   border: 1px solid color-mix(in oklab, var(--color-cream-300) 60%, transparent);
+}
+
+/* Stronger glass for scrolled navbar */
+@utility card-glass-strong {
+  background: color-mix(in oklab, var(--color-paper) 78%, transparent);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid color-mix(in oklab, var(--color-cream-300) 70%, transparent);
 }
 
 /* Subtle dotted hairline divider */
@@ -133,7 +185,85 @@ body {
   height: 8px;
 }
 
-/* Marquee track helper */
+/* Inner highlight — premium card top-edge gleam */
+@utility ring-inset-warm {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 0 0 1px rgba(247, 230, 203, 0.5);
+}
+
+/* -----------------------------------------------------------------------------
+   Utilities — Perspective & 3D tilt (subtle, never showy)
+----------------------------------------------------------------------------- */
+@utility perspective-scene {
+  perspective: 1400px;
+  perspective-origin: 50% 30%;
+  transform-style: preserve-3d;
+}
+
+@utility tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 400ms ease-out;
+  will-change: transform;
+}
+
+@utility tilt-hover {
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  &:hover {
+    transform: rotateX(2deg) rotateY(-2deg) translateZ(8px);
+  }
+}
+
+/* Layered card lift — premium hover */
+@utility lift-card {
+  transition:
+    transform 400ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 400ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 300ms ease-out;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Utilities — Image presentation
+----------------------------------------------------------------------------- */
+@utility img-reveal {
+  overflow: hidden;
+  position: relative;
+
+  & img {
+    transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1), filter 600ms ease-out;
+    will-change: transform;
+  }
+
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+/* Cinematic image vignette — bottom darken for caption legibility */
+@utility img-vignette {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      transparent 40%,
+      rgba(31, 26, 18, 0.05) 60%,
+      rgba(31, 26, 18, 0.45) 100%
+    );
+    pointer-events: none;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Utilities — Motion (calm, reserved)
+----------------------------------------------------------------------------- */
 @keyframes marquee-x {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
@@ -150,6 +280,15 @@ body {
 
 @utility animate-float {
   animation: float-y 6s ease-in-out infinite;
+}
+
+@keyframes float-y-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-10px) rotate(0.4deg); }
+}
+
+@utility animate-float-slow {
+  animation: float-y-slow 9s ease-in-out infinite;
 }
 
 @keyframes shine {
@@ -171,3 +310,54 @@ body {
   color: transparent;
   animation: shine 8s linear infinite;
 }
+
+/* Soft fade-in on first paint — used for hero copy */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@utility animate-fade-up {
+  animation: fade-up 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@utility animate-fade-up-slow {
+  animation: fade-up 1100ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes reveal-img {
+  from { opacity: 0; transform: scale(1.08); filter: blur(8px); }
+  to   { opacity: 1; transform: scale(1);    filter: blur(0); }
+}
+
+@utility animate-reveal {
+  animation: reveal-img 1200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Pulse dot — for "live" indicators */
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(90, 138, 74, 0.55); }
+  70%      { box-shadow: 0 0 0 8px rgba(90, 138, 74, 0); }
+}
+
+@utility animate-pulse-dot {
+  animation: pulse-dot 2.4s ease-out infinite;
+}
+
+/* Subtle ambient breathing for background glow */
+@keyframes breathe {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.04); }
+}
+
+@utility animate-breathe {
+  animation: breathe 8s ease-in-out infinite;
+}
+
+/* Stagger delays — chain reveal animations */
+@utility delay-100 { animation-delay: 100ms; }
+@utility delay-200 { animation-delay: 200ms; }
+@utility delay-300 { animation-delay: 300ms; }
+@utility delay-400 { animation-delay: 400ms; }
+@utility delay-500 { animation-delay: 500ms; }
+@utility delay-700 { animation-delay: 700ms; }

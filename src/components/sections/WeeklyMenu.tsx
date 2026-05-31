@@ -32,25 +32,27 @@ export function WeeklyMenu() {
   }, [filter, meal.isVeg])
 
   return (
-    <Section id="menu" className="bg-mist">
-      <Container>
+    <Section id="menu" className="bg-mist relative overflow-hidden">
+      <div aria-hidden className="absolute inset-0 bg-grain opacity-30" />
+
+      <Container className="relative">
         <SectionHeading
           eyebrow="Weekly rotating menu"
-          title={<>Real food you'd <span className="text-saffron-600">actually look forward to.</span></>}
+          title={<>Real food you&apos;d <span className="italic font-light text-saffron-600">actually look forward to.</span></>}
           description="Our chefs rotate the menu every week to keep things exciting — comfort classics, regional specials, and student favourites. No mystery-meat thalis."
         />
 
         {/* Day picker */}
-        <div className="mt-12 flex justify-center">
-          <div className="inline-flex gap-1 rounded-full bg-paper border border-cream-200 p-1 shadow-soft overflow-x-auto max-w-full">
+        <div className="mt-14 flex justify-center">
+          <div className="inline-flex gap-1 rounded-full bg-paper border border-cream-200 p-1.5 shadow-soft overflow-x-auto max-w-full ring-inset-warm">
             {menu.map((d, i) => (
               <button
                 key={d.day}
                 onClick={() => setDayIdx(i)}
                 className={cn(
-                  'shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors',
+                  'shrink-0 rounded-full px-5 py-2 text-sm font-medium transition-all duration-300',
                   dayIdx === i
-                    ? 'bg-ink-900 text-cream-50'
+                    ? 'bg-ink-900 text-cream-50 shadow-soft scale-105'
                     : 'text-ink-700 hover:bg-cream-100',
                 )}
               >
@@ -61,7 +63,7 @@ export function WeeklyMenu() {
         </div>
 
         {/* Filter chips */}
-        <div className="mt-6 flex justify-center gap-2">
+        <div className="mt-5 flex justify-center gap-2">
           {[
             { id: 'all',    label: 'All' },
             { id: 'veg',    label: '🌿 Vegetarian' },
@@ -71,10 +73,10 @@ export function WeeklyMenu() {
               key={f.id}
               onClick={() => setFilter(f.id as Filter)}
               className={cn(
-                'rounded-full px-4 py-1.5 text-xs font-medium transition-colors border',
+                'rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-300 border',
                 filter === f.id
-                  ? 'border-saffron-500 bg-saffron-50 text-saffron-700'
-                  : 'border-cream-200 text-ink-500 hover:border-cream-300',
+                  ? 'border-saffron-500 bg-saffron-50 text-saffron-700 shadow-soft'
+                  : 'border-cream-200 bg-paper/50 text-ink-500 hover:border-cream-300 hover:bg-paper',
               )}
             >
               {f.label}
@@ -83,7 +85,7 @@ export function WeeklyMenu() {
         </div>
 
         {/* Main meal card + slot tabs */}
-        <div className="mt-10 grid lg:grid-cols-12 gap-6">
+        <div className="mt-12 grid lg:grid-cols-12 gap-6">
           {/* Slot list */}
           <div className="lg:col-span-4 space-y-3">
             {SLOTS.map((s) => {
@@ -94,10 +96,10 @@ export function WeeklyMenu() {
                   key={s.id}
                   onClick={() => setSlot(s.id)}
                   className={cn(
-                    'group w-full text-left rounded-2xl p-5 border transition-all',
+                    'group w-full text-left rounded-2xl p-5 border transition-all duration-400 ease-out',
                     active
-                      ? 'bg-paper border-saffron-300 shadow-card'
-                      : 'bg-paper/60 border-cream-200 hover:border-cream-300',
+                      ? 'bg-paper border-saffron-300 shadow-card ring-1 ring-saffron-200/50 translate-y-0'
+                      : 'bg-paper/60 border-cream-200 hover:border-cream-300 hover:bg-paper hover:-translate-y-0.5 hover:shadow-soft',
                   )}
                 >
                   <div className="flex items-center justify-between text-xs text-ink-500">
@@ -106,16 +108,18 @@ export function WeeklyMenu() {
                   </div>
                   <div className="mt-2 flex items-start justify-between gap-3">
                     <div>
-                      <p className="font-display text-lg text-ink-900">{slotMeal.name}</p>
+                      <p className="font-display text-lg text-ink-900 tracking-tight">{slotMeal.name}</p>
                       <div className="mt-1.5 flex flex-wrap gap-1.5">
-                        <Badge tone={slotMeal.isVeg ? 'leaf' : 'saffron'}>
+                        <Badge tone={slotMeal.isVeg ? 'leaf' : 'saffron'} dot>
                           {slotMeal.isVeg ? 'Veg' : 'Non-veg'}
                         </Badge>
                         {slotMeal.loved && <Badge tone="saffron">❤ Most loved</Badge>}
                       </div>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-sm font-semibold text-ink-900">★ {slotMeal.rating}</p>
+                      <p className="text-sm font-semibold text-ink-900 inline-flex items-center gap-1">
+                        <span className="text-saffron-500">★</span>{slotMeal.rating}
+                      </p>
                       <p className="text-xs text-ink-500">{slotMeal.calories} kcal</p>
                     </div>
                   </div>
@@ -125,11 +129,11 @@ export function WeeklyMenu() {
           </div>
 
           {/* Featured meal */}
-          <Card className="lg:col-span-8 overflow-hidden">
+          <Card className="lg:col-span-8 overflow-hidden p-0">
             <div className="grid md:grid-cols-2">
               <div
                 className={cn(
-                  'relative min-h-[280px] md:min-h-[460px]',
+                  'relative min-h-[300px] md:min-h-[500px] img-reveal',
                   meal.isVeg
                     ? 'bg-gradient-to-br from-leaf-100 via-cream-100 to-saffron-100'
                     : 'bg-gradient-to-br from-saffron-200 via-saffron-100 to-cream-100',
@@ -137,17 +141,18 @@ export function WeeklyMenu() {
               >
                 {meal.imageUrl ? (
                   <img
+                    key={meal.imageUrl}
                     src={meal.imageUrl}
                     alt={meal.name}
                     loading="lazy"
                     decoding="async"
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full object-cover animate-reveal"
                   />
                 ) : (
                   <>
                     <div className="absolute inset-0 bg-grain opacity-50" aria-hidden />
                     <div className="absolute inset-0 grid place-items-center" aria-hidden>
-                      <div className="relative h-56 w-56 rounded-full bg-paper shadow-card">
+                      <div className="relative h-56 w-56 rounded-full bg-paper shadow-card animate-float">
                         <div
                           className={cn(
                             'absolute inset-6 rounded-full',
@@ -161,26 +166,32 @@ export function WeeklyMenu() {
                     </div>
                   </>
                 )}
-                <div className="absolute left-5 top-5 flex flex-wrap gap-2">
+                {/* Cinematic vignette */}
+                <div
+                  aria-hidden
+                  className="absolute inset-0 pointer-events-none bg-gradient-to-t from-ink-900/30 via-transparent to-transparent"
+                />
+                <div className="absolute left-5 top-5 flex flex-wrap gap-2 z-10">
                   {meal.loved && <Badge tone="ink">❤ Most loved</Badge>}
                   <Badge tone="paper">{meal.calories} kcal</Badge>
                 </div>
-                <div className="absolute bottom-5 right-5 inline-flex items-center gap-1 rounded-full bg-paper px-3 py-1.5 shadow-soft">
-                  <span className="text-sm font-semibold text-ink-900">★ {meal.rating}</span>
+                <div className="absolute bottom-5 right-5 z-10 inline-flex items-center gap-1.5 rounded-full bg-paper/95 px-3 py-1.5 shadow-soft backdrop-blur-sm">
+                  <span className="text-saffron-500 text-sm">★</span>
+                  <span className="text-sm font-semibold text-ink-900">{meal.rating}</span>
                   <span className="text-xs text-ink-500">student rating</span>
                 </div>
               </div>
 
-              <div className="p-7 sm:p-9 flex flex-col">
+              <div className="p-7 sm:p-10 flex flex-col">
                 <p className="text-eyebrow">{day.day} · {SLOTS.find((s) => s.id === slot)?.label}</p>
-                <h3 className="mt-3 font-display text-3xl lg:text-4xl text-ink-900">{meal.name}</h3>
+                <h3 className="mt-3 font-display text-3xl lg:text-4xl text-ink-900 tracking-tight leading-tight">{meal.name}</h3>
                 <p className="mt-4 text-ink-500 leading-relaxed">{meal.description}</p>
 
                 <div className="mt-5 flex flex-wrap gap-2">
                   {meal.tags.map((t) => (
                     <span
                       key={t}
-                      className="rounded-full bg-cream-100 px-3 py-1 text-xs font-medium text-ink-700"
+                      className="rounded-full bg-cream-100 px-3 py-1 text-xs font-medium text-ink-700 ring-1 ring-cream-200/60"
                     >
                       {t}
                     </span>
@@ -194,8 +205,8 @@ export function WeeklyMenu() {
                 </div>
 
                 {!compatible && (
-                  <p className="mt-4 rounded-xl bg-cream-100 px-3 py-2 text-xs text-ink-500">
-                    Doesn't match your filter — but it's on the menu today.
+                  <p className="mt-4 rounded-xl bg-cream-100 px-4 py-3 text-xs text-ink-500 border border-cream-200">
+                    Doesn&apos;t match your filter — but it&apos;s on the menu today.
                   </p>
                 )}
               </div>
@@ -211,7 +222,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-eyebrow text-ink-400">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-ink-900">{value}</p>
+      <p className="mt-1.5 text-sm font-semibold text-ink-900">{value}</p>
     </div>
   )
 }

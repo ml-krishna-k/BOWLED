@@ -26,9 +26,9 @@ export function PhoneInput({ value, onChange, error, autoFocus }: PhoneInputProp
       autoFocus={autoFocus}
       autoComplete="tel"
       leading={
-        <span className="flex items-center gap-1.5 pr-2 border-r border-cream-300 mr-1">
-          <span aria-hidden>🇮🇳</span>
-          <span className="text-sm font-medium text-ink-700">+91</span>
+        <span className="flex items-center gap-1.5 pr-3 border-r border-cream-300 mr-2">
+          <span aria-hidden className="text-base">🇮🇳</span>
+          <span className="text-sm font-semibold text-ink-700 tracking-wide">+91</span>
         </span>
       }
     />

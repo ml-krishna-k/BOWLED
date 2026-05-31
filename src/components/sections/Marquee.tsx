@@ -19,14 +19,18 @@ const ITEMS = [
 
 export function Marquee() {
   return (
-    <section className="relative overflow-hidden border-y border-cream-200 bg-paper/40 py-8">
+    <section className="relative overflow-hidden border-y border-cream-200/80 bg-paper/40 py-9">
       <Container size="xl">
-        <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-          <div className="flex w-max gap-12 animate-marquee whitespace-nowrap">
+        <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
+          <div className="flex w-max gap-14 animate-marquee whitespace-nowrap">
             {[...ITEMS, ...ITEMS].map((item, i) => (
               <span
                 key={i}
-                className="text-sm font-medium text-ink-700 tracking-wide"
+                className={
+                  item === '✦'
+                    ? 'text-sm text-saffron-400/70 tracking-wide'
+                    : 'text-sm font-medium text-ink-700 tracking-wide'
+                }
               >
                 {item}
               </span>

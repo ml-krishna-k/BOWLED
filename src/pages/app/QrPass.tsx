@@ -66,12 +66,17 @@ export function QrPass() {
     <AppContainer className="max-w-3xl">
       <PageHeader
         eyebrow="QR meal pass"
-        title="One scan. One meal off."
+        chapter="Live"
+        title={<>One scan. <span className="italic font-light text-saffron-600">One meal off.</span></>}
         description="Show this to the delivery person. They scan once, your meal counter drops by one."
       />
 
-      <Card className="mt-8 p-8 sm:p-10 grid place-items-center text-center">
-        <div className="text-eyebrow text-saffron-700">{user.name} · +91 {user.phone}</div>
+      <Card className="mt-10 p-8 sm:p-12 grid place-items-center text-center relative overflow-hidden ring-inset-warm">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-saffron-200/40 blur-3xl animate-breathe"
+        />
+        <div className="relative text-eyebrow text-saffron-700">{user.name} · +91 {user.phone}</div>
 
         <div className="relative mt-6">
           {/* Pulse ring while scanning */}
@@ -158,36 +163,50 @@ export function QrPass() {
         </p>
       </Card>
 
-      {/* Recent scans */}
-      <Card variant="soft" className="mt-6 p-6">
-        <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl text-ink-900">Recent scans</h2>
-          <p className="text-xs text-ink-500">{sub.history.length} total</p>
+      {/* Recent scans — editorial log */}
+      <section className="mt-12">
+        <div className="flex items-end justify-between mb-5">
+          <div>
+            <p className="text-eyebrow text-ink-500">Recent scans</p>
+            <h2 className="mt-1.5 text-display text-2xl tracking-tight text-ink-900">
+              Your meal log.
+            </h2>
+          </div>
+          <p className="caption text-xs text-ink-500">
+            <span className="not-italic font-semibold text-ink-900">{sub.history.length}</span> total
+          </p>
         </div>
+        <div className="hairline" />
         {sub.history.length === 0 ? (
-          <p className="mt-3 text-sm text-ink-500">
+          <p className="py-8 caption text-ink-500 text-center">
             Nothing yet. Your scan history will live here.
           </p>
         ) : (
-          <ul className="mt-4 divide-y divide-cream-200">
-            {sub.history.slice(0, 8).map((h) => (
-              <li key={h.scannedAt} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="font-medium text-ink-900">{h.mealName}</p>
-                  <p className="text-xs text-ink-500">
-                    Day {h.day} · {h.slot} ·{' '}
-                    {new Date(h.scannedAt).toLocaleTimeString('en-IN', {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                    })}
-                  </p>
+          <ul className="divide-y divide-cream-200/70">
+            {sub.history.slice(0, 8).map((h, i) => (
+              <li key={h.scannedAt} className="flex items-baseline justify-between py-4 gap-4">
+                <div className="flex items-baseline gap-4 min-w-0">
+                  <span className="text-chapter text-sm text-ink-300 tabular-nums shrink-0">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-medium text-ink-900 truncate">{h.mealName}</p>
+                    <p className="caption text-xs text-ink-500">
+                      Day {h.day} · {h.slot} ·{' '}
+                      {new Date(h.scannedAt).toLocaleTimeString('en-IN', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                      })}
+                    </p>
+                  </div>
                 </div>
                 <Badge tone="leaf">−1 meal</Badge>
               </li>
             ))}
           </ul>
         )}
-      </Card>
+        <div className="hairline" />
+      </section>
     </AppContainer>
   )
 }

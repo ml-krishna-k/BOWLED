@@ -34,8 +34,9 @@ export function SubscriptionPage() {
     <AppContainer>
       <PageHeader
         eyebrow="Your subscription"
-        title={`${plan.name} plan`}
-        description={`${plan.groupSize} · ₹${plan.pricePerMeal}/meal · ${plan.meals} meals over 30 days.`}
+        chapter="Plan"
+        title={<>{plan.name} <span className="italic font-light text-saffron-600">plan.</span></>}
+        description={`${plan.groupSize} · ₹${plan.pricePerMeal} / meal · ${plan.meals} meals over 30 days.`}
         action={
           paused ? (
             <Button variant="primary" size="md" onClick={resume}>Resume now</Button>
@@ -47,95 +48,102 @@ export function SubscriptionPage() {
         }
       />
 
-      {/* Active plan card */}
-      <Card className="mt-8 p-6 sm:p-8 relative overflow-hidden">
-        <div
-          aria-hidden
-          className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-saffron-200/40 blur-3xl"
-        />
-        <div className="relative grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-5">
-            <div className="flex flex-wrap items-center gap-3">
-              {plan.recommended && <Badge tone="ink">Recommended</Badge>}
-              {paused && <Badge tone="saffron">Paused</Badge>}
-              {!paused && <Badge tone="leaf">Active</Badge>}
-              <Badge tone="cream">Day {dayNumber} of 30</Badge>
-            </div>
-
-            <div>
-              <p className="text-eyebrow text-ink-500">Plan progress</p>
-              <div className="mt-3 h-2.5 rounded-full bg-cream-200 overflow-hidden">
-                <div
-                  className="h-full bg-saffron-500"
-                  style={{ width: `${Math.min(100, pctServed)}%` }}
-                />
-              </div>
-              <div className="mt-2 flex justify-between text-xs text-ink-500">
-                <span>{sub.mealsServed} served</span>
-                <span>{mealsRemaining} remaining</span>
-              </div>
-            </div>
-
-            {plan.id !== 'solo' && (
-              <Card variant="soft" className="p-4">
-                <p className="text-eyebrow text-saffron-700">Group code</p>
-                <div className="mt-2 flex items-center justify-between gap-3">
-                  <p className="font-mono text-2xl text-ink-900">{sub.groupCode}</p>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => navigator.clipboard?.writeText(sub.groupCode)}
-                  >
-                    Copy
-                  </Button>
-                </div>
-                <p className="mt-2 text-xs text-ink-500">
-                  {sub.groupSize} members in this group. New joiners using this code get the ₹{plan.pricePerMeal}/meal rate automatically.
-                </p>
-              </Card>
-            )}
+      {/* Status & progress — editorial */}
+      <div className="mt-10 grid lg:grid-cols-12 gap-8 lg:gap-12">
+        <div className="lg:col-span-7 space-y-7">
+          <div className="flex flex-wrap items-center gap-2">
+            {plan.recommended && <Badge tone="ink">Recommended</Badge>}
+            {paused ? <Badge tone="saffron" dot>Paused</Badge> : <Badge tone="leaf" dot>Active</Badge>}
+            <Badge tone="cream">Day {dayNumber} of 30</Badge>
           </div>
 
-          {/* Billing receipt */}
-          <Card variant="outline" className="p-5">
-            <p className="text-eyebrow">This cycle</p>
-            <div className="mt-3 space-y-2.5 text-sm">
-              <Row label="Meals" value={`${sub.totalMeals}`} />
-              <Row label="Per meal" value={inr(plan.pricePerMeal)} />
-              {plan.savingPerMeal > 0 && (
-                <Row label="Group discount" value={`− ${inr(plan.savingPerMeal)}/meal`} tone="leaf" />
-              )}
-              <Row label="Delivery" value="Free" tone="leaf" />
-              <div className="my-3 border-t border-cream-200" />
-              <Row label="Paid this cycle" value={inr(plan.monthlyPrice)} bold />
-              {plan.savingPerMonth > 0 && (
-                <p className="text-xs text-leaf-700 font-semibold">
-                  Saved {inr(plan.savingPerMonth)} vs Solo
-                </p>
-              )}
-            </div>
-          </Card>
-        </div>
-      </Card>
-
-      {/* Billing cycle picker */}
-      <div className="mt-10">
-        <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
-            <h2 className="text-display text-2xl text-ink-900">Your rhythm</h2>
-            <p className="mt-1 text-ink-500 text-sm max-w-xl">
+            <div className="flex items-end justify-between">
+              <p className="text-eyebrow text-ink-500">Plan progress</p>
+              <p className="caption text-xs text-ink-500">
+                <span className="not-italic font-semibold text-ink-900">{Math.round(pctServed)}%</span> complete
+              </p>
+            </div>
+            <div className="mt-3 h-2 rounded-full bg-cream-200 overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-saffron-400 to-saffron-500 transition-all duration-700"
+                style={{ width: `${Math.min(100, pctServed)}%` }}
+              />
+            </div>
+            <div className="mt-2 flex justify-between text-xs text-ink-500">
+              <span>{sub.mealsServed} served</span>
+              <span>{mealsRemaining} remaining</span>
+            </div>
+          </div>
+
+          {plan.id !== 'solo' && (
+            <div className="rounded-2xl bg-saffron-50/60 border border-saffron-200 p-5 ring-inset-warm">
+              <p className="text-eyebrow text-saffron-700">Group code</p>
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <p className="font-mono text-2xl text-ink-900 tracking-wide">{sub.groupCode}</p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigator.clipboard?.writeText(sub.groupCode)}
+                >
+                  Copy
+                </Button>
+              </div>
+              <p className="mt-2 caption text-ink-500">
+                {sub.groupSize} members in this group. New joiners using this code get the ₹{plan.pricePerMeal} / meal rate automatically.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Editorial billing receipt */}
+        <div className="lg:col-span-5">
+          <p className="text-eyebrow text-ink-500">This cycle</p>
+          <div className="mt-3 hairline" />
+          <Row label="Meals" value={`${sub.totalMeals}`} />
+          <Row label="Per meal" value={inr(plan.pricePerMeal)} />
+          {plan.savingPerMeal > 0 && (
+            <Row label="Group discount" value={`− ${inr(plan.savingPerMeal)} / meal`} tone="leaf" />
+          )}
+          <Row label="Delivery" value="Free" tone="leaf" />
+          <div className="hairline" />
+          <div className="flex items-baseline justify-between py-5">
+            <span className="text-eyebrow text-ink-500">Paid this cycle</span>
+            <span className="text-editorial text-3xl sm:text-4xl text-ink-900">
+              {inr(plan.monthlyPrice)}
+            </span>
+          </div>
+          {plan.savingPerMonth > 0 && (
+            <p className="caption text-leaf-700">
+              <span className="not-italic font-semibold">Saved {inr(plan.savingPerMonth)}</span> vs Solo
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Billing cycle picker — editorial section */}
+      <section className="mt-16">
+        <div className="flex flex-wrap items-end justify-between gap-2 mb-5">
+          <div>
+            <p className="text-eyebrow text-ink-500">Your rhythm</p>
+            <h2 className="mt-1.5 text-display text-2xl sm:text-3xl tracking-tight text-ink-900">
+              Switch your <span className="italic font-light text-saffron-600">cadence.</span>
+            </h2>
+            <p className="mt-2 caption text-ink-500 max-w-xl">
               Switch between weekly and monthly cadences, or skip Sundays / weekends. Takes effect on your next billing cycle.
             </p>
           </div>
           {cycleBanner && (
-            <span className="rounded-full bg-leaf-100 px-3 py-1.5 text-xs font-semibold text-leaf-700">
+            <span className="inline-flex items-center gap-2 rounded-full bg-leaf-100 px-3 py-1.5 text-xs font-semibold text-leaf-700 ring-1 ring-leaf-300/40">
+              <span className="h-1.5 w-1.5 rounded-full bg-leaf-500" />
               {cycleBanner}
             </span>
           )}
         </div>
 
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {BILLING_CYCLES.map((c) => {
+        <div className="hairline" />
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 sm:divide-x lg:divide-x sm:divide-cream-200">
+          {BILLING_CYCLES.map((c, i) => {
             const active = c.id === sub.billingCycleId
             const saving = cycleSaving === c.id
             return (
@@ -157,29 +165,33 @@ export function SubscriptionPage() {
                   }
                 }}
                 className={cn(
-                  'text-left rounded-2xl border p-5 transition-all',
+                  'text-left p-6 border-b border-cream-200 sm:border-b-0 transition-all duration-300',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron-400',
                   active
-                    ? 'border-saffron-400 bg-saffron-50 ring-2 ring-saffron-200 cursor-default'
-                    : 'border-cream-200 bg-paper hover:border-cream-300 hover:shadow-soft',
+                    ? 'bg-saffron-50/60 cursor-default'
+                    : 'bg-paper hover:bg-cream-50',
                   saving && 'opacity-60',
                 )}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-eyebrow text-ink-500">{c.cadence}</p>
-                  {active && <Badge tone="saffron">Active</Badge>}
+                  <p className="text-chapter text-base text-saffron-500 tabular-nums">
+                    0{i + 1}
+                  </p>
+                  {active && <Badge tone="saffron" dot>Active</Badge>}
                 </div>
-                <p className="mt-2 font-display text-lg text-ink-900">{c.shortLabel}</p>
-                <p className="mt-1 text-xs text-ink-500">{c.rhythm}</p>
-                <p className="mt-3 text-sm text-ink-700 leading-snug">{c.description}</p>
+                <p className="mt-3 text-eyebrow text-ink-500">{c.cadence}</p>
+                <p className="mt-1 text-display text-lg text-ink-900 tracking-tight">{c.shortLabel}</p>
+                <p className="mt-1 caption text-ink-500">{c.rhythm}</p>
+                <p className="mt-3 text-sm text-ink-700 leading-relaxed">{c.description}</p>
                 {saving && (
-                  <p className="mt-3 text-xs font-medium text-saffron-700">Saving…</p>
+                  <p className="mt-3 caption text-saffron-700">Saving…</p>
                 )}
               </button>
             )
           })}
         </div>
-      </div>
+        <div className="hairline" />
+      </section>
 
       {/* Pause modal */}
       {showPauseModal && (
@@ -199,21 +211,18 @@ function Row({
   label,
   value,
   tone,
-  bold,
 }: {
   label: string
   value: string
   tone?: 'leaf'
-  bold?: boolean
 }) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-baseline justify-between py-3 border-b border-cream-200/70 text-sm">
       <span className="text-ink-500">{label}</span>
       <span
         className={cn(
-          tone === 'leaf' && 'text-leaf-700 font-medium',
-          bold && 'font-display text-xl text-ink-900',
-          !tone && !bold && 'text-ink-900 font-medium',
+          'font-medium',
+          tone === 'leaf' ? 'text-leaf-700' : 'text-ink-900',
         )}
       >
         {value}

@@ -56,13 +56,10 @@ export function OtpPage() {
         return
       }
 
-      // No auto-subscribe — plan/group selection happens inside the app.
-      // AppShell redirects any logged-in user without a subscription to
-      // /app/subscription, so the user lands there naturally.
       navigate('/app/home', { replace: true })
     } catch (err) {
       if (err instanceof ApiError) {
-        if (err.status === 401) setErrorMsg('That OTP doesn\'t match. Please try again.')
+        if (err.status === 401) setErrorMsg("That OTP doesn't match. Please try again.")
         else if (err.status === 404) setErrorMsg('No account found for this number. Sign up first.')
         else setErrorMsg(err.message)
       } else {
@@ -87,18 +84,37 @@ export function OtpPage() {
 
   if (!state.phone) return null
 
+  const isSignup = state.mode === 'signup'
+
   return (
     <AuthShell
-      step={state.mode === 'signup' ? { current: 2, total: 2, label: 'Verify' } : undefined}
+      step={isSignup ? { current: 2, total: 2, label: 'Verify' } : undefined}
     >
-      <p className="text-eyebrow">Verify</p>
-      <h1 className="mt-3 text-display text-4xl text-ink-900">Enter your OTP</h1>
-      <p className="mt-3 text-ink-500">
-        We sent a 6-digit code to <span className="font-medium text-ink-900">{maskPhone(state.phone)}</span>{' '}
-        — <Link to="/auth/login" className="text-saffron-700 underline">change number</Link>
-      </p>
+      <div className="animate-fade-up">
+        <div className="flex items-center gap-3">
+          <p className="text-eyebrow">Verify</p>
+          <span aria-hidden className="h-px flex-1 max-w-[5rem] bg-cream-300" />
+          <span className="text-chapter text-sm text-saffron-500 tabular-nums">
+            {isSignup ? '02 / 02' : 'OTP'}
+          </span>
+        </div>
+        <h1 className="mt-3 text-display text-4xl sm:text-5xl tracking-[-0.025em] leading-[1.04] text-ink-900">
+          Enter your <span className="italic font-light text-saffron-600">code.</span>
+        </h1>
+        <p className="mt-4 text-[15px] text-ink-500 leading-relaxed">
+          We sent a 6-digit code to{' '}
+          <span className="font-medium text-ink-900">{maskPhone(state.phone)}</span>
+          {' '}—{' '}
+          <Link
+            to="/auth/login"
+            className="text-saffron-700 underline underline-offset-4 decoration-saffron-300 hover:text-saffron-600"
+          >
+            change number
+          </Link>
+        </p>
+      </div>
 
-      <div className="mt-8 space-y-4">
+      <div className="mt-9 space-y-5 animate-fade-up delay-100">
         <OtpInput
           value={otp}
           onChange={(v) => {
@@ -111,34 +127,50 @@ export function OtpPage() {
         />
 
         {errorMsg && (
-          <p className="text-sm text-spice-500">{errorMsg}</p>
+          <p className="text-sm text-spice-700 inline-flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-spice-500" />
+            {errorMsg}
+          </p>
         )}
 
         {demoOtp && (
-          <div className="rounded-2xl border border-dashed border-saffron-300 bg-saffron-50 px-4 py-3 text-sm text-saffron-700">
-            <p className="font-semibold">Demo OTP · {demoOtp}</p>
-            <p className="text-xs text-saffron-700/80">
+          <div className="relative rounded-2xl border border-dashed border-saffron-300 bg-saffron-50/70 px-5 py-4 ring-inset-warm">
+            <div className="flex items-baseline justify-between gap-4">
+              <p className="text-eyebrow text-saffron-700">Demo OTP</p>
+              <p className="text-editorial text-2xl text-saffron-700 tabular-nums tracking-wider">
+                {demoOtp}
+              </p>
+            </div>
+            <p className="mt-1.5 caption text-xs text-saffron-700/80">
               No SMS goes out — the server returns a deterministic OTP for development.
             </p>
           </div>
         )}
 
         <Button
-          variant="primary"
+          variant="secondary"
           size="lg"
           className="w-full"
           onClick={() => complete(otp)}
           disabled={otp.length !== 6 || verifying}
+          trailing={
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14" />
+              <path d="m13 5 7 7-7 7" />
+            </svg>
+          }
         >
           {verifying ? 'Verifying…' : 'Verify & continue'}
         </Button>
 
-        <p className="text-center text-sm text-ink-500">
-          Didn't get it?{' '}
+        <div className="hairline" />
+
+        <p className="text-center caption text-ink-500">
+          Didn&apos;t get it?{' '}
           <button
             onClick={resend}
             disabled={resendIn > 0}
-            className="font-medium text-saffron-700 disabled:text-ink-400 hover:underline disabled:no-underline"
+            className="not-italic font-medium text-saffron-700 disabled:text-ink-400 underline underline-offset-4 decoration-saffron-300 disabled:no-underline transition-colors"
           >
             {resendIn > 0 ? `Resend in ${resendIn}s` : 'Resend OTP'}
           </button>

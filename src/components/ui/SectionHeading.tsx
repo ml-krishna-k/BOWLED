@@ -8,6 +8,7 @@ interface SectionHeadingProps {
   description?: ReactNode
   align?: 'left' | 'center'
   className?: string
+  size?: 'md' | 'lg'
 }
 
 export function SectionHeading({
@@ -16,11 +17,13 @@ export function SectionHeading({
   description,
   align = 'center',
   className,
+  size = 'md',
 }: SectionHeadingProps) {
   return (
     <div
       className={cn(
-        'max-w-3xl space-y-5',
+        'space-y-5',
+        size === 'lg' ? 'max-w-4xl' : 'max-w-3xl',
         align === 'center' && 'mx-auto text-center',
         className,
       )}
@@ -30,11 +33,25 @@ export function SectionHeading({
           <Eyebrow>{eyebrow}</Eyebrow>
         </div>
       )}
-      <h2 className="text-display text-3xl sm:text-4xl lg:text-5xl">
+      <h2
+        className={cn(
+          'text-display text-ink-900',
+          size === 'lg'
+            ? 'text-4xl sm:text-5xl lg:text-[3.75rem]'
+            : 'text-3xl sm:text-4xl lg:text-5xl',
+        )}
+      >
         {title}
       </h2>
       {description && (
-        <p className="text-ink-500 text-base sm:text-lg leading-relaxed">
+        <p
+          className={cn(
+            'text-ink-500 leading-relaxed',
+            size === 'lg' ? 'text-lg sm:text-xl' : 'text-base sm:text-lg',
+            align === 'center' && 'mx-auto',
+            'max-w-2xl',
+          )}
+        >
           {description}
         </p>
       )}

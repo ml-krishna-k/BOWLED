@@ -103,7 +103,8 @@ export function SkipMealsPage() {
       <AppContainer>
         <PageHeader
           eyebrow="Manage your plan"
-          title="Skip a meal or a day"
+          chapter="Skip"
+          title={<>Skip a meal <span className="italic font-light text-saffron-600">or a day.</span></>}
           description="Tell us when you'll be away — we'll skip cooking and your plan extends by the days you miss."
         />
         <Card className="mt-8 p-8 text-center">
@@ -136,12 +137,13 @@ export function SkipMealsPage() {
     <AppContainer>
       <PageHeader
         eyebrow="Manage your plan"
-        title="Skip a meal or a day"
+        chapter="Skip"
+        title={<>Skip a meal <span className="italic font-light text-saffron-600">or a day.</span></>}
         description="Plan ahead — tell us when you'll be away. Your plan auto-extends by the days you skip."
       />
 
       {/* Allowance summary */}
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+      <div className="mt-10 grid gap-4 sm:grid-cols-2">
         <AllowanceCard
           label="Meal skips"
           used={mealSkipsUsed}
@@ -355,26 +357,32 @@ function AllowanceCard({
   const pct = Math.round((used / total) * 100)
   const exhausted = left === 0
   return (
-    <Card variant="soft" className="p-5">
+    <Card variant="soft" className="p-6 ring-inset-warm">
       <div className="flex items-baseline justify-between">
         <p className="text-eyebrow text-ink-500">{label}</p>
-        <Badge tone={exhausted ? 'cream' : tone}>
+        <Badge tone={exhausted ? 'cream' : tone} dot={!exhausted}>
           {exhausted ? 'Used up' : `${left} left`}
         </Badge>
       </div>
-      <p className="mt-2 font-display text-3xl text-ink-900">
-        {used} <span className="text-ink-400 text-2xl">/ {total}</span>
+      <p className="mt-3 flex items-baseline gap-1">
+        <span className={cn(
+          'text-editorial text-4xl sm:text-5xl',
+          tone === 'saffron' ? 'text-saffron-700' : 'text-leaf-700',
+        )}>
+          {used}
+        </span>
+        <span className="text-base text-ink-400 font-medium">/ {total}</span>
       </p>
-      <div className="mt-3 h-1.5 rounded-full bg-cream-200 overflow-hidden">
+      <div className="mt-4 h-1 rounded-full bg-cream-200 overflow-hidden">
         <div
           className={cn(
-            'h-full transition-all',
-            tone === 'saffron' ? 'bg-saffron-500' : 'bg-leaf-500',
+            'h-full transition-all duration-700',
+            tone === 'saffron' ? 'bg-gradient-to-r from-saffron-400 to-saffron-500' : 'bg-gradient-to-r from-leaf-500 to-leaf-700',
           )}
           style={{ width: `${pct}%` }}
         />
       </div>
-      <p className="mt-2 text-xs text-ink-500">used this billing cycle</p>
+      <p className="mt-2 caption text-ink-500">used this billing cycle</p>
     </Card>
   )
 }

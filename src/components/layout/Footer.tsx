@@ -45,6 +45,13 @@ export function Footer() {
   return (
     <footer className="relative overflow-hidden border-t border-cream-200 bg-cream-100/40">
       <div className="absolute inset-0 bg-grain opacity-50" aria-hidden />
+      {/* Soft top ambient warmth */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-64 w-[80%] rounded-full
+                   bg-[radial-gradient(circle,rgba(255,174,107,0.18),transparent_70%)]"
+      />
+
       <Container className="relative">
         <div className="grid gap-10 py-16 sm:py-20 md:grid-cols-2 lg:grid-cols-6">
           <div className="lg:col-span-2 space-y-5">
@@ -65,7 +72,7 @@ export function Footer() {
                 <a
                   key={s}
                   href="#"
-                  className="grid h-10 w-10 place-items-center rounded-full bg-paper border border-cream-200 text-ink-700 hover:border-saffron-400 hover:text-saffron-700 transition-colors"
+                  className="grid h-10 w-10 place-items-center rounded-full bg-paper border border-cream-200 text-ink-700 transition-all duration-300 hover:border-saffron-400 hover:text-saffron-700 hover:-translate-y-0.5 hover:shadow-soft"
                   aria-label={s}
                 >
                   <span className="text-xs font-semibold">{s[0]}</span>
@@ -82,9 +89,15 @@ export function Footer() {
                   <li key={l.label}>
                     <a
                       href={l.href}
-                      className="text-[15px] text-ink-500 hover:text-saffron-700 transition-colors"
+                      className="group inline-flex items-center gap-1 text-[15px] text-ink-500 transition-colors hover:text-saffron-700"
                     >
-                      {l.label}
+                      <span>{l.label}</span>
+                      <span
+                        aria-hidden
+                        className="opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0"
+                      >
+                        →
+                      </span>
                     </a>
                   </li>
                 ))}
@@ -96,9 +109,9 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-t border-cream-200 py-6 text-sm text-ink-400">
           <p>© {new Date().getFullYear()} {BRAND.name} · A {BRAND.parentCompany} venture · Cooked with care in {BRAND.city}.</p>
           <div className="flex gap-5">
-            <a href="#" className="hover:text-ink-700">Privacy</a>
-            <a href="#" className="hover:text-ink-700">Terms</a>
-            <a href="#" className="hover:text-ink-700">FSSAI Lic. 12345678901234</a>
+            <a href="#" className="hover:text-ink-700 transition-colors">Privacy</a>
+            <a href="#" className="hover:text-ink-700 transition-colors">Terms</a>
+            <a href="#" className="hover:text-ink-700 transition-colors">FSSAI Lic. 12345678901234</a>
           </div>
         </div>
       </Container>

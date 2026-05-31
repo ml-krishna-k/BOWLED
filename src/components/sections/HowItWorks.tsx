@@ -52,32 +52,46 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <Section id="how" className="bg-cream-50">
-      <Container>
+    <Section id="how" className="bg-cream-50 relative overflow-hidden">
+      {/* Soft ambient mesh */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-mesh opacity-40" />
+
+      <Container className="relative">
         <SectionHeading
           eyebrow="How it works"
-          title={<>Four small steps to <span className="text-saffron-600">stop worrying about food.</span></>}
+          title={<>Four small steps to <span className="italic font-light text-saffron-600">stop worrying about food.</span></>}
           description="Designed for the messiness of student life — exam weeks, late nights, sudden trips home. The app bends around your schedule."
         />
 
-        <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-20 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((s, i) => (
-            <Card key={s.n} className="group relative p-7 hover:-translate-y-1 transition-transform duration-300">
-              <div className="absolute right-6 top-6 font-display text-5xl text-cream-200 group-hover:text-saffron-200 transition-colors">
-                {s.n}
-              </div>
+            <Card
+              key={s.n}
+              className="group relative p-7 lift-card overflow-hidden"
+            >
+              {/* Hover sheen */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-saffron-50/0 via-transparent to-saffron-50/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-hover:from-saffron-50/40 group-hover:to-cream-100/40"
+              />
 
-              <div className="relative grid h-12 w-12 place-items-center rounded-2xl bg-saffron-100 text-saffron-700">
-                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  {s.icon}
-                </svg>
-              </div>
+              <div className="relative">
+                <div className="absolute right-0 -top-1 font-display text-[3.5rem] leading-none text-cream-200 transition-all duration-500 group-hover:text-saffron-200 group-hover:scale-110">
+                  {s.n}
+                </div>
 
-              <h3 className="mt-6 font-display text-xl text-ink-900">{s.title}</h3>
-              <p className="mt-2 text-ink-500 text-[15px] leading-relaxed">{s.desc}</p>
+                <div className="relative grid h-12 w-12 place-items-center rounded-2xl bg-saffron-100 text-saffron-700 transition-all duration-300 group-hover:bg-saffron-500 group-hover:text-cream-50 group-hover:shadow-soft">
+                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    {s.icon}
+                  </svg>
+                </div>
+
+                <h3 className="mt-6 font-display text-xl text-ink-900 tracking-tight">{s.title}</h3>
+                <p className="mt-2 text-ink-500 text-[15px] leading-relaxed">{s.desc}</p>
+              </div>
 
               {i < STEPS.length - 1 && (
-                <div className="hidden lg:block absolute -right-3 top-1/2 h-px w-6 bg-cream-300" />
+                <div className="hidden lg:block absolute -right-3 top-1/2 h-px w-6 bg-gradient-to-r from-cream-300 to-transparent" />
               )}
             </Card>
           ))}
