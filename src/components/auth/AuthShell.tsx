@@ -15,7 +15,7 @@ export function AuthShell({ children, step, footer }: AuthShellProps) {
       <div className="lg:col-span-7 flex flex-col bg-cream-50">
         <header className="flex items-center justify-between px-6 sm:px-10 lg:px-14 pt-7">
           <Link to="/" className="transition-transform hover:scale-[1.02]">
-            <Logo />
+            <Logo size="h-12 w-12" />
           </Link>
           <div className="flex items-center gap-4">
             {step && (

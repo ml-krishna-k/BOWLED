@@ -19,10 +19,10 @@ const ITEMS = [
 
 export function Marquee() {
   return (
-    <section className="relative overflow-hidden border-y border-cream-200/80 bg-paper/40 py-9">
+    <section className="relative overflow-hidden border-y border-cream-200/80 bg-paper/40 py-7 sm:py-9">
       <Container size="xl">
-        <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
-          <div className="flex w-max gap-14 animate-marquee whitespace-nowrap">
+        <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] sm:[mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
+          <div className="flex w-max gap-8 sm:gap-14 animate-marquee whitespace-nowrap">
             {[...ITEMS, ...ITEMS].map((item, i) => (
               <span
                 key={i}

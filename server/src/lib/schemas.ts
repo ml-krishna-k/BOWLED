@@ -97,6 +97,30 @@ export const skipDaySchema = z.object({
   date: dateSchema,
 })
 
+/* ---------- Payments (manual UPI) ---------- */
+
+/**
+ * UTR is the bank's "Unique Transaction Reference" for a UPI payment.
+ * Typical formats: 12-digit numeric, or 12–22 alphanumeric (banks vary).
+ */
+export const utrSchema = z
+  .string()
+  .trim()
+  .min(8, 'UTR is too short')
+  .max(32, 'UTR is too long')
+  .regex(/^[A-Za-z0-9]+$/, 'UTR can only contain letters and numbers')
+
+export const submitPaymentSchema = z.object({
+  utr: utrSchema,
+  // Cloudinary secure_url returned from /api/upload/image.
+  screenshotUrl: z.string().trim().url().max(600),
+})
+
+export const reviewPaymentSchema = z.object({
+  /** Optional rejection reason. Required-by-convention when rejecting. */
+  reason: z.string().trim().max(400).optional(),
+})
+
 /* ---------- Admin ---------- */
 
 export const updateSubscriberStatusSchema = z.object({

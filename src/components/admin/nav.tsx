@@ -46,6 +46,17 @@ export const ADMIN_NAV: AdminNavItem[] = [
     ),
   },
   {
+    to: '/admin/payments',
+    label: 'Payments',
+    icon: sv(
+      <>
+        <rect x="3" y="6" width="18" height="13" rx="2" />
+        <path d="M3 10h18" />
+        <path d="M7 15h3" />
+      </>,
+    ),
+  },
+  {
     to: '/admin/subscribers',
     label: 'Subscribers',
     icon: sv(

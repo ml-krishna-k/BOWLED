@@ -23,13 +23,13 @@ export function AppPreview() {
           description="Nothing to download — Bowled runs in your browser and works just as smoothly on your phone, tablet, or laptop. No popups, no chaos. Just three meals a day."
         />
 
-        <div className="mt-20 grid lg:grid-cols-3 gap-6 items-center perspective-scene">
+        <div className="mt-12 sm:mt-16 lg:mt-20 grid sm:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 items-center perspective-scene">
           <PhoneFrame variant="home" rotation="-2deg" />
           <PhoneFrame variant="menu" elevated />
           <PhoneFrame variant="pause" rotation="2deg" />
         </div>
 
-        <div className="mt-16 flex flex-col items-center gap-4">
+        <div className="mt-10 sm:mt-16 flex flex-col items-center gap-4 px-2">
           <Button
             size="lg"
             variant="secondary"
@@ -64,7 +64,7 @@ function PhoneFrame({
   return (
     <div
       className={
-        'group mx-auto w-[260px] sm:w-[280px] aspect-[9/19] rounded-[44px] bg-ink-900 p-2 shadow-card transition-transform duration-700 ease-out ' +
+        'group mx-auto w-[220px] sm:w-[260px] lg:w-[280px] aspect-[9/19] rounded-[44px] bg-ink-900 p-2 shadow-card transition-transform duration-700 ease-out ' +
         (elevated ? 'lg:-translate-y-8 lg:scale-[1.06] hover:lg:-translate-y-10' : 'hover:-translate-y-2')
       }
       style={rotation ? { transform: `rotate(${rotation})` } : undefined}

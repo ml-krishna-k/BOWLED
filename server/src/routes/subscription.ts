@@ -1,5 +1,6 @@
 import { Router } from 'express'
-import { Subscription, PlanEnum } from '../models/Subscription.js'
+import { Subscription, CycleEnum, PlanEnum } from '../models/Subscription.js'
+import { Payment } from '../models/Payment.js'
 import { SkipNotification } from '../models/SkipNotification.js'
 import { User } from '../models/User.js'
 import { requireAuth } from '../middleware/auth.js'
@@ -14,50 +15,153 @@ import {
   skipMealSchema,
   updateSubscriptionSchema,
 } from '../lib/schemas.js'
+import { config } from '../config.js'
 
 const router = Router()
 router.use(requireAuth)
 
-const PLAN_PRICE: Record<typeof PlanEnum[number], number> = {
+type PlanId = typeof PlanEnum[number]
+type CycleId = typeof CycleEnum[number]
+
+/* ---------- Server-side pricing (single source of truth) -------------------
+ * Mirrors src/data/plans.ts on the client. Amounts here are authoritative.
+ * ------------------------------------------------------------------------- */
+
+const PLAN_PRICE: Record<PlanId, number> = {
   solo: 89,
   squad: 69,
   floor: 63,
 }
 
-const PLAN_GROUP_MIN: Record<typeof PlanEnum[number], number> = {
+const PLAN_GROUP_MIN: Record<PlanId, number> = {
   solo: 1,
   squad: 5,
   floor: 10,
 }
 
-/* GET /api/subscription — current user's subscription (null if none). */
+const CYCLE_DAYS: Record<CycleId, number> = {
+  'weekly':              7,
+  'weekly-no-sun':       6,
+  'monthly-no-sun':      26,
+  'monthly-no-weekend':  22,
+}
+
+const MEALS_PER_DAY = 3
+/** How long the user has to submit a UTR + screenshot before the sub auto-expires. */
+const SUBMIT_WINDOW_MS = 48 * 60 * 60 * 1000 // 48h
+/** Active window granted on admin approval. */
+const ACTIVE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000 // 30 days
+
+function totalForPlan(planId: PlanId, cycleId: CycleId): number {
+  const perMember = PLAN_PRICE[planId] * MEALS_PER_DAY * CYCLE_DAYS[cycleId]
+  return perMember * PLAN_GROUP_MIN[planId]
+}
+
+function buildOrderRef(subId: string): string {
+  return `BWL-${subId.slice(-8).toUpperCase()}`
+}
+
+function buildUpiUri(amount: number, orderRef: string): string {
+  const params = new URLSearchParams({
+    pa: config.upi.id,
+    pn: config.upi.name,
+    am: String(amount),
+    tn: orderRef,
+    cu: 'INR',
+  })
+  return `upi://pay?${params.toString()}`
+}
+
+function paymentInstructionsFor(sub: InstanceType<typeof Subscription>) {
+  if (!config.upi.id) return null
+  if (sub.status !== 'pending_payment') return null
+  const orderRef = buildOrderRef(sub._id.toString())
+  const amount = totalForPlan(sub.planId, sub.billingCycleId)
+  const createdAt = (sub as { createdAt?: Date }).createdAt?.getTime() ?? Date.now()
+  return {
+    orderRef,
+    amount,
+    upiId: config.upi.id,
+    businessName: config.upi.name,
+    upiUri: buildUpiUri(amount, orderRef),
+    submitExpiresAt: createdAt + SUBMIT_WINDOW_MS,
+  }
+}
+
+/* ---------- Helpers used by approve + expiry checks ----------------------- */
+
+/** Has a pending sub blown past the 48h submit window? */
+function isSubmitExpired(sub: InstanceType<typeof Subscription>): boolean {
+  if (sub.status !== 'pending_payment') return false
+  const createdAt = (sub as { createdAt?: Date }).createdAt?.getTime() ?? 0
+  return createdAt > 0 && Date.now() - createdAt > SUBMIT_WINDOW_MS
+}
+
+/** Has an active sub blown past its 30-day window? */
+function isActiveExpired(sub: InstanceType<typeof Subscription>): boolean {
+  return sub.status === 'active' && sub.expiresAt > 0 && Date.now() > sub.expiresAt
+}
+
+/**
+ * Check the subscription against its time-based expiry rules and flip status
+ * if needed. Run on every GET so we never serve a stale "still active" doc.
+ */
+async function reconcileExpiry(sub: InstanceType<typeof Subscription>) {
+  if (isSubmitExpired(sub) || isActiveExpired(sub)) {
+    sub.status = 'expired'
+    await sub.save()
+  }
+}
+
+/* ---------- Routes -------------------------------------------------------- */
+
+/**
+ * GET /api/subscription — current user's subscription (null if none).
+ * Includes payment instructions when status === 'pending_payment'.
+ */
 router.get('/', async (req, res) => {
   const sub = await Subscription.findOne({ userId: req.auth!.uid })
-  res.json({ subscription: sub ? serializeSubscription(sub) : null })
+  if (!sub) {
+    res.json({ subscription: null, paymentInstructions: null })
+    return
+  }
+  await reconcileExpiry(sub)
+  res.json({
+    subscription: serializeSubscription(sub),
+    paymentInstructions: paymentInstructionsFor(sub),
+  })
 })
 
-/* POST /api/subscription — create the current user's subscription.
+/**
+ * POST /api/subscription — start a new plan.
  *
  * Two paths:
- *   1. No groupCode → creates a new group, this user is the originator.
- *   2. groupCode supplied → joins an existing group. The group's plan and
- *      billing cycle are inherited (client values are ignored), and every
- *      member's groupSize is recomputed and persisted so reads stay in sync.
+ *   1. groupCode → join an existing group. Inherits plan + cycle from the
+ *      group's originator. Joiners are billed at the group level (they don't
+ *      pay individually), so we mark them `active` immediately.
+ *   2. No groupCode → originator path. Creates a NEW sub in `pending_payment`
+ *      status. The user is shown UPI instructions, pays via any UPI app,
+ *      uploads UTR + screenshot via POST /api/payments. Admin verification
+ *      flips status to `active`.
  *
- * Solo plans always create a fresh single-member group.
+ * The response always includes paymentInstructions (null for joiners).
  */
 router.post('/', async (req, res) => {
   const input = parseBody(createSubscriptionSchema, req)
 
   const existing = await Subscription.findOne({ userId: req.auth!.uid })
-  if (existing) throw new HttpError(409, 'Subscription already exists for this user')
+  if (existing) {
+    // If the existing one is `expired`, allow re-subscribing by deleting it.
+    if (existing.status === 'expired') {
+      await Subscription.deleteOne({ _id: existing._id })
+    } else {
+      throw new HttpError(409, 'Subscription already exists for this user', { reason: 'has-subscription' })
+    }
+  }
 
   let planId = input.planId
   let billingCycleId = input.billingCycleId ?? 'monthly-no-sun'
   let groupCode = input.groupCode?.trim()
-  // Any non-empty groupCode means "I want to join this group" — the planId
-  // the client sent is informational at best; the group's own plan is the
-  // source of truth.
   const isJoin = !!groupCode
 
   if (isJoin) {
@@ -70,18 +174,24 @@ router.post('/', async (req, res) => {
     planId = groupMember.planId
     billingCycleId = groupMember.billingCycleId
   } else {
+    if (!config.upi.id) {
+      throw new HttpError(503, 'Payments are not configured on this environment', { reason: 'upi-not-configured' })
+    }
     groupCode = `BW-${planId.toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`
   }
 
   const now = Date.now()
+
+  // Joiners → active immediately, full 30-day window. Originators → pending.
   const sub = await Subscription.create({
     userId: req.auth!.uid,
     planId,
     billingCycleId,
     groupCode,
-    groupSize: 1, // temporary — recomputed below
-    startedAt: now,
-    cycleStartedAt: now,
+    groupSize: 1, // recomputed below
+    startedAt: isJoin ? now : 0,
+    cycleStartedAt: isJoin ? now : 0,
+    expiresAt: isJoin ? now + ACTIVE_WINDOW_MS : 0,
     totalMeals: 90,
     mealsServed: 0,
     today: { breakfast: 'pending', lunch: 'pending', dinner: 'pending' },
@@ -89,20 +199,21 @@ router.post('/', async (req, res) => {
     pause: null,
     mealSkips: [],
     daySkips: [],
-    status: 'active',
+    status: isJoin ? 'active' : 'pending_payment',
   })
 
-  // Recompute groupSize across every member of this group (one query updates
-  // all rows including the one we just created).
+  // Recompute groupSize across every member of this group.
   const memberCount = await Subscription.countDocuments({ groupCode })
   await Subscription.updateMany({ groupCode }, { $set: { groupSize: memberCount } })
   sub.groupSize = memberCount
 
-  res.status(201).json({ subscription: serializeSubscription(sub) })
+  res.status(201).json({
+    subscription: serializeSubscription(sub),
+    paymentInstructions: paymentInstructionsFor(sub),
+  })
 })
 
-/* PATCH /api/subscription — change the billing cycle (currently the only
- * field a subscriber can edit themselves). */
+/* PATCH /api/subscription — change the billing cycle. */
 router.patch('/', async (req, res) => {
   const patch = parseBody(updateSubscriptionSchema, req)
   const sub = await Subscription.findOneAndUpdate(
@@ -114,8 +225,11 @@ router.patch('/', async (req, res) => {
   res.json({ subscription: serializeSubscription(sub) })
 })
 
-/* DELETE /api/subscription — cancel (used by the "reset" flow on the client). */
+/* DELETE /api/subscription — cancel (used by the "reset" flow). */
 router.delete('/', async (req, res) => {
+  // Also clean up the user's pending payments so they can resubscribe with a fresh UTR.
+  const sub = await Subscription.findOne({ userId: req.auth!.uid })
+  if (sub) await Payment.deleteMany({ subscriptionId: sub._id, status: 'pending_verification' })
   await Subscription.deleteOne({ userId: req.auth!.uid })
   res.json({ ok: true })
 })
@@ -126,6 +240,7 @@ router.post('/skip-meal', async (req, res) => {
 
   const sub = await Subscription.findOne({ userId: req.auth!.uid })
   if (!sub) throw new HttpError(404, 'No active subscription')
+  if (sub.status !== 'active') throw new HttpError(409, 'Subscription is not active', { reason: 'not-active' })
   if (!sub.billingCycleId?.startsWith('monthly')) {
     throw new HttpError(409, 'Skips are only available on monthly plans', { reason: 'not-monthly' })
   }
@@ -170,6 +285,7 @@ router.post('/skip-day', async (req, res) => {
 
   const sub = await Subscription.findOne({ userId: req.auth!.uid })
   if (!sub) throw new HttpError(404, 'No active subscription')
+  if (sub.status !== 'active') throw new HttpError(409, 'Subscription is not active', { reason: 'not-active' })
   if (!sub.billingCycleId?.startsWith('monthly')) {
     throw new HttpError(409, 'Skips are only available on monthly plans', { reason: 'not-monthly' })
   }
@@ -212,7 +328,6 @@ router.delete('/skips/meal/:id', async (req, res) => {
   if (!sub) throw new HttpError(404, 'No active subscription')
   sub.mealSkips = sub.mealSkips.filter((m) => m.id !== req.params.id) as typeof sub.mealSkips
   await sub.save()
-  // Pull the corresponding kitchen notification as well — undo means undo.
   await SkipNotification.deleteOne({ _id: req.params.id }).catch(() => {})
   await SkipNotification.deleteMany({ userId: req.auth!.uid, kind: 'meal' }).catch(() => {})
   res.json({ subscription: serializeSubscription(sub) })
@@ -234,6 +349,7 @@ router.post('/scan', async (req, res) => {
   const input = parseBody(scanSchema, req)
   const sub = await Subscription.findOne({ userId: req.auth!.uid })
   if (!sub) throw new HttpError(404, 'No active subscription')
+  if (sub.status !== 'active') throw new HttpError(409, 'Subscription is not active', { reason: 'not-active' })
   if (!sub.today) throw new HttpError(500, 'Subscription missing today state')
   if (sub.mealsServed >= sub.totalMeals) throw new HttpError(409, 'No meals left to serve')
 
@@ -250,17 +366,16 @@ router.post('/scan', async (req, res) => {
     slot: target,
     mealName: input.mealName ?? 'Meal',
   })
-  // Cap history length without re-assigning the DocumentArray (Mongoose
-  // requires in-place mutation for subdoc arrays).
   while (sub.history.length > 50) sub.history.pop()
   await sub.save()
   res.json({ subscription: serializeSubscription(sub) })
 })
 
-/* POST /api/subscription/skip-next — mark next pending slot as skipped (no skip-allowance impact) */
+/* POST /api/subscription/skip-next */
 router.post('/skip-next', async (req, res) => {
   const sub = await Subscription.findOne({ userId: req.auth!.uid })
   if (!sub) throw new HttpError(404, 'No active subscription')
+  if (sub.status !== 'active') throw new HttpError(409, 'Subscription is not active', { reason: 'not-active' })
   if (!sub.today) throw new HttpError(500, 'Subscription missing today state')
   const today = sub.today
   const target = SLOTS.find((s) => today[s] === 'pending')
@@ -270,7 +385,7 @@ router.post('/skip-next', async (req, res) => {
   res.json({ subscription: serializeSubscription(sub) })
 })
 
-/* POST /api/subscription/pause { fromIso, toIso } */
+/* POST /api/subscription/pause */
 router.post('/pause', async (req, res) => {
   const { fromIso, toIso } = parseBody(pauseSchema, req)
   const sub = await Subscription.findOneAndUpdate(
@@ -293,6 +408,8 @@ router.post('/resume', async (req, res) => {
   res.json({ subscription: serializeSubscription(sub) })
 })
 
+/* ---------- Helpers ------------------------------------------------------- */
+
 export function serializeSubscription(s: InstanceType<typeof Subscription>) {
   return {
     planId: s.planId,
@@ -301,6 +418,7 @@ export function serializeSubscription(s: InstanceType<typeof Subscription>) {
     groupSize: s.groupSize,
     startedAt: s.startedAt,
     cycleStartedAt: s.cycleStartedAt,
+    expiresAt: s.expiresAt,
     totalMeals: s.totalMeals,
     mealsServed: s.mealsServed,
     status: s.status,
@@ -312,5 +430,14 @@ export function serializeSubscription(s: InstanceType<typeof Subscription>) {
   }
 }
 
-export { PLAN_PRICE }
+export {
+  PLAN_PRICE,
+  PLAN_GROUP_MIN,
+  CYCLE_DAYS,
+  MEALS_PER_DAY,
+  SUBMIT_WINDOW_MS,
+  ACTIVE_WINDOW_MS,
+  totalForPlan,
+  buildOrderRef,
+}
 export default router

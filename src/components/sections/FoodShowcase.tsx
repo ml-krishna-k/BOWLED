@@ -62,8 +62,9 @@ export function FoodShowcase() {
           description="We obsess over the boring bits — oil quality, batch size, packaging temperature — so the meal feels like effort, not assembly."
         />
 
-        {/* Bento grid — varied tile sizes for editorial rhythm */}
-        <div className="mt-16 grid gap-5 md:grid-cols-3 md:grid-rows-2 md:auto-rows-fr">
+        {/* Bento grid — single column stack on mobile (each tile is its own
+            full-bleed editorial spread), varied bento on md+. */}
+        <div className="mt-10 sm:mt-16 grid gap-4 sm:gap-5 md:grid-cols-3 md:grid-rows-2 md:auto-rows-fr">
           {TILES.map((tile, i) => {
             const span =
               tile.span === 'tall'
@@ -78,7 +79,7 @@ export function FoodShowcase() {
                 className={`group relative overflow-hidden p-0 lift-card ${span}`}
               >
                 <div
-                  className={`relative h-full min-h-[280px] bg-gradient-to-br ${tile.accent} img-reveal`}
+                  className={`relative h-full aspect-[5/4] sm:aspect-auto sm:min-h-[280px] bg-gradient-to-br ${tile.accent} img-reveal`}
                 >
                   <img
                     src={tile.image}
@@ -98,18 +99,18 @@ export function FoodShowcase() {
 
                   {/* Editorial caption tag */}
                   {tile.caption && (
-                    <span className="absolute top-5 left-5 z-10 inline-flex items-center gap-1.5 rounded-full bg-paper/95 px-3 py-1 text-[11px] font-semibold text-ink-700 shadow-soft backdrop-blur-sm">
+                    <span className="absolute top-4 left-4 sm:top-5 sm:left-5 z-10 inline-flex items-center gap-1.5 rounded-full bg-paper/95 px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] font-semibold text-ink-700 shadow-soft backdrop-blur-sm">
                       <span className="h-1 w-1 rounded-full bg-saffron-500" />
                       {tile.caption}
                     </span>
                   )}
 
                   {/* Copy overlaid for editorial feel */}
-                  <div className="absolute inset-x-0 bottom-0 p-6 sm:p-7 z-10">
-                    <h3 className="font-display text-xl sm:text-2xl text-cream-50 tracking-tight leading-tight">
+                  <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 lg:p-7 z-10">
+                    <h3 className="font-display text-lg sm:text-xl lg:text-2xl text-cream-50 tracking-tight leading-tight">
                       {tile.title}
                     </h3>
-                    <p className="mt-3 text-cream-50/85 text-[14px] sm:text-[15px] leading-relaxed max-w-md">
+                    <p className="mt-2 sm:mt-3 text-cream-50/85 text-[13px] sm:text-[14px] lg:text-[15px] leading-relaxed max-w-md">
                       {tile.desc}
                     </p>
                   </div>

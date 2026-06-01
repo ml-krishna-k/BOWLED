@@ -26,7 +26,7 @@ export function Testimonials() {
         />
 
         {/* Trust strip */}
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-sm text-ink-500">
+        <div className="mt-8 sm:mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 sm:gap-10 text-sm text-ink-500">
           <Stat number="4.8" label="Avg. rating · 300+ subscribers" stars />
           <span className="hidden sm:inline h-8 w-px bg-cream-200" aria-hidden />
           <Stat number="93%" label="Re-subscribe after their first month" />
@@ -35,13 +35,13 @@ export function Testimonials() {
         </div>
 
         {/* Cards */}
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 sm:mt-14 grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {TESTIMONIALS.map((t, i) => (
             <Card
               key={t.id}
               variant={i === 1 ? 'default' : 'soft'}
               className={cn(
-                'group relative p-7 flex flex-col h-full lift-card overflow-hidden',
+                'group relative p-5 sm:p-6 lg:p-7 flex flex-col h-full lift-card overflow-hidden',
                 i === 1 && 'border-saffron-200 ring-1 ring-saffron-200',
               )}
             >
@@ -57,10 +57,11 @@ export function Testimonials() {
                 </>
               )}
 
-              {/* Decorative oversized quote glyph */}
+              {/* Decorative oversized quote glyph — smaller on mobile so it
+                  doesn't crowd a 320-px-wide card. */}
               <span
                 aria-hidden
-                className="absolute -top-2 -left-1 font-display text-[7rem] leading-none text-saffron-100/80 select-none pointer-events-none"
+                className="absolute -top-1 -left-0.5 sm:-top-2 sm:-left-1 font-display text-[5rem] sm:text-[6rem] lg:text-[7rem] leading-none text-saffron-100/80 select-none pointer-events-none"
               >
                 &ldquo;
               </span>

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { AppContainer } from '@/components/app/AppContainer'
 import { PageHeader } from '@/components/app/PageHeader'
+import { PaymentFlow } from '@/components/app/PaymentFlow'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -17,13 +18,35 @@ import type { Plan, Subscription } from '@/types'
 type BillingCycleId = Subscription['billingCycleId']
 
 export function SubscriptionPage() {
-  const { sub, plan, dayNumber, mealsRemaining, changeCycle, pause, resume } = useSubscription()
+  const { sub, paymentInstructions, plan, dayNumber, mealsRemaining, changeCycle, pause, resume } = useSubscription()
   const [showPauseModal, setShowPauseModal] = useState(false)
   const [cycleSaving, setCycleSaving] = useState<BillingCycleId | null>(null)
   const [cycleBanner, setCycleBanner] = useState<string | null>(null)
 
-  // Onboarding fork — no active sub yet
+  // No sub yet → onboarding (pick plan / join group)
   if (!sub) return <Onboarding />
+
+  // Sub in pending_payment → show UPI QR + screenshot upload flow
+  if (sub.status === 'pending_payment' && paymentInstructions) {
+    return (
+      <AppContainer>
+        <PageHeader
+          eyebrow="Subscription"
+          chapter="Payment"
+          title={<>Complete your <span className="italic font-light text-saffron-600">payment.</span></>}
+          description={`${PLANS.find((p) => p.id === sub.planId)?.name ?? sub.planId} plan · ${BILLING_CYCLES.find((c) => c.id === sub.billingCycleId)?.shortLabel ?? sub.billingCycleId}`}
+        />
+        <div className="mt-10">
+          <PaymentFlow instructions={paymentInstructions} />
+        </div>
+      </AppContainer>
+    )
+  }
+
+  // Sub expired → "renew" CTA reusing the Onboarding flow
+  if (sub.status === 'expired') {
+    return <Onboarding expiredNotice />
+  }
 
   if (!plan) return null
 
@@ -235,8 +258,8 @@ function Row({
  * Onboarding — shown when the logged-in user has no subscription yet.
  * AppShell auto-redirects them here from any in-app route.
  * ------------------------------------------------------------------------- */
-function Onboarding() {
-  const { subscribe } = useSubscription()
+function Onboarding({ expiredNotice = false }: { expiredNotice?: boolean } = {}) {
+  const { subscribe, reset } = useSubscription()
   const { user } = useAuth()
 
   const [mode, setMode] = useState<'new' | 'join'>('new')
@@ -281,34 +304,49 @@ function Onboarding() {
     setSubmitError(null)
     try {
       if (mode === 'join') {
+        // Joiners don't pay — the originator already covered the group.
         if (!joinPreview) { setSubmitError('Verify the group code first'); return }
         await subscribe(joinPreview.planId, joinPreview.groupCode, undefined, joinPreview.billingCycleId)
       } else {
+        // New-plan flow → subscription is created in `pending_payment`
+        // status; SubscriptionPage detects that and renders <PaymentFlow />.
         const size = planId === 'solo' ? 1 : planId === 'squad' ? 5 : 10
         await subscribe(planId, undefined, size, cycleId)
       }
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Could not subscribe — try again')
+      if (err instanceof ApiError && err.reason === 'upi-not-configured') {
+        setSubmitError('Payments are not configured on this environment yet. Please try again later.')
+      } else {
+        setSubmitError(err instanceof Error ? err.message : 'Could not subscribe — try again')
+      }
     } finally {
       setSubmitting(false)
     }
   }
 
+  // Suppress unused-var warning — `reset` is referenced via the expiredNotice banner.
+  void reset
+
   return (
     <AppContainer>
       <PageHeader
-        eyebrow={user?.name ? `Welcome, ${user.name.split(' ')[0]}` : 'Welcome'}
-        title="Set up your plan"
-        description="Three home-cooked meals a day. Pause anytime. No autorenewal — just one charge per cycle."
+        eyebrow={expiredNotice ? 'Subscription expired' : (user?.name ? `Welcome, ${user.name.split(' ')[0]}` : 'Welcome')}
+        chapter={expiredNotice ? 'Renew' : 'Start'}
+        title={expiredNotice
+          ? <>Your plan ran out. <span className="italic font-light text-saffron-600">Renew?</span></>
+          : 'Set up your plan'}
+        description={expiredNotice
+          ? 'Pick a plan to start a fresh 30-day cycle. Your skip history and group code carry over once your next payment is approved.'
+          : 'Three home-cooked meals a day. Pause anytime. No autorenewal — just one payment per cycle.'}
       />
 
       {/* Mode toggle */}
-      <div className="mt-8 inline-flex rounded-full bg-cream-100 p-1 text-sm font-medium">
+      <div className="mt-6 sm:mt-8 inline-flex rounded-full bg-cream-100 p-1 text-sm font-medium w-full sm:w-auto">
         <button
           type="button"
           onClick={() => { setMode('new'); setSubmitError(null) }}
           className={cn(
-            'rounded-full px-5 py-2 transition-colors',
+            'flex-1 sm:flex-initial rounded-full px-5 py-2.5 sm:py-2 transition-colors text-center',
             mode === 'new' ? 'bg-ink-900 text-cream-50 shadow-soft' : 'text-ink-600 hover:text-ink-900',
           )}
         >
@@ -318,7 +356,7 @@ function Onboarding() {
           type="button"
           onClick={() => { setMode('join'); setSubmitError(null) }}
           className={cn(
-            'rounded-full px-5 py-2 transition-colors',
+            'flex-1 sm:flex-initial rounded-full px-5 py-2.5 sm:py-2 transition-colors text-center',
             mode === 'join' ? 'bg-ink-900 text-cream-50 shadow-soft' : 'text-ink-600 hover:text-ink-900',
           )}
         >
@@ -330,9 +368,9 @@ function Onboarding() {
       {mode === 'new' && (
         <>
           {/* Plan cards */}
-          <div className="mt-8">
+          <div className="mt-6 sm:mt-8">
             <p className="text-eyebrow text-ink-500">Choose your plan</p>
-            <div className="mt-3 grid gap-4 md:grid-cols-3">
+            <div className="mt-3 grid gap-3 sm:gap-4 md:grid-cols-3">
               {PLANS.map((p) => {
                 const active = p.id === planId
                 return (
@@ -341,7 +379,7 @@ function Onboarding() {
                     type="button"
                     onClick={() => setPlanId(p.id)}
                     className={cn(
-                      'text-left rounded-2xl border p-6 transition-all',
+                      'text-left rounded-2xl border p-5 sm:p-6 transition-all active:scale-[0.99]',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron-400',
                       active
                         ? 'border-saffron-400 bg-saffron-50 ring-2 ring-saffron-200'
@@ -349,20 +387,20 @@ function Onboarding() {
                     )}
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-display text-xl text-ink-900">{p.name}</h3>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="font-display text-lg sm:text-xl text-ink-900">{p.name}</h3>
                           {p.recommended && <Badge tone="ink">Recommended</Badge>}
                         </div>
                         <p className="mt-0.5 text-xs text-ink-500">{p.groupSize}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="font-display text-2xl text-ink-900">₹{p.pricePerMeal}</p>
+                        <p className="font-display text-xl sm:text-2xl text-ink-900">₹{p.pricePerMeal}</p>
                         <p className="text-[11px] text-ink-500">per meal</p>
                       </div>
                     </div>
                     {p.savingPerMonth > 0 && (
-                      <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-leaf-700">
+                      <p className="mt-3 inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-leaf-700">
                         <span className="h-1.5 w-1.5 rounded-full bg-leaf-500" />
                         Save {inr(p.savingPerMonth)} / month each
                       </p>
@@ -374,9 +412,9 @@ function Onboarding() {
           </div>
 
           {/* Cycle picker */}
-          <div className="mt-8">
+          <div className="mt-6 sm:mt-8">
             <p className="text-eyebrow text-ink-500">Pick your rhythm</p>
-            <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-3 grid gap-2.5 sm:gap-3 grid-cols-2 lg:grid-cols-4">
               {BILLING_CYCLES.map((c) => {
                 const active = c.id === cycleId
                 return (
@@ -408,7 +446,7 @@ function Onboarding() {
             const totalDue = perPerson * groupSize
             const isGroup = groupSize > 1
             return (
-              <Card variant="outline" className="mt-8 p-5 sm:p-6">
+              <Card variant="outline" className="mt-6 sm:mt-8 p-5 sm:p-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
                   <div className="min-w-0">
                     <p className="text-eyebrow text-ink-500">
@@ -459,7 +497,7 @@ function Onboarding() {
 
       {/* Join group flow */}
       {mode === 'join' && (
-        <div className="mt-8 max-w-xl space-y-5">
+        <div className="mt-6 sm:mt-8 max-w-xl space-y-4 sm:space-y-5">
           <Input
             label="Group code"
             placeholder="BW-SQUAD-7K2X"

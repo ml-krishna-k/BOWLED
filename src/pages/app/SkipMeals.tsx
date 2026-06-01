@@ -143,7 +143,7 @@ export function SkipMealsPage() {
       />
 
       {/* Allowance summary */}
-      <div className="mt-10 grid gap-4 sm:grid-cols-2">
+      <div className="mt-8 sm:mt-10 grid gap-3 sm:gap-4 sm:grid-cols-2">
         <AllowanceCard
           label="Meal skips"
           used={mealSkipsUsed}
@@ -161,7 +161,7 @@ export function SkipMealsPage() {
       </div>
 
       {/* Skip form */}
-      <Card className="mt-8 p-5 sm:p-8">
+      <Card className="mt-6 sm:mt-8 p-4 sm:p-6 lg:p-8">
         {/* Tabs */}
         <div className="inline-flex w-full sm:w-auto rounded-full bg-cream-100 p-1">
           <TabButton active={tab === 'meal'} onClick={() => { setTab('meal'); setBanner(null) }}>

@@ -155,15 +155,21 @@ export interface SkippedDay {
   requestedAt: number
 }
 
+export type SubscriptionStatus = 'pending_payment' | 'active' | 'expired'
+
 export interface Subscription {
   planId: Plan['id']
   groupCode: string
   groupSize: number
+  /** Set when admin approves payment; 0 while pending. */
   startedAt: number
   cycleStartedAt: number
+  /** Set on approval to now + 30 days; 0 while pending. */
+  expiresAt: number
   billingCycleId: 'weekly' | 'weekly-no-sun' | 'monthly-no-sun' | 'monthly-no-weekend'
   totalMeals: number
   mealsServed: number
+  status: SubscriptionStatus
   today: {
     breakfast: MealStatus
     lunch: MealStatus
@@ -173,6 +179,36 @@ export interface Subscription {
   pause: PauseWindow | null
   mealSkips: SkippedMeal[]
   daySkips: SkippedDay[]
+}
+
+/* ---------------------------------------------------------------------------
+ * Manual UPI payment flow
+ * ------------------------------------------------------------------------- */
+
+export type PaymentStatus = 'pending_verification' | 'approved' | 'rejected'
+
+export interface PaymentInstructions {
+  /** Stable per-subscription reference shown in the UPI QR + form. */
+  orderRef: string
+  amount: number
+  upiId: string
+  businessName: string
+  /** upi:// URL ready to drop into QRCodeSVG. */
+  upiUri: string
+  /** Window to submit screenshot + UTR before subscription auto-expires. */
+  submitExpiresAt: number
+}
+
+export interface PaymentRecord {
+  id: string
+  orderRef: string
+  amount: number
+  utr: string
+  screenshotUrl: string
+  status: PaymentStatus
+  submittedAt: number
+  reviewedAt: number | null
+  rejectionReason: string | null
 }
 
 export type SkipKind = 'meal' | 'day'

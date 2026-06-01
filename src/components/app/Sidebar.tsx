@@ -17,7 +17,7 @@ export function Sidebar() {
     <aside className="hidden lg:flex h-screen w-64 shrink-0 flex-col border-r border-cream-200 bg-paper px-5 py-7 sticky top-0">
       {/* Header — logo + editorial volume marker */}
       <div className="flex items-center justify-between">
-        <Logo />
+        <Logo size="h-12 w-12" />
         <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-ink-400">
           Vol. 01
         </span>

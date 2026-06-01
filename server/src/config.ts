@@ -87,6 +87,13 @@ export const config = {
     // Widget-flow mode — set MSG91_WIDGET_ID to switch to the OTP-widget
     // path (browser handles SMS, server only validates the returned token).
     widgetId: (process.env.MSG91_WIDGET_ID ?? '').trim(),
+    // Transactional Flow template IDs — each DLT-approved template gets its
+    // own ID in MSG91. When unset the matching notification is silently
+    // skipped (logged in dev), so the rest of the system still works
+    // without the templates being registered.
+    approvedTemplateId: (process.env.MSG91_APPROVED_TEMPLATE_ID ?? '').trim(),
+    rejectedTemplateId: (process.env.MSG91_REJECTED_TEMPLATE_ID ?? '').trim(),
+    renewalTemplateId:  (process.env.MSG91_RENEWAL_TEMPLATE_ID ?? '').trim(),
   },
   cloudinary: {
     // Accept either UPPERCASE or lowercase variants, and trim whitespace —
@@ -95,6 +102,13 @@ export const config = {
     apiKey: (process.env.CLOUDINARY_API_KEY ?? process.env.cloudinary_api_key ?? '').trim(),
     apiSecret: (process.env.CLOUDINARY_API_SECRET ?? process.env.cloudinary_api_secret ?? '').trim(),
     folder: (process.env.CLOUDINARY_FOLDER ?? process.env.cloudinary_folder ?? 'bowled').trim(),
+  },
+  // Manual UPI payment flow. Users pay to this UPI ID via any UPI app, then
+  // upload screenshot + UTR; admin verifies in the panel. No payment gateway,
+  // no SDKs, no per-transaction fees.
+  upi: {
+    id:   (process.env.BUSINESS_UPI_ID ?? '').trim(),
+    name: (process.env.BUSINESS_NAME ?? 'Bowled').trim(),
   },
 }
 

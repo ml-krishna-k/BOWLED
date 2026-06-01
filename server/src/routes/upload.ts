@@ -21,4 +21,22 @@ router.post('/image', requireAuth, requireAdmin, async (req, res) => {
   res.json(img)
 })
 
+/**
+ * POST /api/upload/payment-screenshot — any authenticated user.
+ * Body: { data: "data:image/jpeg;base64,..." }
+ *
+ * Folder is forced to `payments/<userId>` server-side — users can't write
+ * to admin folders. Same response shape as /image so the client uploader
+ * is reusable.
+ */
+router.post('/payment-screenshot', requireAuth, async (req, res) => {
+  if (!isCloudinaryEnabled()) {
+    throw new HttpError(503, 'Image upload is not configured on this server')
+  }
+  const { data } = parseBody(uploadImageSchema, req)
+  const folder = `payments/${req.auth!.uid}`
+  const img = await uploadDataUri(data, { folder })
+  res.json(img)
+})
+
 export default router

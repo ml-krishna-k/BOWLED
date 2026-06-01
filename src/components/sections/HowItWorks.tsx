@@ -63,31 +63,31 @@ export function HowItWorks() {
           description="Designed for the messiness of student life — exam weeks, late nights, sudden trips home. The app bends around your schedule."
         />
 
-        <div className="mt-20 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 sm:mt-16 lg:mt-20 grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((s, i) => (
             <Card
               key={s.n}
-              className="group relative p-7 lift-card overflow-hidden"
+              className="group relative p-5 sm:p-6 lg:p-7 lift-card overflow-hidden"
             >
-              {/* Hover sheen */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute inset-0 bg-gradient-to-br from-saffron-50/0 via-transparent to-saffron-50/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-hover:from-saffron-50/40 group-hover:to-cream-100/40"
               />
 
               <div className="relative">
-                <div className="absolute right-0 -top-1 font-display text-[3.5rem] leading-none text-cream-200 transition-all duration-500 group-hover:text-saffron-200 group-hover:scale-110">
+                {/* Numeral scales down on mobile so it doesn't crowd the title */}
+                <div className="absolute right-0 -top-1 font-display text-[2.5rem] sm:text-[3rem] lg:text-[3.5rem] leading-none text-cream-200 transition-all duration-500 group-hover:text-saffron-200 group-hover:scale-110">
                   {s.n}
                 </div>
 
-                <div className="relative grid h-12 w-12 place-items-center rounded-2xl bg-saffron-100 text-saffron-700 transition-all duration-300 group-hover:bg-saffron-500 group-hover:text-cream-50 group-hover:shadow-soft">
-                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <div className="relative grid h-11 w-11 sm:h-12 sm:w-12 place-items-center rounded-2xl bg-saffron-100 text-saffron-700 transition-all duration-300 group-hover:bg-saffron-500 group-hover:text-cream-50 group-hover:shadow-soft">
+                  <svg viewBox="0 0 24 24" className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     {s.icon}
                   </svg>
                 </div>
 
-                <h3 className="mt-6 font-display text-xl text-ink-900 tracking-tight">{s.title}</h3>
-                <p className="mt-2 text-ink-500 text-[15px] leading-relaxed">{s.desc}</p>
+                <h3 className="mt-4 sm:mt-6 font-display text-lg sm:text-xl text-ink-900 tracking-tight">{s.title}</h3>
+                <p className="mt-2 text-ink-500 text-[14px] sm:text-[15px] leading-relaxed">{s.desc}</p>
               </div>
 
               {i < STEPS.length - 1 && (

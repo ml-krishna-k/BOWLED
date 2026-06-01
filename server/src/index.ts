@@ -6,6 +6,7 @@ import { errorHandler, notFound } from './middleware/error.js'
 import authRouter from './routes/auth.js'
 import meRouter from './routes/me.js'
 import subscriptionRouter from './routes/subscription.js'
+import paymentsRouter from './routes/payments.js'
 import adminRouter from './routes/admin.js'
 import groupRouter from './routes/group.js'
 import menuRouter from './routes/menu.js'
@@ -76,11 +77,18 @@ async function start(): Promise<void> {
   app.use('/api/auth', authRouter)
   app.use('/api/me', meRouter)
   app.use('/api/subscription', subscriptionRouter)
+  app.use('/api/payments', paymentsRouter)
   app.use('/api/admin', adminRouter)
   app.use('/api/group', groupRouter)
   app.use('/api/menu', menuRouter)
   app.use('/api/upload', uploadRouter)
   app.use('/api/qr', qrRouter)
+
+  if (config.upi.id) {
+    console.log(`✓ UPI payments active (${config.upi.id} · ${config.upi.name})`)
+  } else {
+    console.warn('! BUSINESS_UPI_ID not set — new subscribers will see "payments not configured" until you set it.')
+  }
 
   app.use(notFound)
   app.use(errorHandler)

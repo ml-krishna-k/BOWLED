@@ -46,24 +46,23 @@ export function WhyStudents() {
           description="Most tiffin services were built for offices. We started by asking 200 students what they actually wanted from a meal plan — these are their answers."
         />
 
-        <div className="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 sm:mt-14 lg:mt-16 grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
           {REASONS.map((r) => (
             <Card
               key={r.title}
               variant="soft"
-              className="group relative p-7 lift-card hover:bg-paper overflow-hidden"
+              className="group relative p-5 sm:p-6 lg:p-7 lift-card hover:bg-paper overflow-hidden"
             >
-              {/* Soft hover wash */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full bg-saffron-200/0 blur-2xl transition-colors duration-500 group-hover:bg-saffron-200/40"
               />
 
-              <div className="relative grid h-12 w-12 place-items-center rounded-2xl bg-saffron-500 text-cream-50 font-display text-2xl shadow-soft transition-transform duration-400 group-hover:scale-110 group-hover:rotate-3">
+              <div className="relative grid h-11 w-11 sm:h-12 sm:w-12 place-items-center rounded-2xl bg-saffron-500 text-cream-50 font-display text-xl sm:text-2xl shadow-soft transition-transform duration-400 group-hover:scale-110 group-hover:rotate-3">
                 {r.icon}
               </div>
-              <h3 className="relative mt-6 font-display text-xl text-ink-900 tracking-tight">{r.title}</h3>
-              <p className="relative mt-2 text-ink-500 text-[15px] leading-relaxed">{r.desc}</p>
+              <h3 className="relative mt-4 sm:mt-6 font-display text-lg sm:text-xl text-ink-900 tracking-tight">{r.title}</h3>
+              <p className="relative mt-2 text-ink-500 text-[14px] sm:text-[15px] leading-relaxed">{r.desc}</p>
             </Card>
           ))}
         </div>

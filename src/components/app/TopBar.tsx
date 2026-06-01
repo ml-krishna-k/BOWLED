@@ -11,7 +11,7 @@ export function TopBar() {
     >
       <div className="flex items-center justify-between px-4 py-3">
         <Link to="/app/home" className="transition-transform hover:scale-[1.02]">
-          <Logo />
+          <Logo size="h-10 w-10" />
         </Link>
         <div className="flex items-center gap-3">
           <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-ink-400 hidden sm:inline">

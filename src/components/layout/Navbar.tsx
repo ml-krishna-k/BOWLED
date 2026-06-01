@@ -26,13 +26,14 @@ export function Navbar() {
     <header
       className={cn(
         'fixed inset-x-0 top-0 z-50 transition-all duration-500',
-        scrolled ? 'pt-3' : 'pt-5',
+        scrolled ? 'pt-2 sm:pt-3' : 'pt-3 sm:pt-5',
       )}
+      style={{ paddingTop: scrolled ? 'max(env(safe-area-inset-top), 8px)' : 'max(env(safe-area-inset-top), 12px)' }}
     >
       <Container size="xl">
         <nav
           className={cn(
-            'flex items-center justify-between rounded-full px-3 sm:px-5 py-2.5',
+            'flex items-center justify-between rounded-full pl-2 pr-2 sm:pl-3 sm:pr-5 py-2',
             'transition-[background,box-shadow,border-color,padding] duration-500 ease-out',
             scrolled
               ? 'card-glass-strong shadow-card'
@@ -41,9 +42,9 @@ export function Navbar() {
         >
           <a
             href="#"
-            className="shrink-0 transition-transform duration-300 hover:scale-[1.02] pl-1"
+            className="shrink-0 transition-transform duration-300 hover:scale-[1.05]"
           >
-            <Logo />
+            <Logo size="h-9 w-9 sm:h-10 sm:w-10" />
           </a>
 
           <ul className="hidden lg:flex items-center gap-0.5">
@@ -95,7 +96,7 @@ export function Navbar() {
 
           <button
             aria-label={open ? 'Close menu' : 'Open menu'}
-            className="md:hidden grid h-10 w-10 place-items-center rounded-full bg-cream-100 text-ink-900 transition-colors hover:bg-cream-200"
+            className="md:hidden grid h-11 w-11 place-items-center rounded-full bg-cream-100 text-ink-900 transition-colors hover:bg-cream-200 active:scale-95"
             onClick={() => setOpen((s) => !s)}
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -116,13 +117,13 @@ export function Navbar() {
         </nav>
 
         {open && (
-          <div className="mt-3 md:hidden card-glass-strong rounded-3xl shadow-card p-4 space-y-1 animate-fade-up">
+          <div className="mt-2 md:hidden card-glass-strong rounded-3xl shadow-card p-3 space-y-0.5 animate-fade-up">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="block rounded-xl px-4 py-3 text-[15px] font-medium text-ink-700 transition-colors hover:bg-cream-100 hover:text-ink-900"
+                className="block rounded-xl px-4 py-3.5 text-base font-medium text-ink-700 transition-colors active:bg-cream-100 hover:text-ink-900"
               >
                 {link.label}
               </a>
@@ -131,7 +132,7 @@ export function Navbar() {
               {isAuthenticated ? (
                 <Button
                   variant="primary"
-                  size="sm"
+                  size="md"
                   className="col-span-2"
                   onClick={() => { setOpen(false); navigate(isAdmin ? '/admin/overview' : '/app/home') }}
                 >
@@ -139,10 +140,10 @@ export function Navbar() {
                 </Button>
               ) : (
                 <>
-                  <Button variant="outline" size="sm" onClick={() => { setOpen(false); navigate('/auth/login') }}>
+                  <Button variant="outline" size="md" onClick={() => { setOpen(false); navigate('/auth/login') }}>
                     Log in
                   </Button>
-                  <Button variant="secondary" size="sm" onClick={() => { setOpen(false); navigate('/auth/signup') }}>
+                  <Button variant="secondary" size="md" onClick={() => { setOpen(false); navigate('/auth/signup') }}>
                     Start trial
                   </Button>
                 </>

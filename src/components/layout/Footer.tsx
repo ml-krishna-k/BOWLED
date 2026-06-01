@@ -53,9 +53,9 @@ export function Footer() {
       />
 
       <Container className="relative">
-        <div className="grid gap-10 py-16 sm:py-20 md:grid-cols-2 lg:grid-cols-6">
-          <div className="lg:col-span-2 space-y-5">
-            <Logo />
+        <div className="grid gap-8 sm:gap-10 py-12 sm:py-16 lg:py-20 md:grid-cols-2 lg:grid-cols-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-5">
+            <Logo size="h-12 w-12 sm:h-14 sm:w-14" />
             <p className="text-ink-500 max-w-xs leading-relaxed">
               {BRAND.tagline}. Cooked fresh every morning in our partner kitchens, delivered warm to your door.
             </p>
@@ -83,13 +83,13 @@ export function Footer() {
 
           {COLUMNS.map((col) => (
             <div key={col.title}>
-              <h4 className="text-eyebrow mb-4 text-ink-900">{col.title}</h4>
-              <ul className="space-y-2.5">
+              <h4 className="text-eyebrow mb-3 sm:mb-4 text-ink-900">{col.title}</h4>
+              <ul className="space-y-3 sm:space-y-2.5">
                 {col.links.map((l) => (
                   <li key={l.label}>
                     <a
                       href={l.href}
-                      className="group inline-flex items-center gap-1 text-[15px] text-ink-500 transition-colors hover:text-saffron-700"
+                      className="group inline-flex items-center gap-1 text-[15px] text-ink-500 transition-colors py-1 hover:text-saffron-700 active:text-saffron-700"
                     >
                       <span>{l.label}</span>
                       <span
@@ -106,9 +106,9 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-t border-cream-200 py-6 text-sm text-ink-400">
-          <p>© {new Date().getFullYear()} {BRAND.name} · A {BRAND.parentCompany} venture · Cooked with care in {BRAND.city}.</p>
-          <div className="flex gap-5">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-t border-cream-200 py-5 sm:py-6 text-xs sm:text-sm text-ink-400">
+          <p className="leading-relaxed">© {new Date().getFullYear()} {BRAND.name} · A {BRAND.parentCompany} venture · Cooked with care in {BRAND.city}.</p>
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
             <a href="#" className="hover:text-ink-700 transition-colors">Privacy</a>
             <a href="#" className="hover:text-ink-700 transition-colors">Terms</a>
             <a href="#" className="hover:text-ink-700 transition-colors">FSSAI Lic. 12345678901234</a>

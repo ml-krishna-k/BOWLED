@@ -58,10 +58,10 @@ export function Dashboard() {
       <div className="mt-4 hairline" />
 
       {/* Greeting block — editorial split */}
-      <div className="mt-8 grid lg:grid-cols-12 gap-6 lg:gap-10 items-end">
+      <div className="mt-6 sm:mt-8 grid lg:grid-cols-12 gap-5 sm:gap-6 lg:gap-10 items-end">
         <div className="lg:col-span-8">
           <p className="text-eyebrow text-saffron-600">{greeting()}</p>
-          <h1 className="mt-2 text-display text-4xl sm:text-5xl lg:text-[3.75rem] tracking-[-0.03em] leading-[1.02] text-ink-900">
+          <h1 className="mt-2 text-display text-[2.25rem] sm:text-4xl lg:text-5xl xl:text-[3.75rem] tracking-[-0.03em] leading-[1.05] sm:leading-[1.02] text-ink-900">
             {user?.name?.split(' ')[0]},
             <br />
             <span className="italic font-light text-saffron-600">
@@ -71,7 +71,7 @@ export function Dashboard() {
             </span>
           </h1>
           {nextSlot && (
-            <p className="mt-4 text-[15px] sm:text-base text-ink-500 leading-relaxed max-w-xl">
+            <p className="mt-3 sm:mt-4 text-[14px] sm:text-[15px] lg:text-base text-ink-500 leading-relaxed max-w-xl">
               <span className="font-display italic text-ink-700">
                 &ldquo;{todayDay.meals[nextSlot].name}&rdquo;
               </span>
@@ -82,10 +82,10 @@ export function Dashboard() {
 
         {/* Plan progress capsule */}
         <div className="lg:col-span-4">
-          <div className="rounded-2xl bg-paper border border-cream-200 p-5 ring-inset-warm">
+          <div className="rounded-2xl bg-paper border border-cream-200 p-4 sm:p-5 ring-inset-warm">
             <p className="text-eyebrow text-ink-500">This cycle</p>
             <p className="mt-2 flex items-baseline gap-1">
-              <span className="text-editorial text-4xl text-ink-900">{dayNumber}</span>
+              <span className="text-editorial text-3xl sm:text-4xl text-ink-900">{dayNumber}</span>
               <span className="text-sm text-ink-400">/ 30</span>
             </p>
             <p className="caption text-xs text-ink-500">day of your plan</p>
@@ -104,11 +104,11 @@ export function Dashboard() {
       </div>
 
       {/* Today's three meals — editorial row, hairline-separated */}
-      <section className="mt-14">
-        <div className="flex items-end justify-between mb-5">
+      <section className="mt-10 sm:mt-14">
+        <div className="flex items-end justify-between mb-4 sm:mb-5">
           <div>
             <p className="text-eyebrow text-ink-500">Today's three meals</p>
-            <h2 className="mt-1.5 text-display text-2xl tracking-tight text-ink-900">
+            <h2 className="mt-1.5 text-display text-xl sm:text-2xl tracking-tight text-ink-900">
               Breakfast, lunch, dinner.
             </h2>
           </div>
@@ -131,14 +131,14 @@ export function Dashboard() {
               <article
                 key={slot}
                 className={cn(
-                  'relative p-6 transition-colors duration-500 border-b border-cream-200 sm:border-b-0',
+                  'relative p-5 sm:p-6 transition-colors duration-500 border-b border-cream-200 sm:border-b-0',
                   isNext && 'bg-saffron-50/60',
                   isServed && 'opacity-60',
                 )}
               >
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-chapter text-xl text-saffron-500 tabular-nums">
+                    <p className="text-chapter text-lg sm:text-xl text-saffron-500 tabular-nums">
                       0{i + 1}
                     </p>
                     <p className="mt-2 text-eyebrow text-ink-500">{meta.label}</p>
@@ -149,10 +149,10 @@ export function Dashboard() {
                   {isSkipped && <Badge tone="cream">Skipped</Badge>}
                 </div>
 
-                <h3 className="mt-5 text-display text-xl tracking-tight text-ink-900 leading-tight">
+                <h3 className="mt-4 sm:mt-5 text-display text-lg sm:text-xl tracking-tight text-ink-900 leading-tight">
                   {meal.name}
                 </h3>
-                <p className="mt-2 text-sm text-ink-500 leading-relaxed line-clamp-2">
+                <p className="mt-1.5 sm:mt-2 text-[13px] sm:text-sm text-ink-500 leading-relaxed line-clamp-2">
                   {meal.description}
                 </p>
 
@@ -175,7 +175,7 @@ export function Dashboard() {
       </section>
 
       {/* Editorial figure sheet */}
-      <section className="mt-14">
+      <section className="mt-10 sm:mt-14">
         <div className="flex items-end justify-between mb-5">
           <div>
             <p className="text-eyebrow text-ink-500">By the numbers</p>
@@ -204,8 +204,8 @@ export function Dashboard() {
       </section>
 
       {/* Calls to action — kept as cards, but editorial */}
-      <section className="mt-14 grid gap-5 md:grid-cols-2">
-        <Card className="relative overflow-hidden bg-ink-900 text-cream-50 p-6 sm:p-7 lift-card">
+      <section className="mt-10 sm:mt-14 grid gap-4 sm:gap-5 md:grid-cols-2">
+        <Card className="relative overflow-hidden bg-ink-900 text-cream-50 p-5 sm:p-6 lg:p-7 lift-card">
           <div
             aria-hidden
             className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-saffron-500/30 blur-2xl animate-breathe"
@@ -226,7 +226,7 @@ export function Dashboard() {
           </div>
         </Card>
 
-        <Card variant="soft" className="p-6 sm:p-7 lift-card">
+        <Card variant="soft" className="p-5 sm:p-6 lg:p-7 lift-card">
           <p className="text-eyebrow">This week's menu</p>
           <h3 className="mt-2 text-display text-2xl sm:text-3xl tracking-tight text-ink-900">
             Plan <span className="italic font-light text-saffron-600">ahead.</span>
@@ -243,7 +243,7 @@ export function Dashboard() {
 
       {/* Skip allowance — monthly subscribers only */}
       {isMonthly && (
-        <section className="mt-14">
+        <section className="mt-10 sm:mt-14">
           <div className="flex items-end justify-between mb-5">
             <div>
               <p className="text-eyebrow text-ink-500">Plan around your week</p>
@@ -315,7 +315,7 @@ export function Dashboard() {
         const pct = Math.min(100, Math.round((sub.groupSize / plan.groupMin) * 100))
         const unlocked = needed === 0
         return (
-          <section className="mt-14 rounded-2xl bg-saffron-50/40 border border-saffron-200 p-6 sm:p-7 ring-inset-warm">
+          <section className="mt-14 rounded-2xl bg-saffron-50/40 border border-saffron-200 p-5 sm:p-6 lg:p-7 ring-inset-warm">
             <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <p className="text-eyebrow text-saffron-700">Your group</p>

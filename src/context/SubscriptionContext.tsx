@@ -11,6 +11,7 @@ import type {
   MealSlot,
   Subscription,
   Plan,
+  PaymentInstructions,
   ServedMeal,
   SkippedMeal,
   SkippedDay,
@@ -35,6 +36,8 @@ export type SkipResult =
 
 interface SubscriptionValue {
   sub: Subscription | null
+  /** Set when sub.status === 'pending_payment'. Carries UPI QR + ref + amount. */
+  paymentInstructions: PaymentInstructions | null
   plan: Plan | null
   loading: boolean
   dayNumber: number
@@ -74,16 +77,19 @@ const SLOT_ORDER: MealSlot[] = ['breakfast', 'lunch', 'dinner']
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated, loading: authLoading } = useAuth()
   const [sub, setSub] = useState<Subscription | null>(null)
+  const [paymentInstructions, setPaymentInstructions] = useState<PaymentInstructions | null>(null)
   const [loading, setLoading] = useState(true)
 
   const refresh = useCallback(async () => {
     if (!isAuthenticated) {
       setSub(null)
+      setPaymentInstructions(null)
       return
     }
     try {
-      const data = await api<{ subscription: Subscription | null }>('/api/subscription')
+      const data = await api<{ subscription: Subscription | null; paymentInstructions: PaymentInstructions | null }>('/api/subscription')
       setSub(data.subscription)
+      setPaymentInstructions(data.paymentInstructions ?? null)
     } catch {
       /* leave existing sub in place — caller doesn't need to know about transient failures */
     }
@@ -94,6 +100,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     if (authLoading) return
     if (!isAuthenticated) {
       setSub(null)
+      setPaymentInstructions(null)
       setLoading(false)
       return
     }
@@ -129,7 +136,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
   const subscribe = useCallback<SubscriptionValue['subscribe']>(
     async (planId, groupCode, groupSize, billingCycleId) => {
-      const data = await api<{ subscription: Subscription }>('/api/subscription', {
+      const data = await api<{ subscription: Subscription; paymentInstructions: PaymentInstructions | null }>('/api/subscription', {
         body: {
           planId,
           groupCode,
@@ -138,6 +145,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         },
       })
       setSub(data.subscription)
+      setPaymentInstructions(data.paymentInstructions ?? null)
     },
     [],
   )
@@ -185,6 +193,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const reset = useCallback(async () => {
     await api('/api/subscription', { method: 'DELETE' })
     setSub(null)
+    setPaymentInstructions(null)
   }, [])
 
   const changeCycle = useCallback<SubscriptionValue['changeCycle']>(async (billingCycleId) => {
@@ -247,14 +256,14 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<SubscriptionValue>(
     () => ({
-      sub, plan, loading, dayNumber, mealsRemaining, todayDay, nextSlot,
+      sub, paymentInstructions, plan, loading, dayNumber, mealsRemaining, todayDay, nextSlot,
       isMonthly, mealSkipsUsed, mealSkipsLeft, daySkipsUsed, daySkipsLeft,
       upcomingMealSkips, upcomingDaySkips,
       subscribe, changeCycle, scanMeal, rescheduleNextSlot, pause, resume, reset,
       skipMeal, skipDay, removeMealSkip, removeDaySkip, refresh,
     }),
     [
-      sub, plan, loading, dayNumber, mealsRemaining, todayDay, nextSlot,
+      sub, paymentInstructions, plan, loading, dayNumber, mealsRemaining, todayDay, nextSlot,
       isMonthly, mealSkipsUsed, mealSkipsLeft, daySkipsUsed, daySkipsLeft,
       upcomingMealSkips, upcomingDaySkips,
       subscribe, changeCycle, scanMeal, rescheduleNextSlot, pause, resume, reset, refresh,

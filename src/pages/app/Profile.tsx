@@ -61,13 +61,13 @@ export function Profile() {
       />
 
       {/* Profile portrait — editorial */}
-      <div className="mt-10 flex items-center gap-6">
-        <div className="grid h-20 w-20 sm:h-24 sm:w-24 place-items-center rounded-full bg-saffron-500 text-cream-50 text-3xl font-display shadow-glow ring-4 ring-paper">
+      <div className="mt-6 sm:mt-10 flex items-center gap-4 sm:gap-6">
+        <div className="grid h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 place-items-center rounded-full bg-saffron-500 text-cream-50 text-2xl sm:text-3xl font-display shadow-glow ring-4 ring-paper shrink-0">
           {user.name[0]}
         </div>
         <div className="min-w-0">
           <p className="text-eyebrow text-ink-500">Subscriber</p>
-          <h2 className="mt-1 text-display text-3xl sm:text-4xl text-ink-900 tracking-tight truncate">
+          <h2 className="mt-1 text-display text-2xl sm:text-3xl lg:text-4xl text-ink-900 tracking-tight truncate">
             {user.name}
           </h2>
           <p className="caption text-ink-500 mt-1">
@@ -76,10 +76,10 @@ export function Profile() {
         </div>
       </div>
 
-      <div className="mt-8 hairline" />
+      <div className="mt-6 sm:mt-8 hairline" />
 
       {/* Personal */}
-      <Card variant="soft" className="mt-6 p-6 space-y-5">
+      <Card variant="soft" className="mt-5 sm:mt-6 p-5 sm:p-6 space-y-5">
         <h3 className="font-display text-xl text-ink-900">Personal details</h3>
         <Input
           label="Name"
@@ -106,7 +106,7 @@ export function Profile() {
       </Card>
 
       {/* Allergens */}
-      <Card className="mt-6 p-6 space-y-4">
+      <Card className="mt-5 sm:mt-6 p-5 sm:p-6 space-y-4">
         <div>
           <h3 className="font-display text-xl text-ink-900">Allergens</h3>
           <p className="text-sm text-ink-500">
@@ -135,7 +135,7 @@ export function Profile() {
       </Card>
 
       {/* Preferences */}
-      <Card variant="soft" className="mt-6 p-6 space-y-5">
+      <Card variant="soft" className="mt-5 sm:mt-6 p-5 sm:p-6 space-y-5">
         <h3 className="font-display text-xl text-ink-900">Notifications & reports</h3>
         <Switch
           label="Push notifications"
@@ -152,7 +152,7 @@ export function Profile() {
       </Card>
 
       {/* Danger zone */}
-      <Card variant="outline" className="mt-6 p-6 space-y-4">
+      <Card variant="outline" className="mt-5 sm:mt-6 p-5 sm:p-6 space-y-4">
         <div>
           <h3 className="font-display text-xl text-ink-900">Account</h3>
           <p className="text-sm text-ink-500">Sign out of this device or reset your demo subscription.</p>

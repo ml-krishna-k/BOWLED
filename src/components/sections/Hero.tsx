@@ -7,53 +7,57 @@ export function Hero() {
   const navigate = useNavigate()
 
   return (
-    <section className="relative overflow-hidden pt-24 sm:pt-32 lg:pt-40 pb-16 sm:pb-24 lg:pb-32">
-      {/* Layered ambient warmth */}
+    <section className="relative overflow-hidden pt-20 sm:pt-28 lg:pt-40 pb-12 sm:pb-20 lg:pb-32">
+      {/* Layered ambient warmth — shorter on mobile so the glow doesn't dominate
+          the first-fold of a 360-wide phone. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[820px]
-                   bg-[radial-gradient(60%_60%_at_50%_0%,rgba(255,174,107,0.5)_0%,rgba(255,174,107,0)_60%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] sm:h-[620px] lg:h-[820px]
+                   bg-[radial-gradient(60%_60%_at_50%_0%,rgba(255,174,107,0.45)_0%,rgba(255,174,107,0)_60%)] sm:bg-[radial-gradient(60%_60%_at_50%_0%,rgba(255,174,107,0.5)_0%,rgba(255,174,107,0)_60%)]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-32 top-1/3 -z-10 h-[460px] w-[460px] rounded-full
-                   bg-[radial-gradient(circle,rgba(155,189,135,0.32),transparent_70%)] animate-breathe"
+        className="pointer-events-none absolute -left-32 top-1/3 -z-10 h-[320px] w-[320px] sm:h-[460px] sm:w-[460px] rounded-full
+                   bg-[radial-gradient(circle,rgba(155,189,135,0.25),transparent_70%)] sm:bg-[radial-gradient(circle,rgba(155,189,135,0.32),transparent_70%)] animate-breathe"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-24 top-1/4 -z-10 h-[380px] w-[380px] rounded-full
-                   bg-[radial-gradient(circle,rgba(245,106,27,0.18),transparent_70%)] animate-breathe"
+        className="pointer-events-none absolute -right-24 top-1/4 -z-10 h-[280px] w-[280px] sm:h-[380px] sm:w-[380px] rounded-full
+                   bg-[radial-gradient(circle,rgba(245,106,27,0.15),transparent_70%)] sm:bg-[radial-gradient(circle,rgba(245,106,27,0.18),transparent_70%)] animate-breathe"
         style={{ animationDelay: '3s' }}
       />
-      <div className="absolute inset-0 -z-10 bg-grain opacity-50" aria-hidden />
+      <div className="absolute inset-0 -z-10 bg-grain opacity-40 sm:opacity-50" aria-hidden />
 
       <Container size="xl">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-14 items-center">
+        <div className="grid lg:grid-cols-12 lg:gap-14 items-center">
           {/* Editorial copy column */}
-          <div className="lg:col-span-7 space-y-8">
-            <div className="flex flex-wrap gap-2 animate-fade-up">
-              <Badge tone="saffron" dot>4.8 average rating</Badge>
-              <Badge tone="leaf" dot>Now serving across Chennai</Badge>
-              <Badge tone="cream">Since 2006 · Sree Krishna Catering</Badge>
+          <div className="lg:col-span-7 space-y-6 sm:space-y-7 lg:space-y-8">
+            {/* Badge cluster — on phones the third badge is hidden because three
+                badges + cramped width creates a messy three-line wrap. */}
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 animate-fade-up">
+              <Badge tone="saffron" dot>4.8 rating</Badge>
+              <Badge tone="leaf" dot>Now in Chennai</Badge>
+              <Badge tone="cream" className="hidden sm:inline-flex">Since 2006 · Sree Krishna Catering</Badge>
             </div>
 
-            <h1 className="text-display text-[2.25rem] sm:text-[3.25rem] lg:text-[4.5rem] leading-[1.04] sm:leading-[1.0] tracking-tight animate-fade-up delay-100">
+            {/* Display headline — mobile-first scale. 2rem on phones reads
+                comfortably on a 360-px viewport without horizontal scroll. */}
+            <h1 className="text-display text-[2rem] sm:text-[3rem] lg:text-[4.5rem] leading-[1.08] sm:leading-[1.02] tracking-[-0.02em] sm:tracking-tight animate-fade-up delay-100">
               Home-style daily meals,
               <br className="hidden sm:block" />
               <span className="italic font-light text-shimmer">
-                for your PG life.
+                {' '}for your PG life.
               </span>
             </h1>
 
-            <p className="text-ink-500 text-base sm:text-lg leading-relaxed max-w-xl animate-fade-up delay-200">
+            <p className="text-ink-500 text-[15px] sm:text-base lg:text-lg leading-relaxed max-w-xl animate-fade-up delay-200">
               Bowled is a meal subscription built for students in hostels,
-              PGs and rented rooms — three balanced, home-cooked meals a day,
+              PGs and rented rooms — three home-cooked meals a day,
               a weekly rotating menu, and the kind of taste that reminds you of
-              your mom&apos;s kitchen. Launched May 2025 by Sree Krishna Catering,
-              who&apos;ve been feeding Chennai since 2006.
+              your mom&apos;s kitchen.
             </p>
 
-            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 pt-1 animate-fade-up delay-300">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2.5 sm:gap-3 pt-1 animate-fade-up delay-300">
               <Button
                 variant="secondary"
                 size="lg"
@@ -78,41 +82,45 @@ export function Hero() {
               </Button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-5 pt-3 animate-fade-up delay-400">
-              <div className="flex -space-x-2.5">
+            <div className="flex items-center gap-4 pt-2 animate-fade-up delay-400">
+              <div className="flex -space-x-2 sm:-space-x-2.5">
                 {['#fde2c4', '#f4c79e', '#e3b07d', '#caa37b'].map((c, i) => (
                   <div
                     key={i}
-                    className="h-9 w-9 rounded-full ring-2 ring-cream-50 grid place-items-center text-xs font-semibold text-ink-700 transition-transform hover:-translate-y-0.5"
+                    className="h-8 w-8 sm:h-9 sm:w-9 rounded-full ring-2 ring-cream-50 grid place-items-center text-xs font-semibold text-ink-700"
                     style={{ background: c }}
                   >
                     {['A','S','K','R'][i]}
                   </div>
                 ))}
               </div>
-              <p className="text-sm text-ink-500">
+              <p className="text-[13px] sm:text-sm text-ink-500 leading-snug">
                 <span className="font-semibold text-ink-900">300+ students</span>
-                {' '}eating with us every day across Chennai
+                {' '}eating with us every day
               </p>
             </div>
 
-            {/* Mobile-only food photo */}
-            <div className="md:hidden relative mt-2 overflow-hidden rounded-3xl shadow-card img-reveal img-vignette animate-fade-up delay-500">
+            {/* Mobile-only food photo — phones don't get the desktop bento. */}
+            <div className="md:hidden relative mt-4 overflow-hidden rounded-2xl shadow-card img-reveal img-vignette animate-fade-up delay-500">
               <img
                 src="/hero-spread.jpg"
                 alt="A spread of home-style dishes — dal, rice, greens and sides"
                 loading="eager"
                 decoding="async"
-                className="h-64 w-full object-cover animate-reveal"
+                className="aspect-[4/3] w-full object-cover animate-reveal"
               />
-              <div className="absolute inset-x-0 bottom-0 p-5 z-10">
-                <p className="text-cream-50 font-display text-lg leading-tight">Today&apos;s lunch · Dal Tadka Thali</p>
-                <p className="text-cream-50/85 text-xs mt-1">Jeera rice · phulka · poriyal · curd · gulab jamun · ★ 4.8</p>
+              <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 z-10">
+                <p className="text-cream-50 font-display text-base sm:text-lg leading-tight">
+                  Today&apos;s lunch · Dal Tadka Thali
+                </p>
+                <p className="text-cream-50/85 text-[11px] sm:text-xs mt-1">
+                  Jeera rice · phulka · poriyal · curd · gulab jamun · ★ 4.8
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Bento composition — perspective scene */}
+          {/* Desktop bento — hidden on mobile (mobile gets the dedicated photo above) */}
           <div className="hidden md:block lg:col-span-5 relative h-[500px] sm:h-[580px] perspective-scene">
             {/* Main hero plate card — featured */}
             <div

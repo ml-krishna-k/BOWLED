@@ -117,6 +117,63 @@ export async function verifyWidgetAccessToken(accessToken: string): Promise<stri
 }
 
 /**
+ * Send a transactional SMS via MSG91's Flow API.
+ *
+ *   POST https://control.msg91.com/api/v5/flow/
+ *   body: { template_id, short_url, recipients: [{ mobiles, VAR1, VAR2, ... }] }
+ *
+ * `vars` keys are the variable names defined in your DLT-approved template
+ * (e.g. VAR1, VAR2 or `name`, `reason` — depends on how you registered them
+ * in MSG91 → Flow → Template Variables). Match the casing exactly.
+ *
+ * Throws on transport / 4xx errors. Callers should wrap in try/catch so a
+ * failed SMS doesn't break the underlying business action (approval, etc.).
+ *
+ * Reference: https://docs.msg91.com/p/tf9GTextN/e/lyQ1MqfaI8/MSG91
+ */
+export async function sendFlow(
+  phone: string,
+  templateId: string,
+  vars: Record<string, string> = {},
+): Promise<{ requestId?: string }> {
+  if (!config.msg91.apiKey) {
+    throw new Error('MSG91_API_KEY is not configured — cannot send transactional SMS')
+  }
+  const url = 'https://control.msg91.com/api/v5/flow/'
+  const body = {
+    template_id: templateId,
+    short_url: '0',
+    recipients: [
+      {
+        mobiles: `${config.msg91.countryCode}${phone}`,
+        ...vars,
+      },
+    ],
+  }
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'authkey': config.msg91.apiKey,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+  const text = await res.text()
+  let parsed: Msg91Response = {}
+  try { parsed = text ? JSON.parse(text) : {} } catch { /* keep empty */ }
+
+  if (config.nodeEnv !== 'production') {
+    console.log(`[msg91:flow] ← ${res.status} ${text}`)
+  }
+
+  if (!res.ok || parsed.type === 'error') {
+    throw new Error(`MSG91 flow send failed (${res.status}): ${parsed.message ?? text}`)
+  }
+  return { requestId: parsed.request_id }
+}
+
+/**
  * Verify an OTP against MSG91's record. Throws on error.
  * Returns true if the OTP matched.
  */

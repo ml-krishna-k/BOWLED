@@ -18,7 +18,11 @@ export function AppShell() {
       navigate('/auth/login', { replace: true })
       return
     }
-    if (isAuthenticated && !sub && loc.pathname !== '/app/subscription') {
+    // Users without a sub OR with a non-active sub (pending payment / expired)
+    // are routed to /app/subscription where the Onboarding / pending-payment
+    // / expired screens live.
+    const needsOnboarding = !sub || sub.status !== 'active'
+    if (needsOnboarding && loc.pathname !== '/app/subscription') {
       navigate('/app/subscription', { replace: true })
     }
   }, [isAuthenticated, loading, sub, loc.pathname, navigate])

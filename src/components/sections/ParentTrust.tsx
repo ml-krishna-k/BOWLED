@@ -14,7 +14,7 @@ export function ParentTrust() {
       />
 
       <Container className="relative">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-16 items-center">
           <div className="lg:col-span-6 space-y-6">
             <Eyebrow>For parents</Eyebrow>
             <h2 className="text-display text-3xl sm:text-4xl lg:text-5xl tracking-tight">
@@ -48,7 +48,7 @@ export function ParentTrust() {
 
           {/* WhatsApp-style preview — subtly tilted for editorial composition */}
           <div className="lg:col-span-6 perspective-scene">
-            <Card className="p-6 max-w-md mx-auto bg-gradient-to-br from-cream-50 to-paper tilt-hover">
+            <Card className="p-5 sm:p-6 max-w-md mx-auto bg-gradient-to-br from-cream-50 to-paper tilt-hover">
               <div className="flex items-center gap-3 border-b border-cream-200 pb-4">
                 <div className="grid h-11 w-11 place-items-center rounded-full bg-saffron-500 text-white font-semibold shadow-soft ring-2 ring-paper">
                   B

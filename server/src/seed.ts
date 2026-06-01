@@ -119,8 +119,14 @@ async function seed() {
     const totalMeals = 90
     const variance = Math.floor((rand() - 0.5) * 6)
     const mealsServed = Math.max(0, Math.min(totalMeals, Math.floor((daysIn / 30) * totalMeals) + variance))
+    // Seeded subs are all approved/active. ~14% get a pause window for variety.
     const rStatus = rand()
-    const status: 'active' | 'paused' | 'churned' = rStatus < 0.78 ? 'active' : rStatus < 0.92 ? 'paused' : 'churned'
+    const isPaused = rStatus >= 0.78 && rStatus < 0.92
+    const isExpired = rStatus >= 0.92
+    const status: 'active' | 'expired' = isExpired ? 'expired' : 'active'
+    const pause = isPaused
+      ? { from: Date.now(), to: Date.now() + 5 * 24 * 60 * 60 * 1000 }
+      : null
     const allergens: string[] = []
     if (rand() < 0.18) allergens.push('Dairy')
     if (rand() < 0.12) allergens.push('Peanuts')
@@ -146,9 +152,11 @@ async function seed() {
       groupSize: planId === 'solo' ? 1 : planId === 'squad' ? 5 : 10,
       startedAt,
       cycleStartedAt: startedAt,
+      expiresAt: startedAt + 30 * 24 * 60 * 60 * 1000,
       totalMeals,
       mealsServed,
       status,
+      pause,
     })
   }
 

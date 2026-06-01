@@ -4,7 +4,23 @@ const MealStatusEnum = ['pending', 'served', 'skipped'] as const
 const SlotEnum = ['breakfast', 'lunch', 'dinner'] as const
 const PlanEnum = ['solo', 'squad', 'floor'] as const
 const CycleEnum = ['weekly', 'weekly-no-sun', 'monthly-no-sun', 'monthly-no-weekend'] as const
-const StatusEnum = ['active', 'paused', 'churned'] as const
+
+/**
+ * Subscription lifecycle:
+ *   pending_payment → active → expired
+ *
+ * `pending_payment`  — created when the user picks a plan; sits here until
+ *                      an admin approves their UPI payment.
+ * `active`           — admin approved the payment; plan is live. 30-day
+ *                      window (extended for skips/pauses) tracked via
+ *                      `expiresAt`.
+ * `expired`          — `expiresAt` elapsed without renewal. The doc stays
+ *                      around for history but no scans / skips are allowed.
+ *
+ * Pause is a separate orthogonal field (`pause: { from, to }`) — a paused
+ * subscription is still `active`.
+ */
+const StatusEnum = ['pending_payment', 'active', 'expired'] as const
 
 const ServedMealSchema = new Schema(
   {
@@ -42,11 +58,22 @@ const SubscriptionSchema = new Schema(
     billingCycleId: { type: String, enum: CycleEnum, default: 'monthly-no-sun' },
     groupCode: { type: String, required: true, index: true },
     groupSize: { type: Number, default: 1 },
-    startedAt: { type: Number, required: true },
-    cycleStartedAt: { type: Number, required: true },
+
+    /**
+     * Started + cycleStarted are set when the admin APPROVES the payment.
+     * Before that the sub is in `pending_payment` and these are 0.
+     */
+    startedAt: { type: Number, default: 0 },
+    cycleStartedAt: { type: Number, default: 0 },
+    /** When the active window ends. Set on approval to now + 30 days. */
+    expiresAt: { type: Number, default: 0 },
+
+    /** Pointer to the most recent approved Payment doc, for audit. */
+    paymentId: { type: Schema.Types.ObjectId, ref: 'Payment', default: null },
+
     totalMeals: { type: Number, required: true },
     mealsServed: { type: Number, default: 0 },
-    status: { type: String, enum: StatusEnum, default: 'active' },
+    status: { type: String, enum: StatusEnum, default: 'pending_payment', index: true },
     today: {
       breakfast: { type: String, enum: MealStatusEnum, default: 'pending' },
       lunch:     { type: String, enum: MealStatusEnum, default: 'pending' },

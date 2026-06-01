@@ -71,7 +71,7 @@ export function QrPass() {
         description="Show this to the delivery person. They scan once, your meal counter drops by one."
       />
 
-      <Card className="mt-10 p-8 sm:p-12 grid place-items-center text-center relative overflow-hidden ring-inset-warm">
+      <Card className="mt-8 sm:mt-10 p-6 sm:p-8 lg:p-12 grid place-items-center text-center relative overflow-hidden ring-inset-warm">
         <div
           aria-hidden
           className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-saffron-200/40 blur-3xl animate-breathe"
@@ -87,7 +87,7 @@ export function QrPass() {
             />
           )}
           {/* QR — real, scannable; encodes /scan/:token URL */}
-          <div className="relative h-56 w-56 sm:h-64 sm:w-64 rounded-3xl bg-paper border border-cream-200 p-4 shadow-card grid place-items-center">
+          <div className="relative h-52 w-52 sm:h-60 sm:w-60 lg:h-64 lg:w-64 rounded-3xl bg-paper border border-cream-200 p-3 sm:p-4 shadow-card grid place-items-center">
             {scanUrl ? (
               <QRCodeSVG
                 value={scanUrl}

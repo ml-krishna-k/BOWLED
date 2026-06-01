@@ -42,18 +42,19 @@ export function WeeklyMenu() {
           description="Our chefs rotate the menu every week to keep things exciting — comfort classics, regional specials, and student favourites. No mystery-meat thalis."
         />
 
-        {/* Day picker */}
-        <div className="mt-14 flex justify-center">
-          <div className="inline-flex gap-1 rounded-full bg-paper border border-cream-200 p-1.5 shadow-soft overflow-x-auto max-w-full ring-inset-warm">
+        {/* Day picker — horizontally scrollable on mobile, edge-to-edge so all
+            7 days fit without cramping. Hides scrollbar but keeps swipe. */}
+        <div className="mt-10 sm:mt-14 -mx-4 sm:mx-0 px-4 sm:px-0 sm:flex sm:justify-center overflow-x-auto">
+          <div className="inline-flex gap-1 rounded-full bg-paper border border-cream-200 p-1 sm:p-1.5 shadow-soft ring-inset-warm">
             {menu.map((d, i) => (
               <button
                 key={d.day}
                 onClick={() => setDayIdx(i)}
                 className={cn(
-                  'shrink-0 rounded-full px-5 py-2 text-sm font-medium transition-all duration-300',
+                  'shrink-0 rounded-full px-3.5 sm:px-5 py-2 text-sm font-medium transition-all duration-300',
                   dayIdx === i
                     ? 'bg-ink-900 text-cream-50 shadow-soft scale-105'
-                    : 'text-ink-700 hover:bg-cream-100',
+                    : 'text-ink-700 active:bg-cream-100 hover:bg-cream-100',
                 )}
               >
                 {d.short}
@@ -63,7 +64,7 @@ export function WeeklyMenu() {
         </div>
 
         {/* Filter chips */}
-        <div className="mt-5 flex justify-center gap-2">
+        <div className="mt-4 sm:mt-5 flex justify-center gap-2 flex-wrap px-2">
           {[
             { id: 'all',    label: 'All' },
             { id: 'veg',    label: '🌿 Vegetarian' },
@@ -73,7 +74,7 @@ export function WeeklyMenu() {
               key={f.id}
               onClick={() => setFilter(f.id as Filter)}
               className={cn(
-                'rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-300 border',
+                'rounded-full px-3.5 sm:px-4 py-2 sm:py-1.5 text-xs font-medium transition-all duration-300 border',
                 filter === f.id
                   ? 'border-saffron-500 bg-saffron-50 text-saffron-700 shadow-soft'
                   : 'border-cream-200 bg-paper/50 text-ink-500 hover:border-cream-300 hover:bg-paper',
@@ -85,9 +86,9 @@ export function WeeklyMenu() {
         </div>
 
         {/* Main meal card + slot tabs */}
-        <div className="mt-12 grid lg:grid-cols-12 gap-6">
+        <div className="mt-8 sm:mt-12 grid lg:grid-cols-12 gap-4 sm:gap-6">
           {/* Slot list */}
-          <div className="lg:col-span-4 space-y-3">
+          <div className="lg:col-span-4 space-y-2 sm:space-y-3 order-2 lg:order-1">
             {SLOTS.map((s) => {
               const slotMeal = day.meals[s.id]
               const active = s.id === slot
@@ -96,9 +97,9 @@ export function WeeklyMenu() {
                   key={s.id}
                   onClick={() => setSlot(s.id)}
                   className={cn(
-                    'group w-full text-left rounded-2xl p-5 border transition-all duration-400 ease-out',
+                    'group w-full text-left rounded-2xl p-4 sm:p-5 border transition-all duration-400 ease-out active:scale-[0.98]',
                     active
-                      ? 'bg-paper border-saffron-300 shadow-card ring-1 ring-saffron-200/50 translate-y-0'
+                      ? 'bg-paper border-saffron-300 shadow-card ring-1 ring-saffron-200/50'
                       : 'bg-paper/60 border-cream-200 hover:border-cream-300 hover:bg-paper hover:-translate-y-0.5 hover:shadow-soft',
                   )}
                 >
@@ -107,8 +108,8 @@ export function WeeklyMenu() {
                     <span>{s.time}</span>
                   </div>
                   <div className="mt-2 flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-display text-lg text-ink-900 tracking-tight">{slotMeal.name}</p>
+                    <div className="min-w-0">
+                      <p className="font-display text-base sm:text-lg text-ink-900 tracking-tight truncate">{slotMeal.name}</p>
                       <div className="mt-1.5 flex flex-wrap gap-1.5">
                         <Badge tone={slotMeal.isVeg ? 'leaf' : 'saffron'} dot>
                           {slotMeal.isVeg ? 'Veg' : 'Non-veg'}
@@ -129,11 +130,13 @@ export function WeeklyMenu() {
           </div>
 
           {/* Featured meal */}
-          <Card className="lg:col-span-8 overflow-hidden p-0">
+          <Card className="lg:col-span-8 overflow-hidden p-0 order-1 lg:order-2">
             <div className="grid md:grid-cols-2">
               <div
                 className={cn(
-                  'relative min-h-[300px] md:min-h-[500px] img-reveal',
+                  // Mobile: 4:3 aspect for a balanced thumbnail; tablet+: full
+                  // panel height so the image fills the card alongside copy.
+                  'relative aspect-[4/3] md:aspect-auto md:min-h-[500px] img-reveal',
                   meal.isVeg
                     ? 'bg-gradient-to-br from-leaf-100 via-cream-100 to-saffron-100'
                     : 'bg-gradient-to-br from-saffron-200 via-saffron-100 to-cream-100',
@@ -171,23 +174,23 @@ export function WeeklyMenu() {
                   aria-hidden
                   className="absolute inset-0 pointer-events-none bg-gradient-to-t from-ink-900/30 via-transparent to-transparent"
                 />
-                <div className="absolute left-5 top-5 flex flex-wrap gap-2 z-10">
+                <div className="absolute left-4 top-4 sm:left-5 sm:top-5 flex flex-wrap gap-1.5 sm:gap-2 z-10">
                   {meal.loved && <Badge tone="ink">❤ Most loved</Badge>}
                   <Badge tone="paper">{meal.calories} kcal</Badge>
                 </div>
-                <div className="absolute bottom-5 right-5 z-10 inline-flex items-center gap-1.5 rounded-full bg-paper/95 px-3 py-1.5 shadow-soft backdrop-blur-sm">
+                <div className="absolute bottom-4 right-4 sm:bottom-5 sm:right-5 z-10 inline-flex items-center gap-1.5 rounded-full bg-paper/95 px-2.5 sm:px-3 py-1 sm:py-1.5 shadow-soft backdrop-blur-sm">
                   <span className="text-saffron-500 text-sm">★</span>
                   <span className="text-sm font-semibold text-ink-900">{meal.rating}</span>
-                  <span className="text-xs text-ink-500">student rating</span>
+                  <span className="text-[11px] sm:text-xs text-ink-500">rating</span>
                 </div>
               </div>
 
-              <div className="p-7 sm:p-10 flex flex-col">
+              <div className="p-5 sm:p-7 lg:p-10 flex flex-col">
                 <p className="text-eyebrow">{day.day} · {SLOTS.find((s) => s.id === slot)?.label}</p>
-                <h3 className="mt-3 font-display text-3xl lg:text-4xl text-ink-900 tracking-tight leading-tight">{meal.name}</h3>
-                <p className="mt-4 text-ink-500 leading-relaxed">{meal.description}</p>
+                <h3 className="mt-2 sm:mt-3 font-display text-2xl sm:text-3xl lg:text-4xl text-ink-900 tracking-tight leading-tight">{meal.name}</h3>
+                <p className="mt-3 sm:mt-4 text-[14px] sm:text-base text-ink-500 leading-relaxed">{meal.description}</p>
 
-                <div className="mt-5 flex flex-wrap gap-2">
+                <div className="mt-4 sm:mt-5 flex flex-wrap gap-2">
                   {meal.tags.map((t) => (
                     <span
                       key={t}
@@ -198,14 +201,14 @@ export function WeeklyMenu() {
                   ))}
                 </div>
 
-                <div className="mt-auto pt-8 grid grid-cols-3 gap-4 border-t border-cream-200">
+                <div className="mt-6 sm:mt-auto sm:pt-8 pt-5 grid grid-cols-3 gap-3 sm:gap-4 border-t border-cream-200">
                   <Stat label="Type" value={meal.isVeg ? 'Vegetarian' : 'Non-veg'} />
                   <Stat label="Calories" value={`${meal.calories} kcal`} />
                   <Stat label="Rating" value={`★ ${meal.rating} / 5`} />
                 </div>
 
                 {!compatible && (
-                  <p className="mt-4 rounded-xl bg-cream-100 px-4 py-3 text-xs text-ink-500 border border-cream-200">
+                  <p className="mt-4 rounded-xl bg-cream-100 px-3 sm:px-4 py-2.5 sm:py-3 text-xs text-ink-500 border border-cream-200">
                     Doesn&apos;t match your filter — but it&apos;s on the menu today.
                   </p>
                 )}
