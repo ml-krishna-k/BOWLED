@@ -14,6 +14,7 @@ import { Profile } from '@/pages/app/Profile'
 import { AdminShell } from '@/pages/admin/AdminShell'
 import { AdminOverview } from '@/pages/admin/Overview'
 import { AdminPayments } from '@/pages/admin/Payments'
+import { AdminScan } from '@/pages/admin/Scan'
 import { AdminSubscribers } from '@/pages/admin/Subscribers'
 import { AdminSubscriberDetail } from '@/pages/admin/SubscriberDetail'
 import { AdminDeliveries } from '@/pages/admin/Deliveries'
@@ -50,6 +51,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/admin/overview" replace /> },
       { path: 'overview',         element: <AdminOverview /> },
+      { path: 'scan',             element: <AdminScan /> },
       { path: 'payments',         element: <AdminPayments /> },
       { path: 'deliveries',       element: <AdminDeliveries /> },
       { path: 'subscribers',      element: <AdminSubscribers /> },

@@ -11,6 +11,10 @@ import { api } from '@/lib/api'
 
 // Server tokens last 60s — rotate just before they expire.
 const TOKEN_REFRESH_MS = 45_000
+// Subscription state poll. Kept tight so that when admin scans the customer's
+// QR from the in-app scanner, the user sees their meal flip to "served"
+// within a few seconds rather than waiting for the next token rotation.
+const SUB_POLL_MS = 5_000
 
 export function QrPass() {
   const { user } = useAuth()
@@ -35,16 +39,23 @@ export function QrPass() {
     }
   }, [])
 
-  // Mint on mount + rotate every 45s. Refresh subscription state after each
-  // rotation so the "Recent scans" list catches anything redeemed via the QR.
+  // Mint on mount + rotate every 45s.
   useEffect(() => {
     void mintToken()
     const id = setInterval(() => {
       void mintToken()
-      void refreshSub()
     }, TOKEN_REFRESH_MS)
     return () => clearInterval(id)
-  }, [mintToken, refreshSub])
+  }, [mintToken])
+
+  // Tight subscription poll — when admin scans the QR, the user's view flips
+  // to "served" within ~5s without waiting for the next token rotation.
+  useEffect(() => {
+    const id = setInterval(() => {
+      void refreshSub()
+    }, SUB_POLL_MS)
+    return () => clearInterval(id)
+  }, [refreshSub])
 
   if (!sub || !user) return null
 

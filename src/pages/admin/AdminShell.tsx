@@ -1,7 +1,6 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
-import { AdminBottomNav } from '@/components/admin/AdminBottomNav'
 import { AdminTopBar } from '@/components/admin/AdminTopBar'
 import { useAuth } from '@/context/AuthContext'
 
@@ -39,12 +38,11 @@ export function AdminShell() {
         <AdminSidebar />
         <div className="flex-1 min-w-0">
           <AdminTopBar />
-          <main className="pb-24 lg:pb-12">
+          <main className="pb-8 lg:pb-12">
             <Outlet />
           </main>
         </div>
       </div>
-      <AdminBottomNav />
     </div>
   )
 }

@@ -46,6 +46,17 @@ export const ADMIN_NAV: AdminNavItem[] = [
     ),
   },
   {
+    to: '/admin/scan',
+    label: 'Scan QR',
+    icon: sv(
+      <>
+        {/* Camera icon — bracket corners + lens, matches the scanner page */}
+        <path d="M4 7h3l2-2h6l2 2h3v12H4z" />
+        <circle cx="12" cy="13" r="3.5" />
+      </>,
+    ),
+  },
+  {
     to: '/admin/payments',
     label: 'Payments',
     icon: sv(

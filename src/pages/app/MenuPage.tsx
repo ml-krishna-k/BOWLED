@@ -119,10 +119,11 @@ export function MenuPage() {
                 dim && 'opacity-40',
               )}
             >
-              {/* Plate visual */}
+              {/* Plate visual — squat banner on mobile so the list stays scannable,
+                  full panel at sm+. */}
               <figure
                 className={cn(
-                  'sm:col-span-5 relative aspect-[5/3] sm:aspect-auto sm:min-h-[200px] rounded-2xl overflow-hidden ring-inset-warm',
+                  'sm:col-span-5 relative aspect-[16/9] sm:aspect-auto sm:min-h-[200px] rounded-2xl overflow-hidden ring-inset-warm',
                   flip ? 'sm:order-2' : 'sm:order-1',
                   meal.isVeg
                     ? 'bg-gradient-to-br from-leaf-100 via-cream-100 to-saffron-100'
@@ -132,19 +133,17 @@ export function MenuPage() {
               >
                 <div className="absolute inset-0 bg-grain opacity-40" />
                 <div className="absolute inset-0 grid place-items-center">
-                  <div className="h-24 w-24 sm:h-32 sm:w-32 rounded-full bg-paper shadow-card grid place-items-center transition-transform duration-700 group-hover:scale-105">
+                  <div className="h-20 w-20 sm:h-32 sm:w-32 rounded-full bg-paper shadow-card grid place-items-center transition-transform duration-700 group-hover:scale-105">
                     <div
                       className={cn(
-                        'h-18 w-18 sm:h-24 sm:w-24 rounded-full',
+                        'h-14 w-14 sm:h-24 sm:w-24 rounded-full',
                         meal.isVeg
                           ? 'bg-gradient-to-br from-leaf-300 to-leaf-500'
                           : 'bg-gradient-to-br from-saffron-400 to-spice-500',
                       )}
-                      style={{ height: '4.5rem', width: '4.5rem' }}
                     />
                   </div>
                 </div>
-                {/* Slot tag */}
                 <span className="absolute top-3 left-3 sm:top-4 sm:left-4 inline-flex items-center gap-1.5 rounded-full bg-paper/95 px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] font-semibold text-ink-700 shadow-soft backdrop-blur-sm tracking-[0.15em] uppercase">
                   <span>{slot.icon}</span>
                   {slot.label}

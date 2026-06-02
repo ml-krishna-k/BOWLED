@@ -18,10 +18,8 @@ import type { Plan, Subscription } from '@/types'
 type BillingCycleId = Subscription['billingCycleId']
 
 export function SubscriptionPage() {
-  const { sub, paymentInstructions, plan, dayNumber, mealsRemaining, changeCycle, pause, resume } = useSubscription()
+  const { sub, paymentInstructions, plan, dayNumber, mealsRemaining, pause, resume } = useSubscription()
   const [showPauseModal, setShowPauseModal] = useState(false)
-  const [cycleSaving, setCycleSaving] = useState<BillingCycleId | null>(null)
-  const [cycleBanner, setCycleBanner] = useState<string | null>(null)
 
   // No sub yet → onboarding (pick plan / join group)
   if (!sub) return <Onboarding />
@@ -143,78 +141,6 @@ export function SubscriptionPage() {
           )}
         </div>
       </div>
-
-      {/* Billing cycle picker — editorial section */}
-      <section className="mt-16">
-        <div className="flex flex-wrap items-end justify-between gap-2 mb-5">
-          <div>
-            <p className="text-eyebrow text-ink-500">Your rhythm</p>
-            <h2 className="mt-1.5 text-display text-2xl sm:text-3xl tracking-tight text-ink-900">
-              Switch your <span className="italic font-light text-saffron-600">cadence.</span>
-            </h2>
-            <p className="mt-2 caption text-ink-500 max-w-xl">
-              Switch between weekly and monthly cadences, or skip Sundays / weekends. Takes effect on your next billing cycle.
-            </p>
-          </div>
-          {cycleBanner && (
-            <span className="inline-flex items-center gap-2 rounded-full bg-leaf-100 px-3 py-1.5 text-xs font-semibold text-leaf-700 ring-1 ring-leaf-300/40">
-              <span className="h-1.5 w-1.5 rounded-full bg-leaf-500" />
-              {cycleBanner}
-            </span>
-          )}
-        </div>
-
-        <div className="hairline" />
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 sm:divide-x lg:divide-x sm:divide-cream-200">
-          {BILLING_CYCLES.map((c, i) => {
-            const active = c.id === sub.billingCycleId
-            const saving = cycleSaving === c.id
-            return (
-              <button
-                key={c.id}
-                disabled={active || cycleSaving !== null}
-                onClick={async () => {
-                  setCycleSaving(c.id)
-                  setCycleBanner(null)
-                  try {
-                    await changeCycle(c.id)
-                    setCycleBanner(`Switched to ${c.label}`)
-                    setTimeout(() => setCycleBanner(null), 4000)
-                  } catch {
-                    setCycleBanner('Could not switch — try again')
-                    setTimeout(() => setCycleBanner(null), 4000)
-                  } finally {
-                    setCycleSaving(null)
-                  }
-                }}
-                className={cn(
-                  'text-left p-6 border-b border-cream-200 sm:border-b-0 transition-all duration-300',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron-400',
-                  active
-                    ? 'bg-saffron-50/60 cursor-default'
-                    : 'bg-paper hover:bg-cream-50',
-                  saving && 'opacity-60',
-                )}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-chapter text-base text-saffron-500 tabular-nums">
-                    0{i + 1}
-                  </p>
-                  {active && <Badge tone="saffron" dot>Active</Badge>}
-                </div>
-                <p className="mt-3 text-eyebrow text-ink-500">{c.cadence}</p>
-                <p className="mt-1 text-display text-lg text-ink-900 tracking-tight">{c.shortLabel}</p>
-                <p className="mt-1 caption text-ink-500">{c.rhythm}</p>
-                <p className="mt-3 text-sm text-ink-700 leading-relaxed">{c.description}</p>
-                {saving && (
-                  <p className="mt-3 caption text-saffron-700">Saving…</p>
-                )}
-              </button>
-            )
-          })}
-        </div>
-        <div className="hairline" />
-      </section>
 
       {/* Pause modal */}
       {showPauseModal && (

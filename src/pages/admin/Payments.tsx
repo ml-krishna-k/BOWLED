@@ -193,13 +193,15 @@ function PaymentRow({
 }) {
   const isPending = row.status === 'pending_verification'
   return (
-    <Card className="p-6 lift-card">
-      <div className="grid lg:grid-cols-[120px_1fr_auto] gap-6 items-start">
+    <Card className="p-4 sm:p-6 lift-card">
+      {/* Mobile: thumbnail row on top, details below, actions full-width.
+          lg+: 3-column grid (thumb | details | actions). */}
+      <div className="grid grid-cols-[80px_1fr] sm:grid-cols-[100px_1fr] lg:grid-cols-[120px_1fr_auto] gap-4 sm:gap-5 lg:gap-6 items-start">
         {/* Screenshot thumbnail */}
         <button
           type="button"
           onClick={onView}
-          className="block aspect-[3/4] w-full overflow-hidden rounded-xl bg-cream-100 ring-1 ring-cream-200 hover:ring-saffron-400 transition-all"
+          className="block aspect-[3/4] w-full overflow-hidden rounded-xl bg-cream-100 ring-1 ring-cream-200 hover:ring-saffron-400 active:ring-saffron-400 transition-all"
           aria-label="View full screenshot"
         >
           <img
@@ -211,25 +213,24 @@ function PaymentRow({
         </button>
 
         {/* Details */}
-        <div className="min-w-0 space-y-3">
-          <div className="flex items-center flex-wrap gap-2">
+        <div className="min-w-0 space-y-2.5 sm:space-y-3">
+          <div className="flex items-center flex-wrap gap-1.5 sm:gap-2">
             <StatusBadge status={row.status} />
             <Badge tone="cream">{row.planId.toUpperCase()}</Badge>
-            <Badge tone="paper">{row.billingCycleId.replace(/-/g, ' ')}</Badge>
+            <Badge tone="paper" className="hidden sm:inline-flex">{row.billingCycleId.replace(/-/g, ' ')}</Badge>
           </div>
 
           <div>
-            <p className="text-display text-xl text-ink-900 tracking-tight">
+            <p className="text-display text-base sm:text-lg lg:text-xl text-ink-900 tracking-tight leading-tight">
               {row.user?.name ?? '— unknown subscriber —'}
             </p>
-            <p className="caption text-ink-500">
+            <p className="caption text-[12px] sm:text-sm text-ink-500 mt-0.5">
               +91 {row.user?.phone ?? '——'}
               {row.user?.area && <> · {row.user.area}</>}
-              {row.user?.pgName && <> · {row.user.pgName}</>}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm pt-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 text-sm pt-1 sm:pt-2">
             <Field label="Amount" value={inr(row.amount)} />
             <Field label="UTR" value={row.utr} mono />
             <Field label="Reference" value={row.orderRef} mono />
@@ -249,8 +250,8 @@ function PaymentRow({
           )}
         </div>
 
-        {/* Actions */}
-        <div className="flex lg:flex-col gap-2 lg:w-32">
+        {/* Actions — span both cols on mobile so buttons fill the card width */}
+        <div className="col-span-2 lg:col-span-1 flex lg:flex-col gap-2 lg:w-32 pt-1">
           {isPending ? (
             <>
               <Button

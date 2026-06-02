@@ -35,8 +35,8 @@ export function AdminOverview() {
         description="A real-time read on today's deliveries, this month's revenue, and who needs attention."
       />
 
-      {/* KPI strip */}
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* KPI strip — 2-col on mobile (compact), 4-col at lg */}
+      <div className="mt-6 sm:mt-8 grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <Kpi label="Active subscribers" value={kpis.active.toString()} hint={`${kpis.paused} paused · ${kpis.totalSubscribers} total`} />
         <Kpi label="Meals to deliver today" value={kpis.mealsToday.toString()} hint={`${kpis.served} served · ${kpis.pending} pending`} tone="saffron" />
         <Kpi label="Revenue this month" value={inr(kpis.monthRevenue)} hint="Across active subscriptions" tone="leaf" />
@@ -44,18 +44,18 @@ export function AdminOverview() {
       </div>
 
       {/* Today's delivery breakdown */}
-      <Card className="mt-6 p-6">
-        <div className="flex items-center justify-between">
-          <div>
+      <Card className="mt-5 sm:mt-6 p-4 sm:p-6">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
             <p className="text-eyebrow">Today's run sheet</p>
-            <h2 className="mt-1 font-display text-2xl text-ink-900">3 meal slots</h2>
+            <h2 className="mt-1 font-display text-xl sm:text-2xl text-ink-900">3 meal slots</h2>
           </div>
-          <Link to="/admin/deliveries" className="text-sm font-medium text-saffron-700 hover:underline">
-            Open run sheet →
+          <Link to="/admin/deliveries" className="text-sm font-medium text-saffron-700 hover:underline shrink-0">
+            Open →
           </Link>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="mt-5 sm:mt-6 grid gap-3 sm:gap-4 sm:grid-cols-3">
           {slotsBreakdown.map((s) => {
             const pct = s.total ? Math.round((s.served / s.total) * 100) : 0
             return (
@@ -240,11 +240,11 @@ function Kpi({
   tone?: 'saffron' | 'leaf'
 }) {
   return (
-    <Card variant="soft" className="p-5">
-      <p className="text-eyebrow text-ink-500">{label}</p>
+    <Card variant="soft" className="p-4 sm:p-5">
+      <p className="text-eyebrow text-[10px] sm:text-xs text-ink-500 leading-tight">{label}</p>
       <p
         className={cn(
-          'mt-2 font-display text-3xl',
+          'mt-2 font-display text-2xl sm:text-3xl',
           tone === 'saffron' && 'text-saffron-700',
           tone === 'leaf' && 'text-leaf-700',
           !tone && 'text-ink-900',
@@ -252,7 +252,7 @@ function Kpi({
       >
         {value}
       </p>
-      {hint && <p className="mt-1 text-xs text-ink-500">{hint}</p>}
+      {hint && <p className="mt-1 text-[11px] sm:text-xs text-ink-500 leading-snug">{hint}</p>}
     </Card>
   )
 }
