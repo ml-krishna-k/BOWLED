@@ -2,15 +2,111 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/webp" href="/logo.webp" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/logo.webp" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#fff8ee" />
+
+    <!-- Favicon — logo.webp is the primary identity. -->
+    <link rel="icon" type="image/webp" href="/logo.webp" />
+    <link rel="apple-touch-icon" href="/logo.webp" />
+    <link rel="shortcut icon" type="image/webp" href="/logo.webp" />
+
+    <!-- Default SEO meta — overridden per-page by the Seo component at hydration.
+         What lives here is what Google crawls on the initial request before JS runs. -->
+    <title>Bowled — Home-Style Daily Meals in Chennai | Tamil Tiffin</title>
     <meta
       name="description"
-      content="Bowled — healthy, home-style daily meal subscriptions for students in Chennai PGs, hostels and rented rooms. A Sree Krishna Catering venture, since 2006."
+      content="Bowled delivers three home-cooked Tamil meals a day across Chennai. For PGs, hostels, offices and homes. From ₹89/meal. By Sree Krishna Catering, since 2006."
     />
+    <meta
+      name="keywords"
+      content="meal subscription chennai, home cooked food chennai, tiffin service chennai, hostel food chennai, pg food chennai, student meals chennai, healthy meals chennai, office lunch chennai, tamil home cooking chennai, daily meals chennai, food delivery chennai"
+    />
+    <link rel="canonical" href="https://bowled.store/" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+    <meta name="author" content="Bowled by Sree Krishna Catering" />
+
+    <!-- Geo signals -->
+    <meta name="geo.region" content="IN-TN" />
+    <meta name="geo.placename" content="Chennai" />
+    <meta name="geo.position" content="13.0827;80.2707" />
+    <meta name="ICBM" content="13.0827, 80.2707" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Bowled — Home-Style Daily Meals in Chennai" />
+    <meta property="og:description" content="Three home-cooked Tamil meals a day, delivered across Chennai. From ₹89/meal." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://bowled.store/" />
+    <meta property="og:image" content="https://bowled.store/hero-spread.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="Bowled" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Bowled — Home-Style Daily Meals in Chennai" />
+    <meta name="twitter:description" content="Three home-cooked Tamil meals a day, delivered across Chennai. From ₹89/meal." />
+    <meta name="twitter:image" content="https://bowled.store/hero-spread.jpg" />
+
+    <!-- LocalBusiness / FoodEstablishment schema — Google reads this for the
+         knowledge panel + local pack. Kept in HTML so it's present without JS. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": ["LocalBusiness", "FoodEstablishment"],
+      "@id": "https://bowled.store/#business",
+      "name": "Bowled",
+      "alternateName": "Bowled by Sree Krishna Catering",
+      "description": "Bowled is a daily home-style meal subscription for students, hostels, PGs and working professionals in Chennai. A venture by Sree Krishna Catering, feeding Chennai since 2006.",
+      "url": "https://bowled.store",
+      "logo": "https://bowled.store/logo.webp",
+      "image": "https://bowled.store/hero-spread.jpg",
+      "foundingDate": "2025-05-05",
+      "parentOrganization": {
+        "@type": "Organization",
+        "name": "Sree Krishna Catering",
+        "foundingDate": "2006"
+      },
+      "telephone": "+91-9360113501",
+      "priceRange": "₹63–₹89 per meal",
+      "servesCuisine": ["South Indian", "Tamil", "Home-style Indian"],
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Chennai",
+        "addressRegion": "Tamil Nadu",
+        "addressCountry": "IN"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 13.0827,
+        "longitude": 80.2707
+      },
+      "areaServed": [
+        { "@type": "City", "name": "Chennai" },
+        { "@type": "Place", "name": "Adyar" },
+        { "@type": "Place", "name": "Velachery" },
+        { "@type": "Place", "name": "T. Nagar" },
+        { "@type": "Place", "name": "OMR (Thoraipakkam)" },
+        { "@type": "Place", "name": "Anna Nagar" },
+        { "@type": "Place", "name": "Tambaram" }
+      ],
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+          "opens": "07:00",
+          "closes": "21:00"
+        }
+      ],
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "300",
+        "bestRating": "5",
+        "worstRating": "1"
+      }
+    }
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -18,8 +114,6 @@
       href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-
-    <title>Bowled — Home-style Daily Meals for Students in Chennai</title>
   </head>
   <body class="bg-cream-50 text-ink-900 antialiased">
     <div id="root"></div>

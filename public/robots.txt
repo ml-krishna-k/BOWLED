@@ -1,0 +1,60 @@
+# Bowled — robots.txt
+# https://bowled.store
+
+# Allow general indexing for marketing surfaces.
+User-agent: *
+Allow: /
+Disallow: /app/
+Disallow: /admin/
+Disallow: /auth/otp
+Disallow: /scan/
+
+# Allow AI search agents (ChatGPT, Perplexity, Google AI Overviews,
+# You.com, Anthropic Claude) to crawl public marketing content.
+User-agent: GPTBot
+Allow: /
+Disallow: /app/
+Disallow: /admin/
+Disallow: /scan/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /app/
+Disallow: /admin/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /app/
+Disallow: /admin/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /app/
+Disallow: /admin/
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /app/
+Disallow: /admin/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /app/
+Disallow: /admin/
+
+User-agent: CCBot
+Allow: /
+Disallow: /app/
+Disallow: /admin/
+
+# Block any known bad-faith scrapers / aggressive bots that don't bring traffic.
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+Sitemap: https://bowled.store/sitemap.xml

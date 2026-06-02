@@ -1,6 +1,8 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { Home } from '@/pages/Home'
 import { ScanPage } from '@/pages/Scan'
+import { LocalSeoLanding } from '@/pages/seo/LocalSeoLanding'
+import { LANDINGS } from '@/data/seo-landings'
 import { LoginPage } from '@/pages/auth/Login'
 import { OtpPage } from '@/pages/auth/Otp'
 import { SignupPage } from '@/pages/auth/Signup'
@@ -23,6 +25,13 @@ import { AdminKitchens } from '@/pages/admin/Kitchens'
 
 export const router = createBrowserRouter([
   { path: '/', element: <Home /> },
+
+  // SEO landing pages — one route per slug, all sharing one template.
+  // Slugs come from src/data/seo-landings.ts and are also in sitemap.xml.
+  ...LANDINGS.map((l) => ({
+    path: `/${l.slug}`,
+    element: <LocalSeoLanding slug={l.slug} />,
+  })),
 
   // Public rider scan endpoint — no auth, JWT in the URL is the auth.
   { path: '/scan/:token', element: <ScanPage /> },

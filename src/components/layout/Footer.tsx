@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Container } from '@/components/ui/Container'
 import { Logo } from '@/components/ui/Logo'
 import { BRAND } from '@/lib/constants'
@@ -13,29 +14,31 @@ const COLUMNS = [
     ],
   },
   {
-    title: 'Kitchen',
+    title: 'Eat with us',
+    // Internal links to SEO landing pages — drives rank flow and gives
+    // crawlers a clear path from every page to every other page.
     links: [
-      { label: 'Our chefs', href: '#kitchen' },
-      { label: 'Hygiene standards', href: '#kitchen' },
-      { label: 'Nutrition philosophy', href: '#kitchen' },
-      { label: 'Partner kitchens', href: '#kitchen' },
+      { label: 'Hostel food in Chennai', href: '/hostel-food-chennai' },
+      { label: 'PG food in Chennai', href: '/pg-food-chennai' },
+      { label: 'Tiffin service Chennai', href: '/tiffin-service-chennai' },
+      { label: 'Meal subscription Chennai', href: '/meal-subscription-chennai' },
     ],
   },
   {
     title: 'For you',
     links: [
-      { label: 'Student plans', href: '#plans' },
-      { label: 'Parent peace-of-mind', href: '#parents' },
-      { label: 'Referral rewards', href: '#' },
-      { label: 'Support', href: '#' },
+      { label: 'Student meals Chennai', href: '/student-meals-chennai' },
+      { label: 'Office lunch Chennai', href: '/office-lunch-chennai' },
+      { label: 'Home-cooked food Chennai', href: '/home-cooked-food-chennai' },
+      { label: 'Healthy meals Chennai', href: '/healthy-meals-chennai' },
     ],
   },
   {
     title: 'Company',
     links: [
-      { label: 'About us', href: '#' },
-      { label: 'Careers', href: '#' },
-      { label: 'Press', href: '#' },
+      { label: 'Our chefs', href: '#kitchen' },
+      { label: 'Parent peace-of-mind', href: '#parents' },
+      { label: 'Best meals in Chennai', href: '/best-meals-chennai' },
       { label: 'Contact', href: '#' },
     ],
   },
@@ -85,22 +88,27 @@ export function Footer() {
             <div key={col.title}>
               <h4 className="text-eyebrow mb-3 sm:mb-4 text-ink-900">{col.title}</h4>
               <ul className="space-y-3 sm:space-y-2.5">
-                {col.links.map((l) => (
-                  <li key={l.label}>
-                    <a
-                      href={l.href}
-                      className="group inline-flex items-center gap-1 text-[15px] text-ink-500 transition-colors py-1 hover:text-saffron-700 active:text-saffron-700"
-                    >
+                {col.links.map((l) => {
+                  // Hash-only links (#section) stay <a> — same-page anchors.
+                  // Path links (/foo) use react-router Link so we don't full-reload.
+                  const isPath = l.href.startsWith('/')
+                  const className = 'group inline-flex items-center gap-1 text-[15px] text-ink-500 transition-colors py-1 hover:text-saffron-700 active:text-saffron-700'
+                  const inner = (
+                    <>
                       <span>{l.label}</span>
-                      <span
-                        aria-hidden
-                        className="opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0"
-                      >
-                        →
-                      </span>
-                    </a>
-                  </li>
-                ))}
+                      <span aria-hidden className="opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">→</span>
+                    </>
+                  )
+                  return (
+                    <li key={l.label}>
+                      {isPath ? (
+                        <Link to={l.href} className={className}>{inner}</Link>
+                      ) : (
+                        <a href={l.href} className={className}>{inner}</a>
+                      )}
+                    </li>
+                  )
+                })}
               </ul>
             </div>
           ))}
