@@ -8,28 +8,24 @@
   ],
   "headers": [
     {
-      "comment": "Hashed assets — safe to cache forever (immutable filenames).",
       "source": "/assets/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
     },
     {
-      "comment": "Static brand assets in /public — long cache, but not immutable since the filename doesn't change between deploys.",
       "source": "/(logo.webp|hero-spread.webp|favicon.svg|hero.png)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=86400" }
       ]
     },
     {
-      "comment": "SEO + crawl files — must stay fresh so search engines see updates promptly.",
       "source": "/(sitemap.xml|robots.txt)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=3600" }
       ]
     },
     {
-      "comment": "HTML shell — never cache. The hashed JS/CSS references inside are what change between deploys.",
       "source": "/(index.html)?",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
