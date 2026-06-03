@@ -103,10 +103,13 @@ export function Hero() {
             {/* Mobile-only food photo — phones don't get the desktop bento. */}
             <div className="md:hidden relative mt-4 overflow-hidden rounded-2xl shadow-card img-reveal img-vignette animate-fade-up delay-500">
               <img
-                src="/hero-spread.jpg"
+                src="/hero-spread.webp"
                 alt="A spread of home-style dishes — dal, rice, greens and sides"
                 loading="eager"
+                fetchPriority="high"
                 decoding="async"
+                width={1200}
+                height={900}
                 className="aspect-[4/3] w-full object-cover animate-reveal"
               />
               <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 z-10">
@@ -138,10 +141,13 @@ export function Hero() {
               </div>
               <div className="my-4 h-48 rounded-2xl bg-cream-100 relative overflow-hidden img-reveal img-vignette">
                 <img
-                  src="/hero-spread.jpg"
+                  src="/hero-spread.webp"
                   alt="A spread of home-style dishes — dal, rice, greens and sides"
                   loading="eager"
+                  fetchPriority="high"
                   decoding="async"
+                  width={1200}
+                  height={900}
                   className="absolute inset-0 h-full w-full object-cover animate-reveal"
                 />
                 <span className="absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-paper/95 px-2.5 py-1 text-[11px] font-semibold text-saffron-700 shadow-soft backdrop-blur-sm">

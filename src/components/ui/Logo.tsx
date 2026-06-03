@@ -1,5 +1,9 @@
 import { cn } from '@/lib/cn'
-import logoUrl from '@/assets/logo.webp'
+
+// Served from /public — Vercel applies a 7-day cache header (vercel.json).
+// Public path means no Vite hash on the filename, so the browser can reuse
+// the same logo file across SPA route changes without re-fetching.
+const logoUrl = '/logo.webp'
 
 interface LogoProps {
   className?: string

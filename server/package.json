@@ -10,7 +10,8 @@
     "build": "tsc -p tsconfig.json",
     "seed": "cross-env NODE_EXTRA_CA_CERTS=../avast-root.pem tsx src/seed.ts",
     "check:db": "cross-env NODE_EXTRA_CA_CERTS=../avast-root.pem tsx src/check-db.ts",
-    "reset:menu": "cross-env NODE_EXTRA_CA_CERTS=../avast-root.pem tsx src/reset-menu-overrides.ts"
+    "reset:menu": "cross-env NODE_EXTRA_CA_CERTS=../avast-root.pem tsx src/reset-menu-overrides.ts",
+    "reset:users": "cross-env NODE_EXTRA_CA_CERTS=../avast-root.pem tsx src/reset-test-users.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

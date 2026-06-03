@@ -15,7 +15,7 @@ import type { ReactNode } from 'react'
 
 export const SITE_ORIGIN = 'https://bowled.store'
 export const SITE_NAME = 'Bowled'
-export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/hero-spread.jpg`
+export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/hero-spread.webp`
 
 interface SeoProps {
   /** Browser tab + Google SERP title. Keep <= 60 chars. */
