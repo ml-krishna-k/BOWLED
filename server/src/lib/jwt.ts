@@ -1,9 +1,14 @@
 import jwt from 'jsonwebtoken'
 import { config } from '../config.js'
 
+/**
+ * Session-token payload. `email` is the primary identifier post-Google-OAuth.
+ * `phone` is retained for backwards compat with the qr-pass scan path that
+ * may still log it; if your route doesn't need it, just omit at sign time.
+ */
 export interface JwtPayload {
   uid: string
-  phone: string
+  email: string
   isAdmin: boolean
 }
 

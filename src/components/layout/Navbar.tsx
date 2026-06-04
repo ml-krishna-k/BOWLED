@@ -87,7 +87,7 @@ export function Navbar() {
                 <Button variant="ghost" size="sm" onClick={() => navigate('/auth/login')}>
                   Log in
                 </Button>
-                <Button variant="secondary" size="sm" onClick={() => navigate('/auth/signup')}>
+                <Button variant="secondary" size="sm" onClick={() => navigate('/auth/login')}>
                   Start trial
                 </Button>
               </>
@@ -143,7 +143,7 @@ export function Navbar() {
                   <Button variant="outline" size="md" onClick={() => { setOpen(false); navigate('/auth/login') }}>
                     Log in
                   </Button>
-                  <Button variant="secondary" size="md" onClick={() => { setOpen(false); navigate('/auth/signup') }}>
+                  <Button variant="secondary" size="md" onClick={() => { setOpen(false); navigate('/auth/login') }}>
                     Start trial
                   </Button>
                 </>

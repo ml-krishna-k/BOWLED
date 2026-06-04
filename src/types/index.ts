@@ -54,9 +54,12 @@ export interface FaqItem {
 
 export interface User {
   id: string
-  phone: string
+  email: string
   name: string
-  email?: string
+  /** Google profile picture URL. Empty if Google didn't return one. */
+  picture?: string
+  /** Optional — collected later for delivery. Empty string when not set. */
+  phone?: string
   isAdmin?: boolean
   address: {
     line1: string

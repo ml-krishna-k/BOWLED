@@ -87,7 +87,7 @@ export function QrPass() {
           aria-hidden
           className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-saffron-200/40 blur-3xl animate-breathe"
         />
-        <div className="relative text-eyebrow text-saffron-700">{user.name} · +91 {user.phone}</div>
+        <div className="relative text-eyebrow text-saffron-700">{user.name} · {user.email}</div>
 
         <div className="relative mt-6">
           {/* Pulse ring while scanning */}

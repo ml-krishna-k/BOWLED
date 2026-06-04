@@ -10,16 +10,16 @@ import { Kitchen } from './models/Kitchen.js'
  *
  *   npm run seed
  *
- * Idempotent — re-running it does not duplicate kitchens or admins.
+ * Idempotent — re-running does not duplicate kitchens.
  *
  * What it does:
  *  - Resets the four FSSAI Grade A kitchens (Adyar / Velachery / OMR / T. Nagar)
- *  - Ensures the admin user(s) listed in ADMIN_PHONES exist + are promoted
- *  - Cleans up any historical demo subscribers seeded with the 7xxxxxxxxx
- *    phone pattern (older builds inserted 24 fake subscribers — that's gone)
+ *  - Cleans up any legacy demo subscribers (phone starting with 7) from older
+ *    seed runs that created fake users
  *
- * Does NOT create fake subscribers. Real signups land in /api/auth/* like
- * any normal user. If you want a totally clean slate, run `reset:users`.
+ * Does NOT pre-create admin users any more. Under Google OAuth, admins are
+ * promoted automatically on first sign-in if their email is in ADMIN_EMAILS.
+ * Just have the admin sign in with Google once and they'll be flagged.
  */
 
 const KITCHEN_DATA = [
@@ -49,10 +49,6 @@ async function seed() {
   await connectDb()
 
   console.log('… clearing legacy demo subscribers (7xxxxxxxxx pattern)')
-  // Older versions of this seed created 24 fake subscribers with phones
-  // starting with '7'. We never insert those any more — but if you're
-  // running this on an existing dev DB, wipe the historical fakes too so
-  // the admin views aren't cluttered.
   const fakeUsers = await User.find(
     { phone: { $regex: /^7/ }, isAdmin: { $ne: true } },
     { _id: 1 },
@@ -72,27 +68,11 @@ async function seed() {
   await Kitchen.deleteMany({})
   await Kitchen.insertMany(KITCHEN_DATA)
 
-  console.log('… ensuring admin user(s)')
-  for (const phone of config.adminPhones) {
-    await User.findOneAndUpdate(
-      { phone },
-      {
-        // Promote/keep admin status on every run (idempotent).
-        $set: { isAdmin: true },
-        // Other fields only on first insert; don't overwrite a real user's name etc.
-        $setOnInsert: {
-          name: 'Bowled Admin',
-          address: { line1: 'Admin office', area: 'Chennai', city: 'Chennai' },
-          pgName: '',
-          allergens: [],
-          parentReport: false,
-          notifications: true,
-          rating: 5.0,
-        },
-      },
-      { upsert: true, new: true },
-    )
-    console.log(`  ✓ admin: ${phone}`)
+  if (config.adminEmails.length > 0) {
+    console.log(`✓ Admin emails configured: ${config.adminEmails.join(', ')}`)
+    console.log('  → Sign in with Google using these accounts to be auto-promoted.')
+  } else {
+    console.warn('! ADMIN_EMAILS is empty — no admin promotion will happen on login.')
   }
 
   console.log('✓ Seed complete')

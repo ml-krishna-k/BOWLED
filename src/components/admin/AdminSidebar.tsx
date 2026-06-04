@@ -60,7 +60,7 @@ export function AdminSidebar() {
             </span>
             <div className="min-w-0">
               <p className="truncate font-medium">{user?.name}</p>
-              <p className="truncate text-xs text-cream-50/60">+91 {user?.phone}</p>
+              <p className="truncate text-xs text-cream-50/60">{user?.email}</p>
             </div>
           </div>
         </div>

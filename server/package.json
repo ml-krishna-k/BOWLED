@@ -11,7 +11,8 @@
     "seed": "cross-env NODE_EXTRA_CA_CERTS=../avast-root.pem tsx src/seed.ts",
     "check:db": "cross-env NODE_EXTRA_CA_CERTS=../avast-root.pem tsx src/check-db.ts",
     "reset:menu": "cross-env NODE_EXTRA_CA_CERTS=../avast-root.pem tsx src/reset-menu-overrides.ts",
-    "reset:users": "cross-env NODE_EXTRA_CA_CERTS=../avast-root.pem tsx src/reset-test-users.ts"
+    "reset:users": "cross-env NODE_EXTRA_CA_CERTS=../avast-root.pem tsx src/reset-test-users.ts",
+    "fix:phone-index": "cross-env NODE_EXTRA_CA_CERTS=../avast-root.pem tsx src/fix-phone-index.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -20,6 +21,7 @@
     "dotenv": "^16.4.7",
     "express": "^5.0.1",
     "express-rate-limit": "^7.5.0",
+    "google-auth-library": "^10.6.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
     "zod": "^3.24.1"

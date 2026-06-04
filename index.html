@@ -112,6 +112,11 @@
          contentful element on / and pulls the LCP if it loads late. -->
     <link rel="preload" as="image" type="image/webp" href="/hero-spread.webp" fetchpriority="high" />
 
+    <!-- Google Identity Services — preconnect so the popup-trigger handshake
+         is faster when the user clicks "Continue with Google". The actual
+         GIS script is loaded lazily from /auth/login via lib/google-auth.ts. -->
+    <link rel="preconnect" href="https://accounts.google.com" />
+
     <!-- Font CSS — preconnect + preload the stylesheet so first paint isn't
          blocked on a cold connection to fonts.googleapis.com. Display=swap
          is already in the URL — text paints in fallback while Fraunces /

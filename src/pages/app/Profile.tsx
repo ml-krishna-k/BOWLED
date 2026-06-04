@@ -9,7 +9,6 @@ import { Switch } from '@/components/ui/Switch'
 import { Badge } from '@/components/ui/Badge'
 import { useAuth } from '@/context/AuthContext'
 import { useSubscription } from '@/context/SubscriptionContext'
-import { maskPhone } from '@/lib/format'
 
 const COMMON_ALLERGENS = ['Peanuts', 'Dairy', 'Eggs', 'Gluten', 'Soy', 'Shellfish']
 
@@ -71,7 +70,7 @@ export function Profile() {
             {user.name}
           </h2>
           <p className="caption text-ink-500 mt-1">
-            {maskPhone(user.phone)} &nbsp;·&nbsp; member since {new Date(user.createdAt).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
+            {user.email} &nbsp;·&nbsp; member since {new Date(user.createdAt).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
           </p>
         </div>
       </div>

@@ -13,8 +13,6 @@ import { LANDINGS } from '@/data/seo-landings'
  * own chunk by Vite. */
 const ScanPage              = lazy(() => import('@/pages/Scan').then((m) => ({ default: m.ScanPage })))
 const LoginPage             = lazy(() => import('@/pages/auth/Login').then((m) => ({ default: m.LoginPage })))
-const OtpPage               = lazy(() => import('@/pages/auth/Otp').then((m) => ({ default: m.OtpPage })))
-const SignupPage            = lazy(() => import('@/pages/auth/Signup').then((m) => ({ default: m.SignupPage })))
 const AppShell              = lazy(() => import('@/pages/app/AppShell').then((m) => ({ default: m.AppShell })))
 const Dashboard             = lazy(() => import('@/pages/app/Dashboard').then((m) => ({ default: m.Dashboard })))
 const MenuPage              = lazy(() => import('@/pages/app/MenuPage').then((m) => ({ default: m.MenuPage })))
@@ -66,9 +64,11 @@ export const router = createBrowserRouter([
   // Public rider scan endpoint — no auth, JWT in the URL is the auth.
   { path: '/scan/:token', element: withSuspense(<ScanPage />) },
 
-  { path: '/auth/login',  element: withSuspense(<LoginPage />) },
-  { path: '/auth/signup', element: withSuspense(<SignupPage />) },
-  { path: '/auth/otp',    element: withSuspense(<OtpPage />) },
+  { path: '/auth/login', element: withSuspense(<LoginPage />) },
+  // /auth/signup and /auth/otp are gone post-Google-OAuth migration.
+  // Any inbound traffic to them lands on /auth/login (the catch-all below).
+  { path: '/auth/signup', element: <Navigate to="/auth/login" replace /> },
+  { path: '/auth/otp',    element: <Navigate to="/auth/login" replace /> },
 
   {
     path: '/app',

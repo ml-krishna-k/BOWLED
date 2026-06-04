@@ -143,7 +143,7 @@ export function AdminTopBar() {
                 </span>
                 <div className="min-w-0">
                   <p className="truncate font-medium text-ink-900 text-sm">{user?.name}</p>
-                  <p className="truncate text-xs text-ink-500">+91 {user?.phone}</p>
+                  <p className="truncate text-xs text-ink-500">{user?.email}</p>
                 </div>
                 <button
                   onClick={handleLogout}

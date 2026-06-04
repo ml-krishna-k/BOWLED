@@ -5,11 +5,6 @@ const phoneSchema = z
   .trim()
   .regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit Indian mobile number')
 
-const otpSchema = z
-  .string()
-  .trim()
-  .regex(/^\d{4,8}$/, 'OTP must be 4–8 digits')
-
 const dateSchema = z
   .string()
   .trim()
@@ -26,22 +21,15 @@ const billingCycleSchema = z.enum([
 ])
 const subStatusSchema = z.enum(['active', 'paused', 'churned'])
 
-/* ---------- Auth ---------- */
+/* ---------- Auth (Google OAuth) ---------- */
 
-export const otpSendSchema = z.object({
-  phone: phoneSchema,
-})
-
-export const otpVerifySchema = z.object({
-  phone: phoneSchema,
-  otp: otpSchema,
-  name: z.string().trim().min(2, 'Name is too short').max(80).optional(),
-})
-
-/** Widget flow — server only sees the signed access-token from MSG91. */
-export const widgetVerifySchema = z.object({
-  accessToken: z.string().trim().min(20).max(4000),
-  name: z.string().trim().min(2, 'Name is too short').max(80).optional(),
+/**
+ * Body for POST /api/auth/google.
+ * `credential` is the Google ID token (a JWT) returned by GIS in the
+ * browser. The server verifies it against Google's public keys.
+ */
+export const googleAuthSchema = z.object({
+  credential: z.string().trim().min(20).max(4096),
 })
 
 /* ---------- Me ---------- */
@@ -49,7 +37,7 @@ export const widgetVerifySchema = z.object({
 export const updateMeSchema = z
   .object({
     name: z.string().trim().min(2).max(80).optional(),
-    email: z.string().trim().email('Enter a valid email').optional().or(z.literal('')),
+    phone: phoneSchema.optional().or(z.literal('')),
     address: z
       .object({
         line1: z.string().trim().max(200).optional(),

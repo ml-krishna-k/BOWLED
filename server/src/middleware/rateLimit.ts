@@ -1,64 +1,32 @@
 import { rateLimit } from 'express-rate-limit'
 
 /**
- * Rate limiters for the OTP endpoints.
+ * Rate limiters for the auth endpoint.
  *
- * MSG91 charges per SMS, so unrate-limited `/otp/send` is a wallet-draining
- * vector for attackers (and a captcha-bypass vector for spammers). We layer
- * defence:
+ * Google ID-token verification is cheap (Google's JWKS is cached locally by
+ * the SDK after first use), so the limiter is more about blocking abuse —
+ * a flood of forged credentials or a denial-of-service against the verify
+ * path. Per-IP cap of 20/minute is plenty for a real user (they'll only
+ * verify once per session) and stops the most obvious abuse.
  *
- *   1. Per-IP   — 10 / minute, applied to all /otp/* endpoints
- *   2. Per-phone — 3 / hour    on /otp/send (the only path that costs money)
- *   3. Per-phone — 10 / hour   on /otp/verify (OTP brute-force protection;
- *                              MSG91 also enforces server-side, this is
- *                              defence-in-depth)
- *
- * The store is in-memory, which means rate limits are per-process. If we
- * ever scale horizontally, swap in `rate-limit-mongo` or `rate-limit-redis`.
+ * Store is in-memory, so limits are per-process. For horizontal scale
+ * swap in `rate-limit-mongo` or `rate-limit-redis`.
  */
 
-/**
- * Common options. `validate: false` disables express-rate-limit v7's strict
- * configuration validators — under Render's reverse proxy a few of them
- * (notably trustProxy & xForwardedForHeader) trip on benign setups and crash
- * the first request with ERR_ERL_PERMISSIVE_TRUST_PROXY. We've already set
- * `app.set('trust proxy', 1)` correctly in index.ts; the validators add no
- * extra safety in this deployment.
- */
 const COMMON = {
   standardHeaders: 'draft-7' as const,
   legacyHeaders: false,
+  // Disable express-rate-limit v7's strict validators — under Render's
+  // reverse proxy a few of them (notably trustProxy & xForwardedForHeader)
+  // trip on benign setups. `app.set('trust proxy', 1)` in index.ts is the
+  // real safeguard.
   validate: false,
 }
 
-/** Per-IP across all /otp/* paths. */
-export const otpIpLimiter = rateLimit({
+/** Per-IP cap on POST /api/auth/google. */
+export const googleAuthIpLimiter = rateLimit({
   ...COMMON,
   windowMs: 60_000,
-  limit: 10,
-  message: { error: 'Too many requests from this network. Please wait a minute and try again.' },
-})
-
-/** Per-phone on /otp/send — protects the SMS budget. */
-export const otpSendPhoneLimiter = rateLimit({
-  ...COMMON,
-  windowMs: 60 * 60_000, // 1 hour
-  limit: 3,
-  keyGenerator: (req) => {
-    const phone = String(req.body?.phone ?? '').trim()
-    return phone || req.ip || '0.0.0.0'
-  },
-  message: { error: 'You\'ve requested too many OTPs for this number. Try again in an hour.' },
-})
-
-/** Per-phone on /otp/verify — defence-in-depth against OTP brute force. */
-export const otpVerifyPhoneLimiter = rateLimit({
-  ...COMMON,
-  windowMs: 60 * 60_000, // 1 hour
-  limit: 10,
-  keyGenerator: (req) => {
-    const phone = String(req.body?.phone ?? '').trim()
-    return phone || req.ip || '0.0.0.0'
-  },
-  message: { error: 'Too many verification attempts. Request a new OTP after an hour.' },
+  limit: 20,
+  message: { error: 'Too many sign-in attempts. Please wait a minute and try again.' },
 })

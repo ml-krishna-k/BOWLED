@@ -1,79 +1,75 @@
 import { Router } from 'express'
+import { OAuth2Client, type TokenPayload } from 'google-auth-library'
 import { User } from '../models/User.js'
 import { HttpError } from '../middleware/error.js'
 import { signToken } from '../lib/jwt.js'
-import { config, isMsg91Enabled, isMsg91WidgetEnabled } from '../config.js'
-import * as msg91 from '../lib/msg91.js'
+import { config, isGoogleAuthEnabled } from '../config.js'
 import { parseBody } from '../lib/validate.js'
-import { otpSendSchema, otpVerifySchema, widgetVerifySchema } from '../lib/schemas.js'
-import {
-  otpIpLimiter,
-  otpSendPhoneLimiter,
-  otpVerifyPhoneLimiter,
-} from '../middleware/rateLimit.js'
+import { googleAuthSchema } from '../lib/schemas.js'
+import { googleAuthIpLimiter } from '../middleware/rateLimit.js'
 
 const router = Router()
 
-// Every /otp/* request first passes the per-IP limiter (10/min).
-router.use('/otp', otpIpLimiter)
-
-/** Deterministic dev OTP — only used when MSG91 is not configured.
- *  Last 6 digits of the phone, same rule as BUILTIN_TEST_PHONES. */
-function mockOtpFor(phone: string): string {
-  return phone.slice(-6)
+// Lazy singleton — verifies the audience matches OUR client id, which is
+// the core defence against token replay from a different Google project.
+let _gsiClient: OAuth2Client | null = null
+function gsiClient(): OAuth2Client {
+  if (!_gsiClient) _gsiClient = new OAuth2Client(config.google.clientId)
+  return _gsiClient
 }
 
-/* POST /api/auth/otp/send  { phone } */
-router.post('/otp/send', otpSendPhoneLimiter, async (req, res) => {
-  const { phone } = parseBody(otpSendSchema, req)
+/**
+ * POST /api/auth/google  { credential }
+ *
+ * `credential` is the Google ID token issued to the browser by Google
+ * Identity Services after the user clicks "Sign in with Google". We:
+ *
+ *   1. Verify the JWT against Google's public keys (handled by the SDK)
+ *   2. Confirm the `aud` matches our OAuth client id
+ *   3. Confirm the email is verified (`email_verified: true`)
+ *   4. Upsert a User keyed by Google's stable `sub` (user id)
+ *   5. Promote to admin if the email is in ADMIN_EMAILS
+ *   6. Issue our own session JWT and return { token, user }
+ */
+router.post('/google', googleAuthIpLimiter, async (req, res) => {
+  if (!isGoogleAuthEnabled()) {
+    throw new HttpError(503, 'Google sign-in is not configured on this server', { reason: 'google-disabled' })
+  }
+  const { credential } = parseBody(googleAuthSchema, req)
 
-  // Test-phone bypass: no SMS, no MSG91 — server already knows the OTP.
-  if (config.testPhones[phone]) {
-    res.json({ ok: true })
-    return
+  let payload: TokenPayload
+  try {
+    const ticket = await gsiClient().verifyIdToken({
+      idToken: credential,
+      audience: config.google.clientId,
+    })
+    const p = ticket.getPayload()
+    if (!p) throw new Error('Empty Google token payload')
+    payload = p
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Invalid Google credential'
+    throw new HttpError(401, `Google sign-in failed: ${message}`, { reason: 'invalid-credential' })
   }
 
-  if (isMsg91Enabled()) {
-    try {
-      await msg91.sendOtp(phone)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'SMS provider failure'
-      throw new HttpError(502, `Could not send OTP: ${message}`)
-    }
-    res.json({ ok: true })
-    return
+  if (!payload.sub) {
+    throw new HttpError(401, 'Google token missing sub claim', { reason: 'invalid-credential' })
+  }
+  if (!payload.email || !payload.email_verified) {
+    throw new HttpError(401, 'Google account email is not verified', { reason: 'email-unverified' })
   }
 
-  res.json({ ok: true, demoOtp: mockOtpFor(phone) })
-})
+  const email = payload.email.toLowerCase()
+  const isAdminEmail = config.adminEmails.includes(email)
 
-/* POST /api/auth/otp/verify  { phone, otp, name? } */
-router.post('/otp/verify', otpVerifyPhoneLimiter, async (req, res) => {
-  const { phone, otp, name } = parseBody(otpVerifySchema, req)
+  const { user, isNewUser } = await upsertGoogleUser({
+    googleSub: payload.sub,
+    email,
+    name: payload.name ?? email.split('@')[0],
+    picture: payload.picture ?? '',
+    isAdminEmail,
+  })
 
-  let ok: boolean
-  // Test-phone bypass — compare against the configured OTP, skip MSG91.
-  if (config.testPhones[phone]) {
-    ok = otp === config.testPhones[phone]
-  } else if (isMsg91Enabled()) {
-    try {
-      ok = await msg91.verifyOtp(phone, otp)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'SMS provider failure'
-      throw new HttpError(502, `Could not verify OTP: ${message}`)
-    }
-  } else {
-    ok = otp === mockOtpFor(phone)
-  }
-  if (!ok) throw new HttpError(401, 'Invalid OTP')
-
-  const result = await findOrCreateUser(phone, name)
-  if (result.kind === 'not-found') {
-    throw new HttpError(404, 'No account found. Please sign up first.')
-  }
-
-  const { user, isNewUser } = result
-  const token = signToken({ uid: String(user._id), phone: user.phone, isAdmin: user.isAdmin })
+  const token = signToken({ uid: String(user._id), email: user.email, isAdmin: user.isAdmin })
 
   res.json({
     token,
@@ -83,89 +79,60 @@ router.post('/otp/verify', otpVerifyPhoneLimiter, async (req, res) => {
 })
 
 /**
- * Atomically find an existing user by phone, or create one when a name is
- * provided. Handles the race where two concurrent verify requests both pass
- * the `findOne` check and then both try to `create` — the second one would
- * get a duplicate-key error (E11000) on the unique `phone` index. We catch
- * that and re-read the row so the caller still gets a User.
+ * Atomically find-or-create a user by Google `sub`. On every login we keep
+ * the email + name + picture + admin flag in sync with what Google sent
+ * (cheap to update, useful when a user changes their Google profile or is
+ * added to ADMIN_EMAILS post-signup).
  */
-type FindOrCreateResult =
-  | { kind: 'found'; user: InstanceType<typeof User>; isNewUser: false }
-  | { kind: 'created'; user: InstanceType<typeof User>; isNewUser: true }
-  | { kind: 'not-found' }
+async function upsertGoogleUser(input: {
+  googleSub: string
+  email: string
+  name: string
+  picture: string
+  isAdminEmail: boolean
+}): Promise<{ user: InstanceType<typeof User>; isNewUser: boolean }> {
+  const existing = await User.findOne({ googleSub: input.googleSub })
+  if (existing) {
+    // Refresh fields that may have changed since signup.
+    existing.email = input.email
+    existing.name = input.name
+    existing.picture = input.picture
+    // Don't downgrade an existing admin — only promote.
+    if (input.isAdminEmail && !existing.isAdmin) existing.isAdmin = true
+    await existing.save()
+    return { user: existing, isNewUser: false }
+  }
 
-async function findOrCreateUser(phone: string, name: string | undefined): Promise<FindOrCreateResult> {
-  let user = await User.findOne({ phone })
-  if (user) return { kind: 'found', user, isNewUser: false }
-  if (!name) return { kind: 'not-found' }
-
-  const shouldBeAdmin = config.adminPhones.includes(phone)
   try {
-    user = await User.create({ phone, name, isAdmin: shouldBeAdmin })
-    return { kind: 'created', user, isNewUser: true }
+    const created = await User.create({
+      googleSub: input.googleSub,
+      email: input.email,
+      name: input.name,
+      picture: input.picture,
+      isAdmin: input.isAdminEmail,
+    })
+    return { user: created, isNewUser: true }
   } catch (err) {
-    // E11000 = duplicate key (concurrent verify created the same phone).
+    // E11000 = duplicate key (concurrent signup raced us, or an existing
+    // user has the same email from a previous account). Try to recover by
+    // re-reading by sub first, then by email as a fallback.
     if (err && typeof err === 'object' && (err as { code?: number }).code === 11000) {
-      user = await User.findOne({ phone })
-      if (user) return { kind: 'found', user, isNewUser: false }
+      const fallback = await User.findOne({ googleSub: input.googleSub })
+        ?? await User.findOne({ email: input.email })
+      if (fallback) return { user: fallback, isNewUser: false }
     }
     throw err
   }
 }
 
-/* POST /api/auth/widget/verify { accessToken, name? }
- *
- * The MSG91 widget runs in the browser, handles SMS + OTP itself, and hands
- * the client a signed access-token on success. This endpoint validates that
- * token against MSG91 server-to-server, then issues our own JWT.
- *
- * We deliberately reuse the verify-phone limiter (10/h per derived phone) —
- * the rate-limit key falls back to IP for this route since we don't know
- * the phone until MSG91 tells us.
- */
-router.post('/widget/verify', async (req, res) => {
-  if (!isMsg91WidgetEnabled()) {
-    throw new HttpError(503, 'Widget verification is not configured on this server')
-  }
-  const { accessToken, name } = parseBody(widgetVerifySchema, req)
-
-  let mobile: string
-  try {
-    mobile = await msg91.verifyWidgetAccessToken(accessToken)
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Widget verification failed'
-    throw new HttpError(401, message)
-  }
-
-  // MSG91 typically returns "91XXXXXXXXXX". Strip the country code so it
-  // matches the canonical 10-digit phone we store on User.
-  const phone = mobile.replace(/^\+?91/, '').replace(/\D/g, '')
-  if (!/^[6-9]\d{9}$/.test(phone)) {
-    throw new HttpError(502, `MSG91 returned an unexpected mobile format: ${mobile}`)
-  }
-
-  const result = await findOrCreateUser(phone, name)
-  if (result.kind === 'not-found') {
-    throw new HttpError(404, 'No account found. Please sign up first.')
-  }
-
-  const { user, isNewUser } = result
-  const token = signToken({ uid: String(user._id), phone: user.phone, isAdmin: user.isAdmin })
-
-  res.json({
-    token,
-    isNewUser,
-    user: serializeUser(user),
-  })
-})
-
 export function serializeUser(u: InstanceType<typeof User>) {
   return {
     id: String(u._id),
-    phone: u.phone,
+    email: u.email,
     name: u.name,
-    email: u.email ?? undefined,
+    picture: u.picture ?? '',
     isAdmin: u.isAdmin,
+    phone: u.phone ?? '',
     address: u.address,
     pgName: u.pgName ?? '',
     allergens: u.allergens,

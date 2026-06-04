@@ -169,7 +169,7 @@ export function Plans() {
                     variant={plan.recommended ? 'secondary' : 'outline'}
                     className="w-full"
                     size="lg"
-                    onClick={() => navigate('/auth/signup', { state: { preselectedPlan: plan.id, preselectedCycle: cycle.id } })}
+                    onClick={() => navigate('/auth/login', { state: { preselectedPlan: plan.id, preselectedCycle: cycle.id } })}
                   >
                     {plan.id === 'solo'
                       ? `Subscribe ${cycle.cadence.toLowerCase()}`

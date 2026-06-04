@@ -69,7 +69,7 @@ export function Sidebar() {
             </span>
             <div className="min-w-0">
               <p className="truncate font-medium text-ink-900">{user?.name}</p>
-              <p className="caption text-xs text-ink-500 truncate">+91 {user?.phone}</p>
+              <p className="caption text-xs text-ink-500 truncate">{user?.email}</p>
             </div>
           </div>
         </div>

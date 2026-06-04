@@ -8,7 +8,7 @@
  *   - Long-form body — multiple H2 sections, with optional H3 bullets
  *   - FAQ accordion (also emitted as FAQPage JSON-LD)
  *   - Internal links to peer landing pages (rank-flow + coverage)
- *   - CTA to /auth/signup
+ *   - CTA to /auth/login (Google OAuth handles signup + signin uniformly)
  *   - Footer
  *
  * Schema emitted per page: BreadcrumbList + FAQPage + Restaurant.
@@ -100,7 +100,7 @@ export function LocalSeoLanding({ slug }: { slug: string }) {
             </div>
 
             <div className="mt-7 sm:mt-9 flex flex-col sm:flex-row gap-2.5 sm:gap-3">
-              <Link to="/auth/signup">
+              <Link to="/auth/login">
                 <Button
                   variant="secondary"
                   size="lg"
@@ -231,7 +231,7 @@ export function LocalSeoLanding({ slug }: { slug: string }) {
                   {landing.cta.sub}
                 </p>
                 <div className="mt-7 flex flex-col sm:flex-row gap-2.5 sm:gap-3">
-                  <Link to="/auth/signup">
+                  <Link to="/auth/login">
                     <Button
                       size="lg"
                       className="w-full sm:w-auto bg-cream-50 text-ink-900 hover:bg-paper shadow-soft"

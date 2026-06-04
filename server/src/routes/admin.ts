@@ -11,7 +11,6 @@ import { parseBody } from '../lib/validate.js'
 import { reviewPaymentSchema, updateSubscriberStatusSchema } from '../lib/schemas.js'
 import { ACTIVE_WINDOW_MS, PLAN_PRICE } from './subscription.js'
 import { serializePayment } from './payments.js'
-import { notifyPaymentApproved, notifyPaymentRejected } from '../lib/notifications.js'
 
 const router = Router()
 router.use(requireAuth, requireAdmin)
@@ -271,13 +270,6 @@ router.post('/payments/:id/approve', async (req, res) => {
     at: now,
   })
 
-  // Fire-and-forget SMS to the subscriber. notifyPaymentApproved swallows
-  // its own errors, so failures here can't break the approval response.
-  const subscriber = await User.findById(payment.userId).select('name phone')
-  if (subscriber) {
-    void notifyPaymentApproved({ name: subscriber.name, phone: subscriber.phone })
-  }
-
   res.json({ payment: serializePayment(payment) })
 })
 
@@ -327,17 +319,6 @@ router.post('/payments/:id/reject', async (req, res) => {
     },
     at: now,
   })
-
-  // Fire-and-forget SMS — see notifyPaymentRejected for behavior on missing
-  // template ids or unreachable MSG91.
-  const subscriber = await User.findById(payment.userId).select('name phone')
-  if (subscriber) {
-    void notifyPaymentRejected({
-      name: subscriber.name,
-      phone: subscriber.phone,
-      reason: reason ?? 'verification failed',
-    })
-  }
 
   res.json({ payment: serializePayment(payment) })
 })
