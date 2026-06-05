@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { AppContainer } from '@/components/app/AppContainer'
 import { PageHeader } from '@/components/app/PageHeader'
 import { Badge } from '@/components/ui/Badge'
-import { WEEKLY_MENU } from '@/data/menu'
+import { useMenu } from '@/lib/menu'
 import type { MealSlot } from '@/types'
 import { cn } from '@/lib/cn'
 
@@ -15,10 +15,14 @@ const SLOTS: { id: MealSlot; label: string; time: string; icon: string }[] = [
 type Filter = 'all' | 'veg' | 'nonveg'
 
 export function MenuPage() {
+  // useMenu() fetches /api/menu/overrides and layers admin edits on top of
+  // the static baseline. Before this change the page imported WEEKLY_MENU
+  // directly and never saw admin updates.
+  const { menu } = useMenu()
   const todayIdx = (new Date().getDay() + 6) % 7
   const [dayIdx, setDayIdx] = useState(todayIdx)
   const [filter, setFilter] = useState<Filter>('all')
-  const day = WEEKLY_MENU[dayIdx]
+  const day = menu[dayIdx]
 
   const matches = (isVeg: boolean) =>
     filter === 'all' ? true : filter === 'veg' ? isVeg : !isVeg
@@ -35,7 +39,7 @@ export function MenuPage() {
       {/* Day picker — pill row with editorial labels */}
       <div className="mt-8 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
         <div className="inline-flex min-w-full gap-1 rounded-2xl bg-paper border border-cream-200 p-1.5 shadow-soft ring-inset-warm">
-          {WEEKLY_MENU.map((d, i) => {
+          {menu.map((d, i) => {
             const isToday = i === todayIdx
             const active = i === dayIdx
             return (

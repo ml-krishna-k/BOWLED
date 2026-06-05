@@ -18,6 +18,7 @@ import type {
 } from '@/types'
 import { PLANS } from '@/data/plans'
 import { WEEKLY_MENU } from '@/data/menu'
+import { useMenu } from '@/lib/menu'
 import {
   currentCycleDaySkips,
   currentCycleMealSkips,
@@ -119,11 +120,15 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     return Math.min(30, Math.max(1, days + 1))
   }, [sub])
 
+  // Pull the API-merged menu (admin overrides on top of the static baseline)
+  // so the Dashboard "next meal" copy stays in sync with the /admin/menu
+  // editor. Falls back to the baseline while the API call is in flight.
+  const { menu: mergedMenu } = useMenu()
   const todayDay = useMemo(() => {
     const idx = new Date().getDay()
     const mondayBased = (idx + 6) % 7
-    return WEEKLY_MENU[mondayBased]
-  }, [])
+    return mergedMenu[mondayBased] ?? WEEKLY_MENU[mondayBased]
+  }, [mergedMenu])
 
   const nextSlot = useMemo<MealSlot | null>(() => {
     if (!sub) return null
