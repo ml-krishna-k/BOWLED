@@ -15,12 +15,20 @@ export function greeting(now = new Date()): string {
   return 'Good night'
 }
 
-export function maskPhone(phone: string): string {
+/**
+ * Format a 10-digit phone as "+91 12345 67890".
+ * Returns "—" when the phone is missing — post-Google-OAuth, users without
+ * a phone yet land here, and the old behaviour of `phone.length` crashed
+ * the page with "Cannot read properties of undefined".
+ */
+export function maskPhone(phone: string | null | undefined): string {
+  if (!phone) return '—'
   if (phone.length < 10) return phone
   return `+91 ${phone.slice(0, 5)} ${phone.slice(5)}`
 }
 
-export function shortPhone(phone: string): string {
+export function shortPhone(phone: string | null | undefined): string {
+  if (!phone) return '—'
   if (phone.length < 10) return phone
   return `xxxxx ${phone.slice(5)}`
 }
