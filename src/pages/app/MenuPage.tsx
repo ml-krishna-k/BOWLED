@@ -124,31 +124,47 @@ export function MenuPage() {
               )}
             >
               {/* Plate visual — squat banner on mobile so the list stays scannable,
-                  full panel at sm+. */}
+                  full panel at sm+. Renders the admin-uploaded Cloudinary
+                  image when present; falls back to the gradient placeholder
+                  so meals without a photo still look intentional. */}
               <figure
                 className={cn(
-                  'sm:col-span-5 relative aspect-[16/9] sm:aspect-auto sm:min-h-[200px] rounded-2xl overflow-hidden ring-inset-warm',
+                  'sm:col-span-5 relative aspect-[16/9] sm:aspect-auto sm:min-h-[200px] rounded-2xl overflow-hidden ring-inset-warm img-reveal',
                   flip ? 'sm:order-2' : 'sm:order-1',
                   meal.isVeg
                     ? 'bg-gradient-to-br from-leaf-100 via-cream-100 to-saffron-100'
                     : 'bg-gradient-to-br from-saffron-200 via-saffron-100 to-cream-100',
                 )}
-                aria-hidden
               >
-                <div className="absolute inset-0 bg-grain opacity-40" />
-                <div className="absolute inset-0 grid place-items-center">
-                  <div className="h-20 w-20 sm:h-32 sm:w-32 rounded-full bg-paper shadow-card grid place-items-center transition-transform duration-700 group-hover:scale-105">
-                    <div
-                      className={cn(
-                        'h-14 w-14 sm:h-24 sm:w-24 rounded-full',
-                        meal.isVeg
-                          ? 'bg-gradient-to-br from-leaf-300 to-leaf-500'
-                          : 'bg-gradient-to-br from-saffron-400 to-spice-500',
-                      )}
+                {meal.imageUrl ? (
+                  <>
+                    <img
+                      src={meal.imageUrl}
+                      alt={meal.name}
+                      loading="lazy"
+                      decoding="async"
+                      className="absolute inset-0 h-full w-full object-cover"
                     />
-                  </div>
-                </div>
-                <span className="absolute top-3 left-3 sm:top-4 sm:left-4 inline-flex items-center gap-1.5 rounded-full bg-paper/95 px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] font-semibold text-ink-700 shadow-soft backdrop-blur-sm tracking-[0.15em] uppercase">
+                    <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-ink-900/30 via-transparent to-transparent" />
+                  </>
+                ) : (
+                  <>
+                    <div aria-hidden className="absolute inset-0 bg-grain opacity-40" />
+                    <div aria-hidden className="absolute inset-0 grid place-items-center">
+                      <div className="h-20 w-20 sm:h-32 sm:w-32 rounded-full bg-paper shadow-card grid place-items-center transition-transform duration-700 group-hover:scale-105">
+                        <div
+                          className={cn(
+                            'h-14 w-14 sm:h-24 sm:w-24 rounded-full',
+                            meal.isVeg
+                              ? 'bg-gradient-to-br from-leaf-300 to-leaf-500'
+                              : 'bg-gradient-to-br from-saffron-400 to-spice-500',
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+                <span className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 inline-flex items-center gap-1.5 rounded-full bg-paper/95 px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] font-semibold text-ink-700 shadow-soft backdrop-blur-sm tracking-[0.15em] uppercase">
                   <span>{slot.icon}</span>
                   {slot.label}
                 </span>
