@@ -45,17 +45,9 @@ export const ADMIN_NAV: AdminNavItem[] = [
       </>,
     ),
   },
-  {
-    to: '/admin/scan',
-    label: 'Scan QR',
-    icon: sv(
-      <>
-        {/* Camera icon — bracket corners + lens, matches the scanner page */}
-        <path d="M4 7h3l2-2h6l2 2h3v12H4z" />
-        <circle cx="12" cy="13" r="3.5" />
-      </>,
-    ),
-  },
+  // 'Scan QR' is no longer a top-level nav item — the real camera scanner
+  // now lives inside the Deliveries page as a modal launched from the
+  // 'Scan QR' button at the top of the list.
   {
     to: '/admin/payments',
     label: 'Payments',

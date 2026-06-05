@@ -6,16 +6,13 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Switch } from '@/components/ui/Switch'
-import { Badge } from '@/components/ui/Badge'
 import { useAuth } from '@/context/AuthContext'
-import { useSubscription } from '@/context/SubscriptionContext'
 
 const COMMON_ALLERGENS = ['Peanuts', 'Dairy', 'Eggs', 'Gluten', 'Soy', 'Shellfish']
 
 export function Profile() {
   const navigate = useNavigate()
   const { user, logout, update } = useAuth()
-  const { reset } = useSubscription()
 
   const [name, setName] = useState(user?.name ?? '')
   const [line1, setLine1] = useState(user?.address.line1 ?? '')
@@ -36,11 +33,6 @@ export function Profile() {
   function handleLogout() {
     logout()
     navigate('/', { replace: true })
-  }
-
-  function handleResetSub() {
-    reset()
-    navigate('/app/subscription', { replace: true })
   }
 
   function toggleAllergen(a: string) {
@@ -150,18 +142,16 @@ export function Profile() {
         />
       </Card>
 
-      {/* Danger zone */}
+      {/* Account */}
       <Card variant="outline" className="mt-5 sm:mt-6 p-5 sm:p-6 space-y-4">
         <div>
           <h3 className="font-display text-xl text-ink-900">Account</h3>
-          <p className="text-sm text-ink-500">Sign out of this device or reset your demo subscription.</p>
+          <p className="text-sm text-ink-500">Sign out of this device.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <Button variant="outline" onClick={handleResetSub}>Reset subscription</Button>
           <Button variant="ghost" onClick={handleLogout}>
             <span className="text-spice-700">Log out</span>
           </Button>
-          <Badge tone="cream">Demo build</Badge>
         </div>
       </Card>
     </AppContainer>

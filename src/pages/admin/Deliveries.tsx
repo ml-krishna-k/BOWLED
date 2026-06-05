@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AppContainer } from '@/components/app/AppContainer'
 import { PageHeader } from '@/components/app/PageHeader'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { QrScannerView, type ScanResult } from '@/components/admin/QrScannerView'
 import { useAdmin } from '@/context/AdminContext'
 import type { MealSlot, DeliveryStatus } from '@/types'
 import { cn } from '@/lib/cn'
@@ -11,10 +12,12 @@ import { cn } from '@/lib/cn'
 type SlotFilter = 'all' | MealSlot
 
 export function AdminDeliveries() {
-  const { deliveries, kitchens, markDelivery, kpis } = useAdmin()
+  const { deliveries, kitchens, markDelivery, kpis, refresh } = useAdmin()
   const [slot, setSlot] = useState<SlotFilter>('all')
   const [status, setStatus] = useState<'all' | DeliveryStatus>('pending')
   const [area, setArea] = useState<string>('all')
+  const [scannerOpen, setScannerOpen] = useState(false)
+  const [flash, setFlash] = useState<string | null>(null)
 
   const areas = useMemo(
     () => Array.from(new Set(deliveries.map((d) => d.area))).sort(),
@@ -34,6 +37,31 @@ export function AdminDeliveries() {
 
   const kitchenOf = (id: string) => kitchens.find((k) => k.id === id)?.area ?? '—'
 
+  // Lock background scroll while the scanner modal is open. Without this the
+  // page scrolls under the modal on mobile when the user pinches/swipes.
+  useEffect(() => {
+    if (!scannerOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [scannerOpen])
+
+  function handleScanSuccess(result: ScanResult) {
+    // Flip the matching delivery row to 'served' immediately so the admin
+    // sees the update before the next API refresh poll completes.
+    const match = deliveries.find(
+      (d) => d.userId === result.subscriberId && d.slot === result.slot && d.status !== 'served',
+    )
+    if (match) markDelivery(match.id, 'served')
+    setFlash(`✓ ${result.slot} marked served · ${result.mealsRemaining} meals left`)
+    // Pull the fresh state from the server so totals + history stay in sync
+    // for the Overview KPIs and any other admin screen.
+    void refresh()
+    setTimeout(() => setFlash(null), 4000)
+  }
+
   return (
     <AppContainer>
       <PageHeader
@@ -42,8 +70,38 @@ export function AdminDeliveries() {
         description={`${kpis.served} served · ${kpis.pending} pending · ${deliveries.length} total. Filter by slot, area, or status.`}
       />
 
+      {/* Top action bar — Scan QR button launches the real camera */}
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+        <p className="caption text-ink-500">
+          Point the camera at the subscriber's QR to mark a meal served.
+        </p>
+        <Button
+          variant="primary"
+          size="md"
+          onClick={() => setScannerOpen(true)}
+          className="shrink-0"
+        >
+          <span className="inline-flex items-center gap-2">
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M4 7h3l2-2h6l2 2h3v12H4z" />
+              <circle cx="12" cy="13" r="3.5" />
+            </svg>
+            Scan QR
+          </span>
+        </Button>
+      </div>
+
+      {flash && (
+        <div
+          role="status"
+          className="mt-4 rounded-2xl bg-leaf-100 border border-leaf-300 px-4 py-3 text-sm text-leaf-700"
+        >
+          {flash}
+        </div>
+      )}
+
       {/* Filters */}
-      <div className="mt-6 flex flex-wrap items-center gap-2">
+      <div className="mt-5 flex flex-wrap items-center gap-2">
         <Chip active={slot === 'all'} onClick={() => setSlot('all')}>All slots</Chip>
         <Chip active={slot === 'breakfast'} onClick={() => setSlot('breakfast')}>🌅 Breakfast</Chip>
         <Chip active={slot === 'lunch'} onClick={() => setSlot('lunch')}>🍛 Lunch</Chip>
@@ -91,14 +149,14 @@ export function AdminDeliveries() {
                   {d.status}
                 </Badge>
                 {d.status === 'pending' ? (
-                  <>
-                    <Button size="sm" variant="primary" onClick={() => markDelivery(d.id, 'served')}>
-                      Scan QR
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => markDelivery(d.id, 'skipped')}>
-                      Skip
-                    </Button>
-                  </>
+                  <Button size="sm" variant="ghost" onClick={() => markDelivery(d.id, 'served')}>
+                    Mark served
+                  </Button>
+                ) : d.status === 'skipped' ? (
+                  // Skipped rows are read-only — the customer chose to skip,
+                  // so we don't show an Undo (admin shouldn't override the
+                  // customer's opt-out from this list view).
+                  <span className="text-xs text-ink-400">Skipped by customer</span>
                 ) : (
                   <Button size="sm" variant="ghost" onClick={() => markDelivery(d.id, 'pending')}>
                     Undo
@@ -112,6 +170,41 @@ export function AdminDeliveries() {
           )}
         </ul>
       </Card>
+
+      {/* Scanner modal — only mounted while open so the camera releases on close */}
+      {scannerOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Scan subscriber QR"
+          className="fixed inset-0 z-50 grid place-items-center bg-ink-900/70 backdrop-blur-sm p-3 sm:p-6 animate-fade-up"
+        >
+          <div className="relative w-full max-w-4xl rounded-3xl bg-cream-50 p-4 sm:p-6 shadow-card max-h-[92vh] overflow-y-auto">
+            <div className="flex items-start justify-between gap-3 mb-3 sm:mb-4">
+              <div>
+                <p className="text-eyebrow text-saffron-600">Scan QR</p>
+                <h2 className="mt-1 text-display text-xl sm:text-2xl tracking-tight text-ink-900">
+                  Scan a customer's pass
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setScannerOpen(false)}
+                aria-label="Close scanner"
+                className="grid h-9 w-9 place-items-center rounded-full bg-cream-100 text-ink-700 hover:bg-cream-200 transition-colors"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 6l12 12M6 18L18 6" />
+                </svg>
+              </button>
+            </div>
+            <QrScannerView
+              onSuccess={handleScanSuccess}
+              onClose={() => setScannerOpen(false)}
+            />
+          </div>
+        </div>
+      )}
     </AppContainer>
   )
 }

@@ -9,6 +9,10 @@ import { useAuth } from '@/context/AuthContext'
 import { useSubscription } from '@/context/SubscriptionContext'
 import { api } from '@/lib/api'
 
+// 'Simulate delivery scan' was removed — the QR is now the only path to mark a
+// meal served. Admins scan from /admin/deliveries (real camera). The unused
+// scanMeal + justServed state went with it.
+
 // Server tokens last 60s — rotate just before they expire.
 const TOKEN_REFRESH_MS = 45_000
 // Subscription state poll. Kept tight so that when admin scans the customer's
@@ -18,9 +22,7 @@ const SUB_POLL_MS = 5_000
 
 export function QrPass() {
   const { user } = useAuth()
-  const { sub, nextSlot, scanMeal, mealsRemaining, refresh: refreshSub } = useSubscription()
-  const [pulse, setPulse] = useState(false)
-  const [justServed, setJustServed] = useState<string | null>(null)
+  const { sub, nextSlot, mealsRemaining, refresh: refreshSub } = useSubscription()
 
   const [token, setToken] = useState<string | null>(null)
   const [tokenError, setTokenError] = useState<string | null>(null)
@@ -63,16 +65,6 @@ export function QrPass() {
   const scanUrl = token ? `${window.location.origin}/scan/${token}` : ''
   const shortCode = token ? token.slice(-8).toUpperCase() : '········'
 
-  async function simulateScan() {
-    const result = await scanMeal()
-    if (result) {
-      setJustServed(result.mealName)
-      setPulse(true)
-      setTimeout(() => setPulse(false), 1200)
-      setTimeout(() => setJustServed(null), 4000)
-    }
-  }
-
   return (
     <AppContainer className="max-w-3xl">
       <PageHeader
@@ -90,13 +82,6 @@ export function QrPass() {
         <div className="relative text-eyebrow text-saffron-700">{user.name} · {user.email}</div>
 
         <div className="relative mt-6">
-          {/* Pulse ring while scanning */}
-          {pulse && (
-            <div
-              aria-hidden
-              className="absolute inset-0 -m-4 rounded-3xl bg-leaf-300/50 animate-ping"
-            />
-          )}
           {/* QR — real, scannable; encodes /scan/:token URL */}
           <div className="relative h-52 w-52 sm:h-60 sm:w-60 lg:h-64 lg:w-64 rounded-3xl bg-paper border border-cream-200 p-3 sm:p-4 shadow-card grid place-items-center">
             {scanUrl ? (
@@ -144,21 +129,7 @@ export function QrPass() {
           </p>
         )}
 
-        {justServed && (
-          <div className="mt-4 rounded-2xl bg-leaf-100 border border-leaf-300 px-4 py-3 text-sm text-leaf-700">
-            ✓ Scanned. <span className="font-semibold">{justServed}</span> marked as served. Plan auto-updated.
-          </div>
-        )}
-
         <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={simulateScan}
-            disabled={!nextSlot}
-          >
-            {nextSlot ? 'Simulate delivery scan' : 'No pending meal'}
-          </Button>
           <Button
             variant="outline"
             size="lg"
@@ -170,7 +141,7 @@ export function QrPass() {
         </div>
 
         <p className="mt-5 text-[11px] text-ink-400 max-w-sm">
-          The rider scans this with any phone camera — it opens a one-tap confirmation page that marks the meal as served. "Simulate scan" does the same locally for testing.
+          The delivery person scans this with any phone camera — it opens a one-tap confirmation page that marks the meal as served.
         </p>
       </Card>
 

@@ -21,6 +21,7 @@ import { WEEKLY_MENU } from '@/data/menu'
 import { PLANS } from '@/data/plans'
 import { api } from '@/lib/api'
 import { applyMenuOverrides, mealToOverridePatch, type MenuOverride } from '@/lib/menu'
+import { todayKey } from '@/lib/skip'
 import { useAuth } from './AuthContext'
 
 interface AdminValue {
@@ -68,28 +69,50 @@ interface AdminOverview {
   skipNotifications: AdminSkipNotification[]
 }
 
-function buildDeliveries(subs: Subscriber[], dayMenu: DayMenu): Delivery[] {
+function buildDeliveries(
+  subs: Subscriber[],
+  dayMenu: DayMenu,
+  skipNotifications: AdminSkipNotification[],
+): Delivery[] {
   const SCHED: Record<MealSlot, string> = {
     breakfast: '08:30',
     lunch: '13:00',
     dinner: '20:00',
   }
+
+  // Lookup: which (userId, slot) is skipped today? A 'day' skip covers all
+  // three slots; a 'meal' skip covers a single slot. Built once per refresh.
+  const today = todayKey()
+  const skippedSlots = new Set<string>() // key = `${userId}|${slot}`
+  for (const n of skipNotifications) {
+    if (n.date !== today) continue
+    if (n.kind === 'day') {
+      for (const s of ['breakfast', 'lunch', 'dinner'] as MealSlot[]) {
+        skippedSlots.add(`${n.subscriberId}|${s}`)
+      }
+    } else if (n.slot) {
+      skippedSlots.add(`${n.subscriberId}|${n.slot}`)
+    }
+  }
+
   const out: Delivery[] = []
   let i = 0
   for (const s of subs) {
     if (s.status !== 'active') continue
     for (const slot of ['breakfast', 'lunch', 'dinner'] as MealSlot[]) {
       const meal = dayMenu.meals[slot]
+      const isSkipped = s.userId ? skippedSlots.has(`${s.userId}|${slot}`) : false
       out.push({
         id: `d_${s.id}_${slot}_${i++}`,
         subscriberId: s.id,
+        userId: s.userId,
         subscriberName: s.name,
         area: s.area,
         pgName: s.pgName,
         slot,
         mealName: meal.name,
         isVeg: meal.isVeg,
-        status: 'pending',
+        status: isSkipped ? 'skipped' : 'pending',
         kitchenId: '',
         scheduledAt: SCHED[slot],
       })
@@ -125,7 +148,13 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       setSubscribers(subsRes.subscribers)
       const mergedMenu = applyMenuOverrides(menuRes.overrides)
       setMenu(mergedMenu)
-      setDeliveries(buildDeliveries(subsRes.subscribers, mergedMenu[todayMenuIdx()]))
+      setDeliveries(
+        buildDeliveries(
+          subsRes.subscribers,
+          mergedMenu[todayMenuIdx()],
+          overviewRes.skipNotifications,
+        ),
+      )
     } catch (err) {
       console.error('[admin] refresh failed:', err)
     } finally {
@@ -144,13 +173,37 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
   // Live skip-notification updates from the user-side flow happen via the API,
   // not localStorage. We poll every 20s so the admin page picks up new events
-  // without a manual refresh.
+  // without a manual refresh, and rebuild deliveries so today's rows flip to
+  // 'skipped' as soon as the user opts out.
   useEffect(() => {
     if (!enabled) return
     const id = setInterval(async () => {
       try {
         const data = await api<{ skipNotifications: AdminSkipNotification[] }>('/api/admin/skip-notifications')
         setSkipNotifications(data.skipNotifications)
+        setDeliveries((prev) => {
+          // Rebuild status flags only — leave 'served' rows untouched so a
+          // late-arriving skip note doesn't clobber a meal that's already been
+          // marked served.
+          const today = todayKey()
+          const skippedSlots = new Set<string>()
+          for (const n of data.skipNotifications) {
+            if (n.date !== today) continue
+            if (n.kind === 'day') {
+              for (const s of ['breakfast', 'lunch', 'dinner'] as MealSlot[]) {
+                skippedSlots.add(`${n.subscriberId}|${s}`)
+              }
+            } else if (n.slot) {
+              skippedSlots.add(`${n.subscriberId}|${n.slot}`)
+            }
+          }
+          return prev.map((d) => {
+            if (d.status === 'served') return d
+            const isSkipped = d.userId ? skippedSlots.has(`${d.userId}|${d.slot}`) : false
+            const nextStatus = isSkipped ? 'skipped' : d.status === 'skipped' ? 'pending' : d.status
+            return nextStatus === d.status ? d : { ...d, status: nextStatus }
+          })
+        })
       } catch {
         /* swallow */
       }

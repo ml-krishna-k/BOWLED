@@ -80,6 +80,10 @@ export type SubscriberStatus = 'active' | 'paused' | 'churned'
 
 export interface Subscriber {
   id: string
+  /** User._id (distinct from the subscription _id stored in `id`). Skip
+   *  notifications and QR-redeem responses reference the user, so the admin
+   *  Deliveries page joins by this field. */
+  userId?: string
   name: string
   phone: string
   area: string
@@ -120,6 +124,10 @@ export type DeliveryStatus = 'pending' | 'served' | 'skipped'
 export interface Delivery {
   id: string
   subscriberId: string
+  /** User._id of the customer this delivery belongs to. Used by the in-app
+   *  scanner to find the matching delivery row after a successful redeem
+   *  (QR /redeem returns the user id). */
+  userId?: string
   subscriberName: string
   area: string
   pgName: string

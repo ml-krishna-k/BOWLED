@@ -23,7 +23,6 @@ const Profile               = lazy(() => import('@/pages/app/Profile').then((m) 
 const AdminShell            = lazy(() => import('@/pages/admin/AdminShell').then((m) => ({ default: m.AdminShell })))
 const AdminOverview         = lazy(() => import('@/pages/admin/Overview').then((m) => ({ default: m.AdminOverview })))
 const AdminPayments         = lazy(() => import('@/pages/admin/Payments').then((m) => ({ default: m.AdminPayments })))
-const AdminScan             = lazy(() => import('@/pages/admin/Scan').then((m) => ({ default: m.AdminScan })))
 const AdminSubscribers      = lazy(() => import('@/pages/admin/Subscribers').then((m) => ({ default: m.AdminSubscribers })))
 const AdminSubscriberDetail = lazy(() => import('@/pages/admin/SubscriberDetail').then((m) => ({ default: m.AdminSubscriberDetail })))
 const AdminDeliveries       = lazy(() => import('@/pages/admin/Deliveries').then((m) => ({ default: m.AdminDeliveries })))
@@ -90,7 +89,10 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/admin/overview" replace /> },
       { path: 'overview',         element: withSuspense(<AdminOverview />) },
-      { path: 'scan',             element: withSuspense(<AdminScan />) },
+      // /admin/scan was removed — the QR camera now lives in a modal launched
+      // from /admin/deliveries. Old bookmarks land on /admin/overview via the
+      // index redirect.
+      { path: 'scan',             element: <Navigate to="/admin/deliveries" replace /> },
       { path: 'payments',         element: withSuspense(<AdminPayments />) },
       { path: 'deliveries',       element: withSuspense(<AdminDeliveries />) },
       { path: 'subscribers',      element: withSuspense(<AdminSubscribers />) },

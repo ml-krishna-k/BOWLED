@@ -82,6 +82,10 @@ router.post('/redeem', async (req, res) => {
   res.json({
     ok: true,
     slot: target,
+    // Returned so the admin Deliveries page can flip the matching row to
+    // 'served' the moment the scan succeeds, without waiting for the next
+    // refresh poll.
+    subscriberId: payload.uid,
     mealsServed: sub.mealsServed,
     mealsRemaining: Math.max(0, sub.totalMeals - sub.mealsServed),
   })
