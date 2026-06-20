@@ -29,8 +29,8 @@ type CycleId = typeof CycleEnum[number]
 
 const PLAN_PRICE: Record<PlanId, number> = {
   solo: 89,
-  squad: 69,
-  floor: 63,
+  squad: 75,
+  floor: 69,
 }
 
 const PLAN_GROUP_MIN: Record<PlanId, number> = {

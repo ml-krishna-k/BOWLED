@@ -78,7 +78,7 @@ export const LANDINGS: SeoLanding[] = [
     slug: 'hostel-food-chennai',
     title: 'Hostel Food in Chennai — 3 Home-Style Meals a Day | Bowled',
     metaDescription:
-      'Tired of hostel mess food in Chennai? Bowled delivers three home-cooked Tamil meals daily to PGs and hostels across Chennai. From ₹89/meal. Skip anytime.',
+      'Tired of hostel mess food in Chennai? Bowled delivers three home-cooked Tamil meals daily to PGs and hostels across Chennai. From ₹69/meal. Skip anytime.',
     keywords:
       'hostel food chennai, hostel mess alternative chennai, hostel meal delivery chennai, hostel tiffin chennai, hostel food service chennai, food for hostel students chennai',
     eyebrow: 'Hostel food in Chennai',
@@ -146,8 +146,8 @@ export const LANDINGS: SeoLanding[] = [
         eyebrow: 'What you pay',
         heading: 'Hostel meal pricing that respects student budgets',
         paragraphs: [
-          'Most hostel residents in Chennai pay between ₹3,500 and ₹6,000 per month for mess food — and the food, frankly, does not always justify it. Bowled starts at ₹89 per meal on Solo, drops to ₹69 on Squad (five-friend group) and ₹63 on Floor (ten-person hostel-block group). For a typical monthly plan with Sunday off, that is ₹6,942 Solo, dropping to ₹5,382 in a Squad — but the food on your plate is fresh, home-style, and never reheated.',
-          'Group plans are how most hostels actually subscribe. Get five roommates on the same code and save ₹1,800 per person per month. Get ten of your floor on one Floor plan and save ₹2,340 each.',
+          'Most hostel residents in Chennai pay between ₹3,500 and ₹6,000 per month for mess food — and the food, frankly, does not always justify it. Bowled starts at ₹89 per meal on Solo, drops to ₹75 on Squad (five-friend group) and ₹69 on Floor (ten-person hostel-block group). For a typical monthly plan with Sunday off, that is ₹6,942 Solo, dropping to ₹5,382 in a Floor — but the food on your plate is fresh, home-style, and never reheated.',
+          'Group plans are how most hostels actually subscribe. Get five roommates on the same code and save ₹1,260 per person per month. Get ten of your floor on one Floor plan and save ₹1,800 each.',
         ],
       },
     ],
@@ -178,7 +178,7 @@ export const LANDINGS: SeoLanding[] = [
       },
       {
         q: 'Is there a free trial for hostel students?',
-        a: 'You can subscribe to a one-week Solo plan from ₹89 per meal — the shortest, lowest-commitment way to try us. If the food doesn\'t taste like home, write to us within the first week and we will refund the full amount.',
+        a: 'You can start with a one-week plan from ₹69 per meal on Floor — the shortest, lowest-commitment way to try us. If the food doesn\'t taste like home, write to us within the first week and we will refund the full amount.',
       },
     ],
     internalLinks: [
@@ -205,8 +205,8 @@ export const LANDINGS: SeoLanding[] = [
     ],
     cta: {
       headline: 'Skip the hostel mess. Start your plan today.',
-      sub: 'Three home-cooked meals delivered to your hostel from ₹89/meal. Pause anytime.',
-      buttonLabel: 'Subscribe from ₹89 / meal',
+      sub: 'Three home-cooked meals delivered to your hostel from ₹69/meal. Pause anytime.',
+      buttonLabel: 'Subscribe from ₹69 / meal',
     },
   },
 
@@ -215,7 +215,7 @@ export const LANDINGS: SeoLanding[] = [
     slug: 'pg-food-chennai',
     title: 'PG Food in Chennai — Home-Style Meals Delivered Daily | Bowled',
     metaDescription:
-      'Living in a PG in Chennai? Get three home-cooked meals a day delivered to your door. Tamil menu, weekly rotation, from ₹89/meal. Skip anytime, no commitment.',
+      'Living in a PG in Chennai? Get three home-cooked meals a day delivered to your door. Tamil menu, weekly rotation, from ₹69/meal. Skip anytime, no commitment.',
     keywords:
       'pg food chennai, pg food delivery chennai, food for pg students chennai, pg meal subscription chennai, pg tiffin chennai, food for paying guest chennai',
     eyebrow: 'PG food delivery in Chennai',
@@ -230,7 +230,7 @@ export const LANDINGS: SeoLanding[] = [
         heading: 'Why PGs in Chennai are switching to Bowled',
         paragraphs: [
           'Most PG residents in Chennai are renting a room with no proper kitchen access — at most a kettle, sometimes a microwave. Cooking is not really an option, even if you wanted to. That leaves you ordering food daily, which gets expensive fast and rarely tastes like the home you left behind.',
-          'Bowled solves both problems at once. The pricing — ₹63 to ₹89 per meal depending on group size — is lower than most regular Swiggy orders. And the food is real Tamil home cooking, made by chefs from Sree Krishna Catering who have been feeding Chennai families since 2006.',
+          'Bowled solves both problems at once. The pricing — ₹69 to ₹89 per meal depending on group size — is lower than most regular Swiggy orders. And the food is real Tamil home cooking, made by chefs from Sree Krishna Catering who have been feeding Chennai families since 2006.',
         ],
         points: [
           {
@@ -239,7 +239,7 @@ export const LANDINGS: SeoLanding[] = [
           },
           {
             title: 'Cheaper than daily delivery apps',
-            body: 'A typical Swiggy thali in Chennai is ₹180–₹250. Bowled is ₹89 on Solo, ₹69 in a group of five, ₹63 in a group of ten — and the food is home-style, not restaurant-style.',
+            body: 'A typical Swiggy thali in Chennai is ₹180–₹250. Bowled is ₹89 on Solo, ₹75 in a group of five, ₹69 in a group of ten — and the food is home-style, not restaurant-style.',
           },
           {
             title: 'Same time, every day',
@@ -303,7 +303,7 @@ export const LANDINGS: SeoLanding[] = [
       },
       {
         q: 'How much does a monthly plan cost for a PG resident?',
-        a: 'A Solo monthly plan (26 cooking days, three meals per day) is ₹6,942. Bring four PG mates on the same code and it drops to ₹5,382 per person on Squad. Bring nine and it drops to ₹4,914 on Floor.',
+        a: 'A Solo monthly plan (26 cooking days, three meals per day) is ₹6,942. Bring four PG mates on the same code and it drops to ₹5,850 per person on Squad. Bring nine and it drops to ₹5,382 on Floor.',
       },
       {
         q: 'Can I pay weekly instead of monthly?',
@@ -342,7 +342,7 @@ export const LANDINGS: SeoLanding[] = [
     ],
     cta: {
       headline: 'Three home-cooked meals delivered to your PG every day.',
-      sub: 'From ₹89/meal Solo, dropping to ₹63 in a group of ten. Skip anytime.',
+      sub: 'From ₹89/meal Solo, dropping to ₹69 in a group of ten. Skip anytime.',
       buttonLabel: 'Start your subscription',
     },
   },
@@ -352,7 +352,7 @@ export const LANDINGS: SeoLanding[] = [
     slug: 'home-cooked-food-chennai',
     title: 'Home-Cooked Food in Chennai, Delivered Daily | Bowled',
     metaDescription:
-      'Real home-cooked Tamil food in Chennai, delivered three times a day. Less oil, slow-cooked, freshly ground spices. From ₹89/meal. By Sree Krishna Catering.',
+      'Real home-cooked Tamil food in Chennai, delivered three times a day. Less oil, slow-cooked, freshly ground spices. From ₹69/meal. By Sree Krishna Catering.',
     keywords:
       'home cooked food chennai, home style food chennai, home food delivery chennai, mom-style food chennai, tamil home cooking chennai, freshly cooked meals chennai',
     eyebrow: 'Home-cooked food in Chennai',
@@ -445,8 +445,8 @@ export const LANDINGS: SeoLanding[] = [
     ],
     cta: {
       headline: 'Home-style Tamil food, every day, no kitchen needed.',
-      sub: 'From ₹89/meal. Three meals daily, weekly rotating menu, pause anytime.',
-      buttonLabel: 'Subscribe from ₹89 / meal',
+      sub: 'From ₹69/meal. Three meals daily, weekly rotating menu, pause anytime.',
+      buttonLabel: 'Subscribe from ₹69 / meal',
     },
   },
 
@@ -455,7 +455,7 @@ export const LANDINGS: SeoLanding[] = [
     slug: 'healthy-meals-chennai',
     title: 'Healthy Meals in Chennai — Balanced Daily Tiffin | Bowled',
     metaDescription:
-      'Healthy home-cooked meals in Chennai with balanced nutrition, cold-pressed oils and small-batch cooking. 700–800 kcal portions. From ₹89/meal.',
+      'Healthy home-cooked meals in Chennai with balanced nutrition, cold-pressed oils and small-batch cooking. 700–800 kcal portions. From ₹69/meal.',
     keywords:
       'healthy meals chennai, healthy food delivery chennai, balanced meals chennai, nutritious food chennai, healthy lunch chennai, healthy tiffin chennai',
     eyebrow: 'Healthy meals in Chennai',
@@ -565,7 +565,7 @@ export const LANDINGS: SeoLanding[] = [
     ],
     cta: {
       headline: 'Eat well, eat home, eat every day.',
-      sub: 'Balanced Tamil home cooking, three meals a day, from ₹89/meal.',
+      sub: 'Balanced Tamil home cooking, three meals a day, from ₹69/meal.',
       buttonLabel: 'Start your healthy plan',
     },
   },
@@ -575,7 +575,7 @@ export const LANDINGS: SeoLanding[] = [
     slug: 'meal-subscription-chennai',
     title: 'Meal Subscription in Chennai — Daily Tiffin Plans | Bowled',
     metaDescription:
-      'Daily meal subscription in Chennai with weekly rotating Tamil menu. Plans from ₹89/meal. Solo, Squad and Floor pricing. Skip anytime, no commitment.',
+      'Daily meal subscription in Chennai with weekly rotating Tamil menu. Plans from ₹69/meal. Solo, Squad and Floor pricing. Skip anytime, no commitment.',
     keywords:
       'meal subscription chennai, daily meal plan chennai, monthly meal subscription chennai, food subscription chennai, breakfast lunch dinner subscription chennai',
     eyebrow: 'Meal subscription in Chennai',
@@ -597,8 +597,8 @@ export const LANDINGS: SeoLanding[] = [
         eyebrow: 'Plan tiers',
         heading: 'Solo, Squad and Floor — which one fits',
         paragraphs: [
-          'Solo is the individual plan at ₹89 per meal. Squad drops to ₹69 per meal when you bring four friends onto the same code (five people on one Squad plan). Floor is ₹63 per meal when you have ten people on the same code, typically the residents of a single hostel floor.',
-          'The per-meal price difference adds up. On a monthly plan with 26 cooking days, Solo costs ₹6,942 per person. Squad drops to ₹5,382 per person — savings of ₹1,560 per month each. Floor drops to ₹4,914 — savings of ₹2,028 per month each. The originator pays for the group upfront and shares the code; everyone else just joins.',
+          'Solo is the individual plan at ₹89 per meal. Squad drops to ₹75 per meal when you bring four friends onto the same code (five people on one Squad plan). Floor is ₹69 per meal when you have ten people on the same code, typically the residents of a single hostel floor.',
+          'The per-meal price difference adds up. On a monthly plan with 26 cooking days, Solo costs ₹6,942 per person. Squad drops to ₹5,850 per person — savings of ₹1,092 per month each. Floor drops to ₹5,382 — savings of ₹1,560 per month each. The originator pays for the group upfront and shares the code; everyone else just joins.',
         ],
         points: [
           {
@@ -606,12 +606,12 @@ export const LANDINGS: SeoLanding[] = [
             body: 'For individual subscribers. ₹6,942 for the standard monthly cycle (26 cooking days, three meals/day).',
           },
           {
-            title: 'Squad — ₹69/meal',
-            body: 'For groups of five. Originator pays ₹26,910 upfront and shares the code with four friends, each of whom subscribes at ₹5,382 effectively.',
+            title: 'Squad — ₹75/meal',
+            body: 'For groups of five. Originator pays ₹29,250 upfront and shares the code with four friends, each of whom subscribes at ₹5,850 effectively.',
           },
           {
-            title: 'Floor — ₹63/meal',
-            body: 'For groups of ten. Originator pays ₹49,140 upfront and shares the code with nine friends, each at ₹4,914 effectively. Best for hostel floors.',
+            title: 'Floor — ₹69/meal',
+            body: 'For groups of ten. Originator pays ₹53,820 upfront and shares the code with nine friends, each at ₹5,382 effectively. Best for hostel floors.',
           },
         ],
       },
@@ -711,7 +711,7 @@ export const LANDINGS: SeoLanding[] = [
     cta: {
       headline: 'Subscribe once. Eat home-style for thirty days.',
       sub: 'No autorenewal. No hidden charges. Pause anytime.',
-      buttonLabel: 'See plans from ₹89 / meal',
+      buttonLabel: 'See plans from ₹69 / meal',
     },
   },
 
@@ -720,7 +720,7 @@ export const LANDINGS: SeoLanding[] = [
     slug: 'tiffin-service-chennai',
     title: 'Tiffin Service in Chennai — Daily Home Meals | Bowled',
     metaDescription:
-      'Modern tiffin service in Chennai by Sree Krishna Catering. Three home-cooked Tamil meals delivered daily. Weekly menu rotation. From ₹89/meal.',
+      'Modern tiffin service in Chennai by Sree Krishna Catering. Three home-cooked Tamil meals delivered daily. Weekly menu rotation. From ₹69/meal.',
     keywords:
       'tiffin service chennai, tiffin delivery chennai, daily tiffin chennai, monthly tiffin chennai, best tiffin service in chennai, vegetarian tiffin chennai, non veg tiffin chennai',
     eyebrow: 'Tiffin service in Chennai',
@@ -832,7 +832,7 @@ export const LANDINGS: SeoLanding[] = [
     ],
     cta: {
       headline: 'Tiffin service, modernised. Tamil food, made properly.',
-      sub: 'Three meals daily, app-driven, group pricing from ₹63/meal.',
+      sub: 'Three meals daily, app-driven, group pricing from ₹69/meal.',
       buttonLabel: 'Subscribe to Bowled',
     },
   },
@@ -947,7 +947,7 @@ export const LANDINGS: SeoLanding[] = [
     ],
     cta: {
       headline: 'Try the highest-rated meal subscription in Chennai.',
-      sub: '4.8/5 by 300+ subscribers. From ₹89/meal. Skip anytime.',
+      sub: '4.8/5 by 300+ subscribers. From ₹69/meal. Skip anytime.',
       buttonLabel: 'Start your subscription',
     },
   },
@@ -957,7 +957,7 @@ export const LANDINGS: SeoLanding[] = [
     slug: 'student-meals-chennai',
     title: 'Student Meals in Chennai — Affordable Daily Plans | Bowled',
     metaDescription:
-      'Affordable daily meals for students in Chennai. From ₹63/meal in a group of ten. Skip exam weeks, pause for trips home. Three home-cooked meals a day.',
+      'Affordable daily meals for students in Chennai. From ₹69/meal in a group of ten. Skip exam weeks, pause for trips home. Three home-cooked meals a day.',
     keywords:
       'student meals chennai, food for students chennai, college student food chennai, affordable meals chennai, cheap food delivery chennai students, student meal plan chennai',
     eyebrow: 'Student meals in Chennai',
@@ -979,8 +979,8 @@ export const LANDINGS: SeoLanding[] = [
         eyebrow: 'Pricing for students',
         heading: 'Why we charge what we charge — and why groups save',
         paragraphs: [
-          'Solo plans are ₹89 per meal — a sensible standalone rate. The real student pricing kicks in when groups subscribe. Five roommates on a Squad plan drop to ₹69 per meal each, saving ₹1,560 per month. Ten people on a single Floor plan drop to ₹63 per meal each, saving ₹2,028 per month.',
-          'That is genuine student-friendly pricing. A typical college student in Chennai who eats out daily spends ₹3,500–₹5,500 per month on lunch alone. A Floor-plan subscriber pays ₹4,914 per month for all three meals every cooking day.',
+          'Solo plans are ₹89 per meal — a sensible standalone rate. The real student pricing kicks in when groups subscribe. Five roommates on a Squad plan drop to ₹75 per meal each, saving ₹1,092 per month. Ten people on a single Floor plan drop to ₹69 per meal each, saving ₹1,560 per month.',
+          'That is genuine student-friendly pricing. A typical college student in Chennai who eats out daily spends ₹3,500–₹5,500 per month on lunch alone. A Floor-plan subscriber pays ₹5,382 per month for all three meals every cooking day.',
         ],
         points: [
           {
@@ -988,12 +988,12 @@ export const LANDINGS: SeoLanding[] = [
             body: 'Standalone plan. ₹6,942 for a monthly cycle (26 cooking days, three meals each day). Total monthly meal count: 78.',
           },
           {
-            title: 'Squad — ₹69/meal',
-            body: 'Five-friend plan. ₹5,382/month per person. Best for tight roommate groups in PGs and hostels.',
+            title: 'Squad — ₹75/meal',
+            body: 'Five-friend plan. ₹5,850/month per person. Best for tight roommate groups in PGs and hostels.',
           },
           {
-            title: 'Floor — ₹63/meal',
-            body: 'Ten-person plan. ₹4,914/month per person. Most-used by hostel floors and shared houses.',
+            title: 'Floor — ₹69/meal',
+            body: 'Ten-person plan. ₹5,382/month per person. Most-used by hostel floors and shared houses.',
           },
         ],
       },
@@ -1015,11 +1015,11 @@ export const LANDINGS: SeoLanding[] = [
     faqs: [
       {
         q: 'How much does student food cost in Chennai with Bowled?',
-        a: 'From ₹89 per meal Solo, dropping to ₹69 in a group of five (Squad) and ₹63 in a group of ten (Floor). Monthly all-in cost ranges from ₹4,914 to ₹6,942 depending on group size.',
+        a: 'From ₹89 per meal Solo, dropping to ₹75 in a group of five (Squad) and ₹69 in a group of ten (Floor). Monthly all-in cost ranges from ₹5,382 to ₹6,942 depending on group size.',
       },
       {
         q: 'Do you have a student discount?',
-        a: 'The Squad (₹69/meal) and Floor (₹63/meal) plans are effectively our group student pricing. The more friends you bring on the same code, the lower the per-person rate.',
+        a: 'The Squad (₹75/meal) and Floor (₹69/meal) plans are effectively our group student pricing. The more friends you bring on the same code, the lower the per-person rate.',
       },
       {
         q: 'What happens to my plan during semester breaks?',
@@ -1066,7 +1066,7 @@ export const LANDINGS: SeoLanding[] = [
     ],
     cta: {
       headline: 'Affordable home-style meals for Chennai students.',
-      sub: 'From ₹63/meal in a group of ten. Skip exam weeks, pause for trips home.',
+      sub: 'From ₹69/meal in a group of ten. Skip exam weeks, pause for trips home.',
       buttonLabel: 'See student plans',
     },
   },
@@ -1076,7 +1076,7 @@ export const LANDINGS: SeoLanding[] = [
     slug: 'office-lunch-chennai',
     title: 'Office Lunch Delivery in Chennai — Daily Tiffin | Bowled',
     metaDescription:
-      'Daily office lunch delivery in Chennai. Home-cooked Tamil meals to your office desk by 1 PM. From ₹89/meal. Pause when you work from home.',
+      'Daily office lunch delivery in Chennai. Home-cooked Tamil meals to your office desk by 1 PM. From ₹69/meal. Pause when you work from home.',
     keywords:
       'office lunch chennai, office tiffin chennai, office food delivery chennai, working professional meals chennai, daily lunch chennai, lunch delivery omr chennai',
     eyebrow: 'Office lunch in Chennai',
@@ -1091,7 +1091,7 @@ export const LANDINGS: SeoLanding[] = [
         heading: 'Built around the IT corridor and central offices',
         paragraphs: [
           'Bowled\'s OMR kitchen handles the Rajiv Gandhi Salai corridor — from Tidel Park down to Sholinganallur and Navalur. Our T. Nagar kitchen covers the central belt — Nungambakkam, Anna Salai, T. Nagar offices. Adyar and Velachery kitchens reach the south side. Wherever your office is, one of our kitchens is within delivery range.',
-          'Delivery to office addresses works the same as residential — a delivery person arrives in the 12:45 PM to 1:15 PM slot, you show your QR meal pass, meal counter drops by one. Several offices in OMR have started doing pooled Floor plans (₹63/meal) for ten-person teams, which works well in shared cafeteria contexts.',
+          'Delivery to office addresses works the same as residential — a delivery person arrives in the 12:45 PM to 1:15 PM slot, you show your QR meal pass, meal counter drops by one. Several offices in OMR have started doing pooled Floor plans (₹69/meal) for ten-person teams, which works well in shared cafeteria contexts.',
         ],
       },
       {
@@ -1099,7 +1099,7 @@ export const LANDINGS: SeoLanding[] = [
         heading: 'And how a subscription fixes it',
         paragraphs: [
           'Working professionals lose roughly thirty to sixty minutes a day to lunch decisions — checking Swiggy, walking to a restaurant, queuing at the office cafeteria. Multiply that across five days and you lose three hours a week to lunch logistics alone. A daily subscription removes the decision entirely. The food shows up. You eat. You go back to work.',
-          'On the cost side, the math is straightforward. A daily Swiggy lunch in Chennai costs ₹200–₹350 with delivery fees. Bowled lunches are ₹89 per meal Solo, ₹69 in a Squad, ₹63 in a Floor. Even on the most expensive plan, you save 50–60% vs. daily app delivery.',
+          'On the cost side, the math is straightforward. A daily Swiggy lunch in Chennai costs ₹200–₹350 with delivery fees. Bowled lunches are ₹89 per meal Solo, ₹75 in a Squad, ₹69 in a Floor. Even on the most expensive plan, you save 50–60% vs. daily app delivery.',
         ],
         points: [
           {
@@ -1120,7 +1120,7 @@ export const LANDINGS: SeoLanding[] = [
         eyebrow: 'For team lunches',
         heading: 'Office Floor plans for ten-person teams',
         paragraphs: [
-          'Several Chennai offices use Bowled as a structured daily team-lunch programme. A team lead originates a Floor plan and shares the group code with nine teammates. Each teammate joins at ₹63/meal and the team gets ten meals delivered together every weekday at 1 PM. Works particularly well for small startups and ten-person teams in OMR / T. Nagar.',
+          'Several Chennai offices use Bowled as a structured daily team-lunch programme. A team lead originates a Floor plan and shares the group code with nine teammates. Each teammate joins at ₹69/meal and the team gets ten meals delivered together every weekday at 1 PM. Works particularly well for small startups and ten-person teams in OMR / T. Nagar.',
           'Some companies subsidise part of the Bowled subscription as a perk. We are happy to invoice a company directly for the originator side of a Floor plan if that helps — write to us from the Contact section.',
         ],
       },
@@ -1144,7 +1144,7 @@ export const LANDINGS: SeoLanding[] = [
       },
       {
         q: 'How does the team Floor plan work?',
-        a: 'A team lead originates the Floor plan and pays ₹49,140 upfront for ten people on a monthly cycle. The group code is shared with nine teammates. Each teammate joins via the app, signs up with their phone, enters the group code, and their subscription starts at ₹63/meal without separate payment.',
+        a: 'A team lead originates the Floor plan and pays ₹53,820 upfront for ten people on a monthly cycle. The group code is shared with nine teammates. Each teammate joins via the app, signs up with their phone, enters the group code, and their subscription starts at ₹69/meal without separate payment.',
       },
       {
         q: 'When does the office lunch arrive?',
@@ -1175,7 +1175,7 @@ export const LANDINGS: SeoLanding[] = [
     ],
     cta: {
       headline: 'Office lunch, sorted for the year.',
-      sub: 'Home-cooked Tamil lunch at your desk by 1 PM. From ₹89/meal Solo, ₹63 in a team of ten.',
+      sub: 'Home-cooked Tamil lunch at your desk by 1 PM. From ₹89/meal Solo, ₹69 in a team of ten.',
       buttonLabel: 'Start an office plan',
     },
   },

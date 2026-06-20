@@ -7,7 +7,7 @@ export const FAQS: FaqItem[] = [
   },
   {
     q: 'How does the group pricing work?',
-    a: 'The more people who subscribe together — flatmates, family members, colleagues or neighbours — the lower the per-meal price. ₹89/meal solo, ₹69/meal in a group of 5 (save ₹1,800/month each), ₹63/meal in a group of 10+ (save ₹2,340/month each). Everyone pays separately and joins the same group code.',
+    a: 'The more people who subscribe together — flatmates, family members, colleagues or neighbours — the lower the per-meal price. ₹89/meal solo, ₹75/meal in a group of 5 (save ₹1,260/month each), ₹69/meal in a group of 10+ (save ₹1,800/month each). Everyone pays separately and joins the same group code.',
   },
   {
     q: 'How does the QR meal pass work?',

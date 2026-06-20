@@ -11,7 +11,7 @@ const REASONS = [
   },
   {
     title: 'Cheaper with friends',
-    desc: 'Bring 5 roommates → ₹69/meal, save ₹1,800 each. Bring 10 from your floor → ₹63/meal, save ₹2,340 each. Real squad pricing, applied automatically.',
+    desc: 'Bring 5 roommates → ₹75/meal, save ₹1,260 each. Bring 10 from your floor → ₹69/meal, save ₹1,800 each. Real group pricing, applied automatically.',
     icon: '★',
   },
   {

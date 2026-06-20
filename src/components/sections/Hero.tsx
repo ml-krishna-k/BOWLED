@@ -70,7 +70,7 @@ export function Hero() {
                   </svg>
                 }
               >
-                Subscribe from ₹89 / meal
+                Subscribe from ₹69 / meal
               </Button>
               <Button
                 variant="outline"

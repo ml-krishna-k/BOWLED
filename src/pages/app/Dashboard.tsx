@@ -359,7 +359,7 @@ export function Dashboard() {
               </span>
             </p>
             <p className="mt-2 caption text-ink-500">
-              Get 5 roommates on the same code, drop to ₹69 / meal. We&apos;ll handle the rest.
+              Get 5 roommates on the same code, drop to ₹75 / meal. We&apos;ll handle the rest.
             </p>
           </div>
           <Button

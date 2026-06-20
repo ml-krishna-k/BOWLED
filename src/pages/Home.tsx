@@ -21,7 +21,7 @@ export function Home() {
     <>
       <Seo
         title="Bowled — Home-Style Daily Meals in Chennai | Tamil Tiffin"
-        description="Bowled delivers three home-cooked Tamil meals a day across Chennai. PG, hostel, office or home — from ₹89/meal. By Sree Krishna Catering since 2006."
+        description="Bowled delivers three home-cooked Tamil meals a day across Chennai. PG, hostel, office or home — from ₹69/meal. By Sree Krishna Catering since 2006."
         keywords="meal subscription chennai, home cooked food chennai, tiffin service chennai, hostel food chennai, pg food chennai, student meals chennai, healthy meals chennai, office lunch chennai, tamil home cooking chennai"
         path="/"
         ogType="website"

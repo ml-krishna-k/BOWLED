@@ -26,7 +26,7 @@ export const TESTIMONIALS: Testimonial[] = [
     initials: 'KR',
     city: 'OMR, Chennai',
     quote:
-      'Got my 4 roommates to join — we pay ₹69 a meal instead of ₹89. ₹9,000 saved across us in one month, and the food honestly feels home-cooked, not bulk-canteen-cooked.',
+      'Got my 4 roommates to join — we pay ₹75 a meal instead of ₹89. ₹6,300 saved across us in one month, and the food honestly feels home-cooked, not bulk-canteen-cooked.',
   },
   {
     id: 't4',

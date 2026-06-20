@@ -121,7 +121,7 @@ export function localBusinessSchema(): object {
       foundingDate: '2006',
     },
     telephone: '+91-9360113501',
-    priceRange: '₹63–₹89 per meal',
+    priceRange: '₹69–₹89 per meal',
     servesCuisine: ['South Indian', 'Tamil', 'Home-style Indian'],
     address: {
       '@type': 'PostalAddress',
@@ -178,7 +178,7 @@ export function restaurantSchema(): object {
     servesCuisine: ['South Indian', 'Tamil', 'Home-style Indian'],
     acceptsReservations: false,
     hasMenu: `${SITE_ORIGIN}/#menu`,
-    priceRange: '₹63–₹89',
+    priceRange: '₹69–₹89',
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Chennai',
