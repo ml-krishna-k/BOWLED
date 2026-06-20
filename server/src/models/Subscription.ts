@@ -3,7 +3,16 @@ import { Schema, model, type InferSchemaType, Types } from 'mongoose'
 const MealStatusEnum = ['pending', 'served', 'skipped'] as const
 const SlotEnum = ['breakfast', 'lunch', 'dinner'] as const
 const PlanEnum = ['solo', 'squad', 'floor'] as const
-const CycleEnum = ['weekly', 'weekly-no-sun', 'monthly-no-sun', 'monthly-no-weekend'] as const
+const CycleEnum = [
+  'weekly',
+  'weekly-no-sun',
+  'weekly-no-weekend',
+  'monthly-31',
+  'monthly-no-sun',
+  'monthly-no-weekend',
+  'dinner-weekly',
+  'dinner-monthly',
+] as const
 
 /**
  * Subscription lifecycle:
@@ -55,7 +64,7 @@ const SubscriptionSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true, index: true },
     planId: { type: String, enum: PlanEnum, required: true },
-    billingCycleId: { type: String, enum: CycleEnum, default: 'monthly-no-sun' },
+    billingCycleId: { type: String, enum: CycleEnum, default: 'monthly-31' },
     groupCode: { type: String, required: true, index: true },
     groupSize: { type: Number, default: 1 },
 

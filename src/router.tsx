@@ -25,6 +25,7 @@ const AdminOverview         = lazy(() => import('@/pages/admin/Overview').then((
 const AdminPayments         = lazy(() => import('@/pages/admin/Payments').then((m) => ({ default: m.AdminPayments })))
 const AdminSubscribers      = lazy(() => import('@/pages/admin/Subscribers').then((m) => ({ default: m.AdminSubscribers })))
 const AdminSubscriberDetail = lazy(() => import('@/pages/admin/SubscriberDetail').then((m) => ({ default: m.AdminSubscriberDetail })))
+const AdminUsers            = lazy(() => import('@/pages/admin/Users').then((m) => ({ default: m.AdminUsers })))
 const AdminDeliveries       = lazy(() => import('@/pages/admin/Deliveries').then((m) => ({ default: m.AdminDeliveries })))
 const AdminMenuEditor       = lazy(() => import('@/pages/admin/MenuEditor').then((m) => ({ default: m.AdminMenuEditor })))
 const AdminKitchens         = lazy(() => import('@/pages/admin/Kitchens').then((m) => ({ default: m.AdminKitchens })))
@@ -97,6 +98,7 @@ export const router = createBrowserRouter([
       { path: 'deliveries',       element: withSuspense(<AdminDeliveries />) },
       { path: 'subscribers',      element: withSuspense(<AdminSubscribers />) },
       { path: 'subscribers/:id',  element: withSuspense(<AdminSubscriberDetail />) },
+      { path: 'users',            element: withSuspense(<AdminUsers />) },
       { path: 'menu',             element: withSuspense(<AdminMenuEditor />) },
       { path: 'kitchens',         element: withSuspense(<AdminKitchens />) },
     ],

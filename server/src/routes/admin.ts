@@ -5,6 +5,7 @@ import { PaymentAudit } from '../models/PaymentAudit.js'
 import { SkipNotification } from '../models/SkipNotification.js'
 import { Kitchen } from '../models/Kitchen.js'
 import { User } from '../models/User.js'
+import { UserActivity } from '../models/UserActivity.js'
 import { requireAuth, requireAdmin } from '../middleware/auth.js'
 import { HttpError } from '../middleware/error.js'
 import { parseBody } from '../lib/validate.js'
@@ -23,11 +24,13 @@ router.use(requireAuth, requireAdmin)
  * mental model still wants active vs. paused vs. churned.
  */
 router.get('/overview', async (_req, res) => {
-  const [subs, kitchens, skipNotifications] = await Promise.all([
+  const [subs, kitchens, skipNotifications, totalUsers, recentActivities] = await Promise.all([
     Subscription.find({ status: { $ne: 'pending_payment' } })
       .populate('userId', 'name phone address pgName rating allergens'),
     Kitchen.find().sort({ area: 1 }),
     SkipNotification.find().sort({ requestedAt: -1 }).limit(50),
+    User.countDocuments({}),
+    UserActivity.find().sort({ at: -1 }).limit(20),
   ])
 
   const active = subs.filter((s) => s.status === 'active' && !s.pause).length
@@ -42,6 +45,7 @@ router.get('/overview', async (_req, res) => {
   res.json({
     kpis: {
       totalSubscribers: subs.length,
+      totalUsers,
       active,
       paused,
       monthRevenue,
@@ -49,7 +53,43 @@ router.get('/overview', async (_req, res) => {
     },
     kitchens: kitchens.map(serializeKitchen),
     skipNotifications: skipNotifications.map(serializeSkipNotification),
+    recentActivities: recentActivities.map(serializeUserActivity),
   })
+})
+
+/* GET /api/admin/users
+ *
+ * Lists every registered user (subscribers + non-subscribers + admins). Used
+ * for the new "Users" view in the admin dashboard so admins can see all data
+ * collected at signup, including users who haven't subscribed yet.
+ */
+router.get('/users', async (_req, res) => {
+  const users = await User.find().sort({ createdAt: -1 })
+  res.json({
+    users: users.map((u) => ({
+      id: String(u._id),
+      name: u.name,
+      email: u.email,
+      phone: u.phone ?? '',
+      picture: u.picture ?? '',
+      isAdmin: !!u.isAdmin,
+      area: u.address?.area ?? '',
+      pgName: u.pgName ?? '',
+      createdAt: u.get('createdAt')?.getTime?.() ?? 0,
+    })),
+  })
+})
+
+/* GET /api/admin/activities
+ *
+ * Recent auth-event log: register / login / profile_completed entries from
+ * UserActivity. Polled by the admin Overview + Users pages so admins get a
+ * live feed of new sign-ups and returning sign-ins.
+ */
+router.get('/activities', async (req, res) => {
+  const limit = Math.min(200, Math.max(1, Number(req.query.limit ?? 100)))
+  const items = await UserActivity.find().sort({ at: -1 }).limit(limit)
+  res.json({ activities: items.map(serializeUserActivity) })
 })
 
 /* GET /api/admin/subscribers
@@ -369,6 +409,20 @@ function serializeSkipNotification(n: InstanceType<typeof SkipNotification>) {
     date: n.date,
     slot: n.slot,
     requestedAt: n.requestedAt,
+  }
+}
+
+function serializeUserActivity(a: InstanceType<typeof UserActivity>) {
+  return {
+    id: String(a._id),
+    userId: String(a.userId),
+    kind: a.kind,
+    name: a.name,
+    email: a.email,
+    phone: a.phone ?? '',
+    ipAddress: a.ipAddress ?? '',
+    userAgent: a.userAgent ?? '',
+    at: a.at,
   }
 }
 

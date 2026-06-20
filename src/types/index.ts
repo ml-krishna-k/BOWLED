@@ -177,7 +177,15 @@ export interface Subscription {
   cycleStartedAt: number
   /** Set on approval to now + 30 days; 0 while pending. */
   expiresAt: number
-  billingCycleId: 'weekly' | 'weekly-no-sun' | 'monthly-no-sun' | 'monthly-no-weekend'
+  billingCycleId:
+    | 'weekly'
+    | 'weekly-no-sun'
+    | 'weekly-no-weekend'
+    | 'monthly-31'
+    | 'monthly-no-sun'
+    | 'monthly-no-weekend'
+    | 'dinner-weekly'
+    | 'dinner-monthly'
   totalMeals: number
   mealsServed: number
   status: SubscriptionStatus
@@ -233,4 +241,39 @@ export interface AdminSkipNotification {
   date: string // 'YYYY-MM-DD'
   slot?: MealSlot // only for 'meal'
   requestedAt: number
+}
+
+/* ---------------------------------------------------------------------------
+ * Admin: full user list + auth-event log
+ * ------------------------------------------------------------------------- */
+
+/** A registered user as surfaced on the admin "Users" page. Includes everyone
+ *  — subscribers and non-subscribers — since the admin needs visibility on
+ *  details collected at signup, not just paying customers. */
+export interface AdminUser {
+  id: string
+  name: string
+  email: string
+  phone: string
+  picture: string
+  isAdmin: boolean
+  area: string
+  pgName: string
+  createdAt: number
+}
+
+export type UserActivityKind = 'register' | 'login' | 'profile_completed'
+
+/** One auth event. Used to render the admin notification feed for new
+ *  registrations / logins. */
+export interface UserActivity {
+  id: string
+  userId: string
+  kind: UserActivityKind
+  name: string
+  email: string
+  phone: string
+  ipAddress: string
+  userAgent: string
+  at: number
 }

@@ -7,8 +7,10 @@ export const BRAND = {
   launchedAt: 'May 5, 2025',
   activeUsers: 300,
   city: 'Chennai',
-  email: 'care@bowled.in',
-  phone: '+91 90000 00000',
+  email: 'bkdbowled@gmail.com',
+  /** Display-formatted with a space for readability. The footer derives the
+   *  digits-only version for the tel: link so dialers parse it correctly. */
+  phone: '+91 93601 13501',
 } as const
 
 export const NAV_LINKS = [

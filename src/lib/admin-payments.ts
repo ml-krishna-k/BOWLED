@@ -17,7 +17,15 @@ export interface AdminPaymentRow {
   reviewedAt: number | null
   rejectionReason: string | null
   planId: 'solo' | 'squad' | 'floor'
-  billingCycleId: 'weekly' | 'weekly-no-sun' | 'monthly-no-sun' | 'monthly-no-weekend'
+  billingCycleId:
+    | 'weekly'
+    | 'weekly-no-sun'
+    | 'weekly-no-weekend'
+    | 'monthly-31'
+    | 'monthly-no-sun'
+    | 'monthly-no-weekend'
+    | 'dinner-weekly'
+    | 'dinner-monthly'
   expiresAt: number
   user: {
     id: string

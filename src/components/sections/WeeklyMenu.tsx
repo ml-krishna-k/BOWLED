@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Container } from '@/components/ui/Container'
 import { Section } from '@/components/ui/Section'
 import { SectionHeading } from '@/components/ui/SectionHeading'
@@ -14,22 +14,28 @@ const SLOTS: { id: MealSlot; label: string; time: string }[] = [
   { id: 'dinner',    label: 'Dinner',    time: '7:30 – 9 PM' },
 ]
 
-type Filter = 'all' | 'veg' | 'nonveg'
+// Monday-based weekday index — the WEEKLY_MENU array starts on Monday.
+function todayIdx(): number {
+  return (new Date().getDay() + 6) % 7
+}
+
+// Default to the slot that's most relevant for the current time of day, so
+// that a visitor arriving at lunchtime sees today's lunch up first instead
+// of a hard-coded slot.
+function currentSlot(): MealSlot {
+  const h = new Date().getHours()
+  if (h < 10) return 'breakfast'
+  if (h < 16) return 'lunch'
+  return 'dinner'
+}
 
 export function WeeklyMenu() {
   const { menu } = useMenu()
-  const [dayIdx, setDayIdx] = useState(2) // start on Wednesday
-  const [slot, setSlot] = useState<MealSlot>('lunch')
-  const [filter, setFilter] = useState<Filter>('all')
+  const [dayIdx, setDayIdx] = useState(todayIdx)
+  const [slot, setSlot] = useState<MealSlot>(currentSlot)
 
   const day = menu[dayIdx]
   const meal = day.meals[slot]
-
-  const compatible = useMemo(() => {
-    if (filter === 'all') return true
-    if (filter === 'veg') return meal.isVeg
-    return !meal.isVeg
-  }, [filter, meal.isVeg])
 
   return (
     <Section id="menu" className="bg-mist relative overflow-hidden">
@@ -43,51 +49,42 @@ export function WeeklyMenu() {
         />
 
         {/* Day picker — horizontally scrollable on mobile, edge-to-edge so all
-            7 days fit without cramping. Hides scrollbar but keeps swipe. */}
+            7 days fit without cramping. Hides scrollbar but keeps swipe.
+            Defaults to today on load (todayIdx) so a visitor doesn't have to
+            hunt for the current day. */}
         <div className="mt-10 sm:mt-14 -mx-4 sm:mx-0 px-4 sm:px-0 sm:flex sm:justify-center overflow-x-auto">
           <div className="inline-flex gap-1 rounded-full bg-paper border border-cream-200 p-1 sm:p-1.5 shadow-soft ring-inset-warm">
-            {menu.map((d, i) => (
-              <button
-                key={d.day}
-                onClick={() => setDayIdx(i)}
-                className={cn(
-                  'shrink-0 rounded-full px-3.5 sm:px-5 py-2 text-sm font-medium transition-all duration-300',
-                  dayIdx === i
-                    ? 'bg-ink-900 text-cream-50 shadow-soft scale-105'
-                    : 'text-ink-700 active:bg-cream-100 hover:bg-cream-100',
-                )}
-              >
-                {d.short}
-              </button>
-            ))}
+            {menu.map((d, i) => {
+              const isToday = i === todayIdx()
+              return (
+                <button
+                  key={d.day}
+                  onClick={() => setDayIdx(i)}
+                  className={cn(
+                    'shrink-0 rounded-full px-3.5 sm:px-5 py-2 text-sm font-medium transition-all duration-300',
+                    dayIdx === i
+                      ? 'bg-ink-900 text-cream-50 shadow-soft scale-105'
+                      : 'text-ink-700 active:bg-cream-100 hover:bg-cream-100',
+                  )}
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    {d.short}
+                    {isToday && dayIdx !== i && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-saffron-500 animate-pulse-dot" />
+                    )}
+                  </span>
+                </button>
+              )
+            })}
           </div>
-        </div>
-
-        {/* Filter chips */}
-        <div className="mt-4 sm:mt-5 flex justify-center gap-2 flex-wrap px-2">
-          {[
-            { id: 'all',    label: 'All' },
-            { id: 'veg',    label: '🌿 Vegetarian' },
-            { id: 'nonveg', label: '🍗 Non-veg' },
-          ].map((f) => (
-            <button
-              key={f.id}
-              onClick={() => setFilter(f.id as Filter)}
-              className={cn(
-                'rounded-full px-3.5 sm:px-4 py-2 sm:py-1.5 text-xs font-medium transition-all duration-300 border',
-                filter === f.id
-                  ? 'border-saffron-500 bg-saffron-50 text-saffron-700 shadow-soft'
-                  : 'border-cream-200 bg-paper/50 text-ink-500 hover:border-cream-300 hover:bg-paper',
-              )}
-            >
-              {f.label}
-            </button>
-          ))}
         </div>
 
         {/* Main meal card + slot tabs */}
         <div className="mt-8 sm:mt-12 grid lg:grid-cols-12 gap-4 sm:gap-6">
-          {/* Slot list */}
+          {/* Slot list — each slot is a tap-to-expand row. The chevron makes
+              the interactivity legible at a glance: closed slots show a down
+              chevron (tap to see details), the active slot shows it rotated
+              and the meal panel on the right reflects the chosen slot. */}
           <div className="lg:col-span-4 space-y-2 sm:space-y-3 order-2 lg:order-1">
             {SLOTS.map((s) => {
               const slotMeal = day.meals[s.id]
@@ -96,6 +93,7 @@ export function WeeklyMenu() {
                 <button
                   key={s.id}
                   onClick={() => setSlot(s.id)}
+                  aria-expanded={active}
                   className={cn(
                     'group w-full text-left rounded-2xl p-4 sm:p-5 border transition-all duration-400 ease-out active:scale-[0.98]',
                     active
@@ -117,11 +115,30 @@ export function WeeklyMenu() {
                         {slotMeal.loved && <Badge tone="saffron">❤ Most loved</Badge>}
                       </div>
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-sm font-semibold text-ink-900 inline-flex items-center gap-1">
-                        <span className="text-saffron-500">★</span>{slotMeal.rating}
-                      </p>
-                      <p className="text-xs text-ink-500">{slotMeal.calories} kcal</p>
+                    <div className="flex items-start gap-2 shrink-0">
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-ink-900 inline-flex items-center gap-1">
+                          <span className="text-saffron-500">★</span>{slotMeal.rating}
+                        </p>
+                        <p className="text-xs text-ink-500">{slotMeal.calories} kcal</p>
+                      </div>
+                      {/* Expand chevron — rotates when the slot is active so
+                          the user feels the row "open" into the detail panel.
+                          Sized to match other affordances; not focusable on
+                          its own (the parent button handles activation). */}
+                      <span
+                        aria-hidden
+                        className={cn(
+                          'mt-0.5 grid h-7 w-7 place-items-center rounded-full transition-all duration-300 shrink-0',
+                          active
+                            ? 'bg-saffron-500 text-cream-50 rotate-180 shadow-soft'
+                            : 'bg-cream-100 text-ink-500 group-hover:bg-cream-200',
+                        )}
+                      >
+                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </button>
@@ -206,12 +223,6 @@ export function WeeklyMenu() {
                   <Stat label="Calories" value={`${meal.calories} kcal`} />
                   <Stat label="Rating" value={`★ ${meal.rating} / 5`} />
                 </div>
-
-                {!compatible && (
-                  <p className="mt-4 rounded-xl bg-cream-100 px-3 sm:px-4 py-2.5 sm:py-3 text-xs text-ink-500 border border-cream-200">
-                    Doesn&apos;t match your filter — but it&apos;s on the menu today.
-                  </p>
-                )}
               </div>
             </div>
           </Card>

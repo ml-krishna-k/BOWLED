@@ -1,8 +1,9 @@
 import type { Plan } from '@/types'
 
 /**
- * Per-meal price stays the same across cycles — only the day count changes.
- * Cycles are surfaced via BILLING_CYCLES below.
+ * Per-meal price stays the same across cycles — only the day count changes,
+ * unless a cycle sets `pricePerMealOverride` (used by the special-pricing
+ * dinner-only and Mon-to-Fri rhythms).
  */
 export const PLANS: Plan[] = [
   {
@@ -67,14 +68,23 @@ export const PLANS: Plan[] = [
 
 /* ---------------------------------------------------------------------------
  * Billing cycles — every plan (Solo / Squad / Floor) can be subscribed under
- * any of these. Day counts reflect a typical 30-day month.
+ * any of these. Two new shapes added:
+ *
+ *   • `pricePerMealOverride` — fixed per-meal rate that supersedes the plan's
+ *     default per-meal price. Used for the "no Sat & Sun" weekly (₹75/meal)
+ *     and "dinner-only monthly" (₹70/meal) promotional rhythms.
+ *   • `mealsPerDay` — was always 3; can now be 1 for dinner-only cycles.
  * ------------------------------------------------------------------------- */
 
 export type BillingCycleId =
   | 'weekly'
   | 'weekly-no-sun'
+  | 'weekly-no-weekend'
+  | 'monthly-31'
   | 'monthly-no-sun'
   | 'monthly-no-weekend'
+  | 'dinner-weekly'
+  | 'dinner-monthly'
 
 export interface BillingCycle {
   id: BillingCycleId
@@ -86,11 +96,53 @@ export interface BillingCycle {
   description: string
   tagline: string
   rhythm: string
+  /** Flat per-meal rate that supersedes the plan's pricePerMeal for every
+   *  tier (Solo/Squad/Floor). Used by promotional rhythms that aren't tier-
+   *  scaled — e.g. the ₹70 Dinner-only Monthly. */
+  pricePerMealOverride?: number
+  /** Per-plan per-meal rate. Wins over both `pricePerMealOverride` and the
+   *  plan's own `pricePerMeal` when the active plan id is present in the
+   *  map. Used for tier-scaled promotional rhythms — e.g. Dinner-only Weekly
+   *  is ₹73/meal for Squad and ₹69/meal for Floor, with Solo on the default. */
+  pricePerMealByPlan?: Partial<Record<Plan['id'], number>>
 }
 
 export const MEALS_PER_DAY = 3
 
 export const BILLING_CYCLES: BillingCycle[] = [
+  {
+    id: 'monthly-31',
+    label: 'Complete 31-Day Monthly Plan',
+    shortLabel: '31-Day Monthly',
+    cadence: 'Monthly',
+    days: 31,
+    mealsPerDay: MEALS_PER_DAY,
+    description: 'Complete 31-Day Monthly Plan — every meal, every day for a whole month.',
+    tagline: 'Most chosen',
+    rhythm: '3 meals × 31 days',
+  },
+  {
+    id: 'monthly-no-sun',
+    label: 'Monthly · No Sundays',
+    shortLabel: 'Monthly · No Sun',
+    cadence: 'Monthly',
+    days: 26,
+    mealsPerDay: MEALS_PER_DAY,
+    description: 'Full month of meals, Sundays free.',
+    tagline: 'Sundays off',
+    rhythm: '3 meals × 26 days',
+  },
+  {
+    id: 'monthly-no-weekend',
+    label: 'Monthly · Weekdays only',
+    shortLabel: 'Monthly · Mon–Fri',
+    cadence: 'Monthly',
+    days: 22,
+    mealsPerDay: MEALS_PER_DAY,
+    description: 'Built around college and office weeks — Sat & Sun free.',
+    tagline: 'Weekdays only',
+    rhythm: '3 meals × 22 days',
+  },
   {
     id: 'weekly',
     label: 'Weekly · All 7 days',
@@ -114,32 +166,61 @@ export const BILLING_CYCLES: BillingCycle[] = [
     rhythm: '3 meals × 6 days',
   },
   {
-    id: 'monthly-no-sun',
-    label: 'Monthly · No Sundays',
-    shortLabel: 'Monthly · No Sun',
-    cadence: 'Monthly',
-    days: 26,
+    id: 'weekly-no-weekend',
+    label: 'Weekly · No Sat & Sun',
+    shortLabel: 'Weekly · Mon–Fri',
+    cadence: 'Weekly',
+    days: 5,
     mealsPerDay: MEALS_PER_DAY,
-    description: 'Full month of meals, Sundays free.',
-    tagline: 'Most chosen',
-    rhythm: '3 meals × 26 days',
+    pricePerMealOverride: 75,
+    description: 'Weekly plan with no Saturday & Sunday — flat ₹75 per meal.',
+    tagline: 'Mon–Fri at ₹75/meal',
+    rhythm: '3 meals × 5 days',
   },
   {
-    id: 'monthly-no-weekend',
-    label: 'Monthly · Weekdays only',
-    shortLabel: 'Monthly · No Sat & Sun',
+    id: 'dinner-weekly',
+    label: 'Dinner-only · Weekly',
+    shortLabel: 'Dinner-only · Weekly',
+    cadence: 'Weekly',
+    days: 7,
+    mealsPerDay: 1,
+    // Group-scaled promotional pricing: ₹73 / dinner for a Squad of 5,
+    // ₹69 / dinner for a Floor of 10+. Solo subscribers fall back to the
+    // plan's tier price (₹89).
+    pricePerMealByPlan: { squad: 73, floor: 69 },
+    description: 'Just dinners, all week — one home-cooked night meal delivered every evening for 7 days. Squad of 5 pays ₹73 / dinner, Floor of 10+ pays ₹69 / dinner.',
+    tagline: 'Group dinners',
+    rhythm: '1 dinner × 7 days',
+  },
+  {
+    id: 'dinner-monthly',
+    label: 'Dinner-only Monthly Plan',
+    shortLabel: 'Dinner-only · Monthly',
     cadence: 'Monthly',
-    days: 22,
-    mealsPerDay: MEALS_PER_DAY,
-    description: 'Built around college and office weeks — Sat & Sun free.',
-    tagline: 'Weekdays only',
-    rhythm: '3 meals × 22 days',
+    days: 30,
+    mealsPerDay: 1,
+    pricePerMealOverride: 70,
+    description: 'A full month of dinners — one home-cooked night meal delivered every evening for 30 days. Flat ₹70 per dinner, no tier upgrades or hidden fees.',
+    tagline: 'Every night, ₹70',
+    rhythm: '1 dinner × 30 days',
   },
 ]
 
+/** Per-meal price for a given plan + cycle.
+ *  Resolution order (most specific wins):
+ *    1. cycle.pricePerMealByPlan[plan.id]   — tier-scaled promotional rate
+ *    2. cycle.pricePerMealOverride          — flat promotional rate
+ *    3. plan.pricePerMeal                   — default tier price
+ */
+export function pricePerMealFor(plan: Plan, cycle: BillingCycle): number {
+  return cycle.pricePerMealByPlan?.[plan.id]
+    ?? cycle.pricePerMealOverride
+    ?? plan.pricePerMeal
+}
+
 /** Total price for a plan under a billing cycle. */
 export function priceFor(plan: Plan, cycle: BillingCycle): number {
-  return plan.pricePerMeal * cycle.mealsPerDay * cycle.days
+  return pricePerMealFor(plan, cycle) * cycle.mealsPerDay * cycle.days
 }
 
 /** Total meal count for a billing cycle. */
@@ -148,9 +229,16 @@ export function mealsFor(cycle: BillingCycle): number {
 }
 
 /**
- * Savings for a non-Solo plan, computed against Solo's per-meal rate.
- * Returns 0 for Solo.
- */
+ * Savings for a non-Solo plan, computed against Solo's per-meal rate. Returns
+ * 0 for Solo and for cycles that aren't tier-scaled (a flat
+ * `pricePerMealOverride` already IS the discount; for tier-scaled promo
+ * pricing — `pricePerMealByPlan` — savings are derived against the Solo
+ * tier rate so the user sees the group discount in money terms). */
 export function savingsFor(plan: Plan, cycle: BillingCycle): number {
-  return plan.savingPerMeal * cycle.mealsPerDay * cycle.days
+  if (cycle.pricePerMealOverride && !cycle.pricePerMealByPlan) return 0
+  const soloRate = cycle.pricePerMealByPlan?.solo
+    ?? cycle.pricePerMealOverride
+    ?? PLANS[0].pricePerMeal
+  const perMealSaving = Math.max(0, soloRate - pricePerMealFor(plan, cycle))
+  return perMealSaving * cycle.mealsPerDay * cycle.days
 }

@@ -16,6 +16,8 @@ import type {
   Subscriber,
   AdminGroup,
   AdminSkipNotification,
+  AdminUser,
+  UserActivity,
 } from '@/types'
 import { WEEKLY_MENU } from '@/data/menu'
 import { PLANS } from '@/data/plans'
@@ -26,6 +28,13 @@ import { useAuth } from './AuthContext'
 
 interface AdminValue {
   subscribers: Subscriber[]
+  /** Every registered user — superset of `subscribers`. Used by the Users
+   *  admin page to show all collected user details (name, email, phone),
+   *  including users who signed up but haven't subscribed yet. */
+  users: AdminUser[]
+  /** Recent auth events: registers / logins / profile completions. Drives
+   *  the admin notification feed on the Overview page. */
+  activities: UserActivity[]
   kitchens: Kitchen[]
   groups: AdminGroup[]
   menu: DayMenu[]
@@ -35,6 +44,8 @@ interface AdminValue {
   todayIdx: number
   kpis: {
     totalSubscribers: number
+    /** Total registered users (subscribers + non-subscribers). */
+    totalUsers: number
     active: number
     paused: number
     mealsToday: number
@@ -60,6 +71,7 @@ function todayMenuIdx(): number {
 interface AdminOverview {
   kpis: {
     totalSubscribers: number
+    totalUsers: number
     active: number
     paused: number
     monthRevenue: number
@@ -67,6 +79,7 @@ interface AdminOverview {
   }
   kitchens: Kitchen[]
   skipNotifications: AdminSkipNotification[]
+  recentActivities: UserActivity[]
 }
 
 function buildDeliveries(
@@ -126,6 +139,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const enabled = !!user?.isAdmin
 
   const [subscribers, setSubscribers] = useState<Subscriber[]>([])
+  const [users, setUsers] = useState<AdminUser[]>([])
+  const [activities, setActivities] = useState<UserActivity[]>([])
   const [kitchens, setKitchens] = useState<Kitchen[]>([])
   const [menu, setMenu] = useState<DayMenu[]>(WEEKLY_MENU)
   const [deliveries, setDeliveries] = useState<Delivery[]>([])
@@ -137,15 +152,18 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     if (!enabled) return
     setLoading(true)
     try {
-      const [overviewRes, subsRes, menuRes] = await Promise.all([
+      const [overviewRes, subsRes, usersRes, menuRes] = await Promise.all([
         api<AdminOverview>('/api/admin/overview'),
         api<{ subscribers: Subscriber[] }>('/api/admin/subscribers'),
+        api<{ users: AdminUser[] }>('/api/admin/users'),
         api<{ overrides: MenuOverride[] }>('/api/menu/overrides').catch(() => ({ overrides: [] as MenuOverride[] })),
       ])
       setKitchens(overviewRes.kitchens)
       setSkipNotifications(overviewRes.skipNotifications)
       setOverviewKpis(overviewRes.kpis)
       setSubscribers(subsRes.subscribers)
+      setUsers(usersRes.users)
+      setActivities(overviewRes.recentActivities ?? [])
       const mergedMenu = applyMenuOverrides(menuRes.overrides)
       setMenu(mergedMenu)
       setDeliveries(
@@ -174,12 +192,18 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   // Live skip-notification updates from the user-side flow happen via the API,
   // not localStorage. We poll every 20s so the admin page picks up new events
   // without a manual refresh, and rebuild deliveries so today's rows flip to
-  // 'skipped' as soon as the user opts out.
+  // 'skipped' as soon as the user opts out. The same tick also refreshes the
+  // auth-activity feed so register/login notifications appear within ~20s.
   useEffect(() => {
     if (!enabled) return
     const id = setInterval(async () => {
       try {
-        const data = await api<{ skipNotifications: AdminSkipNotification[] }>('/api/admin/skip-notifications')
+        const [skipsRes, actsRes] = await Promise.all([
+          api<{ skipNotifications: AdminSkipNotification[] }>('/api/admin/skip-notifications'),
+          api<{ activities: UserActivity[] }>('/api/admin/activities?limit=50').catch(() => ({ activities: [] as UserActivity[] })),
+        ])
+        const data = skipsRes
+        setActivities(actsRes.activities)
         setSkipNotifications(data.skipNotifications)
         setDeliveries((prev) => {
           // Rebuild status flags only — leave 'served' rows untouched so a
@@ -240,6 +264,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     const pending = deliveries.filter((d) => d.status === 'pending').length
     return {
       totalSubscribers: overviewKpis?.totalSubscribers ?? subscribers.length,
+      totalUsers: overviewKpis?.totalUsers ?? users.length,
       active: overviewKpis?.active ?? subscribers.filter((s) => s.status === 'active').length,
       paused: overviewKpis?.paused ?? subscribers.filter((s) => s.status === 'paused').length,
       mealsToday: deliveries.length,
@@ -248,7 +273,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       monthRevenue: overviewKpis?.monthRevenue ?? 0,
       avgRating: overviewKpis?.avgRating ?? 0,
     }
-  }, [overviewKpis, subscribers, deliveries])
+  }, [overviewKpis, subscribers, users, deliveries])
 
   const markDelivery = useCallback<AdminValue['markDelivery']>((id, status) => {
     // Deliveries are derived client-side from the subscribers list for the
@@ -286,6 +311,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const value = useMemo<AdminValue>(
     () => ({
       subscribers,
+      users,
+      activities,
       kitchens,
       groups,
       menu,
@@ -300,7 +327,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       resumeSubscriber,
       refresh,
     }),
-    [subscribers, kitchens, groups, menu, deliveries, skipNotifications, loading, todayIdx, kpis,
+    [subscribers, users, activities, kitchens, groups, menu, deliveries, skipNotifications, loading, todayIdx, kpis,
       markDelivery, saveMenuMeal, pauseSubscriber, resumeSubscriber, refresh],
   )
 

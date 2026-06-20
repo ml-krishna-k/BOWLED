@@ -146,7 +146,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
           planId,
           groupCode,
           groupSize: groupSize ?? (planId === 'solo' ? 1 : planId === 'squad' ? 5 : 10),
-          billingCycleId: billingCycleId ?? 'monthly-no-sun',
+          billingCycleId: billingCycleId ?? 'monthly-31',
         },
       })
       setSub(data.subscription)

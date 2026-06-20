@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { OAuth2Client, type TokenPayload } from 'google-auth-library'
 import { User } from '../models/User.js'
+import { UserActivity } from '../models/UserActivity.js'
 import { HttpError } from '../middleware/error.js'
 import { signToken } from '../lib/jwt.js'
 import { config, isGoogleAuthEnabled } from '../config.js'
@@ -68,6 +69,24 @@ router.post('/google', googleAuthIpLimiter, async (req, res) => {
     picture: payload.picture ?? '',
     isAdminEmail,
   })
+
+  // Log the auth event so admins get a notification feed of who came through.
+  // Best-effort — a failure here must not block sign-in. Trust-proxy is set
+  // at the app level, so req.ip resolves to the real client IP behind Render.
+  try {
+    await UserActivity.create({
+      userId: user._id,
+      kind: isNewUser ? 'register' : 'login',
+      name: user.name,
+      email: user.email,
+      phone: user.phone ?? '',
+      ipAddress: req.ip ?? '',
+      userAgent: req.get('user-agent')?.slice(0, 300) ?? '',
+      at: Date.now(),
+    })
+  } catch (err) {
+    console.warn('[auth] failed to record UserActivity:', err)
+  }
 
   const token = signToken({ uid: String(user._id), email: user.email, isAdmin: user.isAdmin })
 

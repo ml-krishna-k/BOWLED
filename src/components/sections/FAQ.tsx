@@ -15,7 +15,7 @@ export function FAQ() {
       <Container size="md" className="relative">
         <SectionHeading
           eyebrow="Questions"
-          title={<>Things students <span className="italic font-light text-saffron-600">ask us first.</span></>}
+          title={<>The things people <span className="italic font-light text-saffron-600">ask us first.</span></>}
           description="Couldn't find an answer? Drop us a message — we reply within 4 hours, even on weekends."
         />
 

@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Container } from '@/components/ui/Container'
 import { Section } from '@/components/ui/Section'
-import { Button } from '@/components/ui/Button'
 
 export function CTA() {
   const navigate = useNavigate()
@@ -35,27 +34,29 @@ export function CTA() {
             </p>
 
             <div className="mt-7 sm:mt-9 flex flex-col sm:flex-row sm:flex-wrap gap-2.5 sm:gap-3">
-              <Button
-                size="lg"
-                className="w-full sm:w-auto bg-cream-50 text-ink-900 hover:bg-paper shadow-soft hover:shadow-card"
+              {/* Custom buttons here instead of the shared <Button> — the
+                  CTA inverts the brand palette (cream pill on saffron card)
+                  and the variant system's `bg-ink-900` was winning the
+                  cascade, making the primary button render dark with
+                  invisible dark text. */}
+              <button
+                type="button"
                 onClick={() => navigate('/auth/login')}
-                trailing={
-                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14" />
-                    <path d="m13 5 7 7-7 7" />
-                  </svg>
-                }
+                className="group inline-flex h-14 w-full sm:w-auto items-center justify-center gap-2.5 rounded-full bg-cream-50 px-7 text-base font-semibold text-ink-900 shadow-soft hover:bg-paper hover:shadow-card transition-all duration-300 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream-50 focus-visible:ring-offset-2 focus-visible:ring-offset-saffron-500"
               >
                 Start your subscription
-              </Button>
-              <Button
-                size="lg"
-                variant="ghost"
-                className="w-full sm:w-auto text-cream-50 hover:bg-cream-50/15"
+                <svg viewBox="0 0 24 24" className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14" />
+                  <path d="m13 5 7 7-7 7" />
+                </svg>
+              </button>
+              <button
+                type="button"
                 onClick={() => navigate('/auth/login')}
+                className="inline-flex h-14 w-full sm:w-auto items-center justify-center rounded-full border border-cream-50/40 bg-transparent px-7 text-base font-medium text-cream-50 hover:bg-cream-50/15 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream-50 focus-visible:ring-offset-2 focus-visible:ring-offset-saffron-500"
               >
                 I already have an account
-              </Button>
+              </button>
             </div>
           </div>
         </div>

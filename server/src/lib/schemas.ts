@@ -16,8 +16,12 @@ const planIdSchema = z.enum(['solo', 'squad', 'floor'])
 const billingCycleSchema = z.enum([
   'weekly',
   'weekly-no-sun',
+  'weekly-no-weekend',
+  'monthly-31',
   'monthly-no-sun',
   'monthly-no-weekend',
+  'dinner-weekly',
+  'dinner-monthly',
 ])
 const subStatusSchema = z.enum(['active', 'paused', 'churned'])
 

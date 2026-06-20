@@ -40,10 +40,39 @@ const PLAN_GROUP_MIN: Record<PlanId, number> = {
 }
 
 const CYCLE_DAYS: Record<CycleId, number> = {
-  'weekly':              7,
-  'weekly-no-sun':       6,
-  'monthly-no-sun':      26,
-  'monthly-no-weekend':  22,
+  'weekly':             7,
+  'weekly-no-sun':      6,
+  'weekly-no-weekend':  5,
+  'monthly-31':         31,
+  'monthly-no-sun':     26,
+  'monthly-no-weekend': 22,
+  'dinner-weekly':      7,
+  'dinner-monthly':     30,
+}
+
+/** Per-cycle meals-per-day override. Dinner-only cycles drop to 1. */
+const CYCLE_MEALS_PER_DAY: Partial<Record<CycleId, number>> = {
+  'dinner-weekly':  1,
+  'dinner-monthly': 1,
+}
+
+/**
+ * Per-meal price override for promotional cycles. When present, this flat
+ * rate beats the plan's tier price (Solo/Squad/Floor).
+ */
+const CYCLE_PRICE_OVERRIDE: Partial<Record<CycleId, number>> = {
+  'weekly-no-weekend': 75,
+  'dinner-monthly':    70,
+}
+
+/**
+ * Per-plan-per-cycle override — wins over CYCLE_PRICE_OVERRIDE and the plan
+ * tier price for the matching plan id. Used for tier-scaled promotional
+ * pricing (e.g. Dinner-only Weekly: ₹73 for Squad, ₹69 for Floor; Solo
+ * stays on the plan's default).
+ */
+const CYCLE_PRICE_BY_PLAN: Partial<Record<CycleId, Partial<Record<PlanId, number>>>> = {
+  'dinner-weekly': { squad: 73, floor: 69 },
 }
 
 const MEALS_PER_DAY = 3
@@ -52,9 +81,24 @@ const SUBMIT_WINDOW_MS = 48 * 60 * 60 * 1000 // 48h
 /** Active window granted on admin approval. */
 const ACTIVE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000 // 30 days
 
+function pricePerMealFor(planId: PlanId, cycleId: CycleId): number {
+  return CYCLE_PRICE_BY_PLAN[cycleId]?.[planId]
+    ?? CYCLE_PRICE_OVERRIDE[cycleId]
+    ?? PLAN_PRICE[planId]
+}
+
+function mealsPerDayFor(cycleId: CycleId): number {
+  return CYCLE_MEALS_PER_DAY[cycleId] ?? MEALS_PER_DAY
+}
+
 function totalForPlan(planId: PlanId, cycleId: CycleId): number {
-  const perMember = PLAN_PRICE[planId] * MEALS_PER_DAY * CYCLE_DAYS[cycleId]
+  const perMember =
+    pricePerMealFor(planId, cycleId) * mealsPerDayFor(cycleId) * CYCLE_DAYS[cycleId]
   return perMember * PLAN_GROUP_MIN[planId]
+}
+
+function totalMealsFor(cycleId: CycleId): number {
+  return mealsPerDayFor(cycleId) * CYCLE_DAYS[cycleId]
 }
 
 function buildOrderRef(subId: string): string {
@@ -160,7 +204,7 @@ router.post('/', async (req, res) => {
   }
 
   let planId = input.planId
-  let billingCycleId = input.billingCycleId ?? 'monthly-no-sun'
+  let billingCycleId = input.billingCycleId ?? 'monthly-31'
   let groupCode = input.groupCode?.trim()
   const isJoin = !!groupCode
 
@@ -192,7 +236,7 @@ router.post('/', async (req, res) => {
     startedAt: isJoin ? now : 0,
     cycleStartedAt: isJoin ? now : 0,
     expiresAt: isJoin ? now + ACTIVE_WINDOW_MS : 0,
-    totalMeals: 90,
+    totalMeals: totalMealsFor(billingCycleId),
     mealsServed: 0,
     today: { breakfast: 'pending', lunch: 'pending', dinner: 'pending' },
     history: [],

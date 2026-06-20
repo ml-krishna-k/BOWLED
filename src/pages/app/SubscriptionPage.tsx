@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
 import { useSubscription } from '@/context/SubscriptionContext'
 import { useAuth } from '@/context/AuthContext'
-import { PLANS, BILLING_CYCLES, priceFor, mealsFor } from '@/data/plans'
+import { PLANS, BILLING_CYCLES, priceFor, mealsFor, pricePerMealFor } from '@/data/plans'
 import { lookupGroup, type GroupPreview } from '@/lib/group'
 import { ApiError } from '@/lib/api'
 import { inr } from '@/lib/format'
@@ -190,9 +190,11 @@ function Onboarding({ expiredNotice = false }: { expiredNotice?: boolean } = {})
 
   const [mode, setMode] = useState<'new' | 'join'>('new')
 
-  // New-plan state
-  const [planId, setPlanId] = useState<Plan['id']>('squad')
-  const [cycleId, setCycleId] = useState<BillingCycleId>('monthly-no-sun')
+  // New-plan state. Plan starts unselected so the CTA visibly switches to
+  // the saffron/white "active" theme the moment the user picks one — clear
+  // feedback that "this is the plan you're buying".
+  const [planId, setPlanId] = useState<Plan['id'] | null>(null)
+  const [cycleId, setCycleId] = useState<BillingCycleId>('monthly-31')
 
   // Group-join state
   const [joinCode, setJoinCode] = useState('')
@@ -204,7 +206,10 @@ function Onboarding({ expiredNotice = false }: { expiredNotice?: boolean } = {})
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const cycle = useMemo(() => BILLING_CYCLES.find((c) => c.id === cycleId)!, [cycleId])
-  const selectedPlan = useMemo(() => PLANS.find((p) => p.id === planId)!, [planId])
+  const selectedPlan = useMemo(
+    () => (planId ? PLANS.find((p) => p.id === planId) ?? null : null),
+    [planId],
+  )
   const previewPlan = joinPreview ? PLANS.find((p) => p.id === joinPreview.planId) : null
 
   async function verifyGroup() {
@@ -234,6 +239,7 @@ function Onboarding({ expiredNotice = false }: { expiredNotice?: boolean } = {})
         if (!joinPreview) { setSubmitError('Verify the group code first'); return }
         await subscribe(joinPreview.planId, joinPreview.groupCode, undefined, joinPreview.billingCycleId)
       } else {
+        if (!planId) { setSubmitError('Pick a plan to continue'); return }
         // New-plan flow → subscription is created in `pending_payment`
         // status; SubscriptionPage detects that and renders <PaymentFlow />.
         const size = planId === 'solo' ? 1 : planId === 'squad' ? 5 : 10
@@ -293,7 +299,31 @@ function Onboarding({ expiredNotice = false }: { expiredNotice?: boolean } = {})
       {/* New plan flow */}
       {mode === 'new' && (
         <>
-          {/* Plan cards */}
+          {/* Subscription gate banner — explains why this page is the landing
+              spot for users who haven't subscribed yet. Bigger / more visible
+              than a passing toast because the user lands here every session
+              until they pick a plan. */}
+          <div className="mt-5 sm:mt-7 rounded-2xl border border-saffron-300 bg-saffron-50 p-4 sm:p-5">
+            <div className="flex items-start gap-3">
+              <span aria-hidden className="grid h-9 w-9 sm:h-10 sm:w-10 shrink-0 place-items-center rounded-full bg-saffron-500 text-cream-50 font-display text-lg">
+                ✦
+              </span>
+              <div className="min-w-0">
+                <p className="font-semibold text-ink-900 text-[15px] sm:text-base">
+                  A subscription unlocks the rest of the app
+                </p>
+                <p className="mt-1 text-xs sm:text-sm text-ink-700 leading-relaxed">
+                  Pick a plan and your rhythm below to start. Menu, QR pass, skips
+                  and your dashboard all become available once your first
+                  payment is approved.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Plan cards — strong active treatment. Selected card flips to a
+              saffron-tinted surface with a ring + lift; unselected cards stay
+              in the neutral paper default. */}
           <div className="mt-6 sm:mt-8">
             <p className="text-eyebrow text-ink-500">Choose your plan</p>
             <div className="mt-3 grid gap-3 sm:gap-4 md:grid-cols-3">
@@ -304,24 +334,42 @@ function Onboarding({ expiredNotice = false }: { expiredNotice?: boolean } = {})
                     key={p.id}
                     type="button"
                     onClick={() => setPlanId(p.id)}
+                    aria-pressed={active}
                     className={cn(
-                      'text-left rounded-2xl border p-5 sm:p-6 transition-all active:scale-[0.99]',
+                      'relative text-left rounded-2xl border p-5 sm:p-6 transition-all duration-300 ease-out active:scale-[0.99]',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron-400',
                       active
-                        ? 'border-saffron-400 bg-saffron-50 ring-2 ring-saffron-200'
+                        ? 'border-saffron-500 bg-saffron-50 ring-2 ring-saffron-500/40 shadow-card -translate-y-0.5'
                         : 'border-cream-200 bg-paper hover:border-cream-300 hover:shadow-soft',
                     )}
                   >
+                    {/* Active-state corner badge — gives the user a clear "yes
+                        this is the one you picked" signal. */}
+                    {active && (
+                      <span className="absolute -top-2 -right-2 inline-flex items-center gap-1 rounded-full bg-saffron-500 px-2.5 py-1 text-[10px] font-semibold text-cream-50 shadow-soft uppercase tracking-wider">
+                        ✓ Selected
+                      </span>
+                    )}
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="font-display text-lg sm:text-xl text-ink-900">{p.name}</h3>
-                          {p.recommended && <Badge tone="ink">Recommended</Badge>}
+                          <h3 className={cn(
+                            'font-display text-lg sm:text-xl tracking-tight',
+                            active ? 'text-saffron-700' : 'text-ink-900',
+                          )}>
+                            {p.name}
+                          </h3>
+                          {p.recommended && !active && <Badge tone="ink">Recommended</Badge>}
                         </div>
                         <p className="mt-0.5 text-xs text-ink-500">{p.groupSize}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="font-display text-xl sm:text-2xl text-ink-900">₹{p.pricePerMeal}</p>
+                        <p className={cn(
+                          'font-display text-xl sm:text-2xl tracking-tight',
+                          active ? 'text-saffron-700' : 'text-ink-900',
+                        )}>
+                          ₹{p.pricePerMeal}
+                        </p>
                         <p className="text-[11px] text-ink-500">per meal</p>
                       </div>
                     </div>
@@ -335,6 +383,11 @@ function Onboarding({ expiredNotice = false }: { expiredNotice?: boolean } = {})
                 )
               })}
             </div>
+            {!planId && (
+              <p className="mt-3 text-xs text-ink-500">
+                Tap a plan to continue.
+              </p>
+            )}
           </div>
 
           {/* Cycle picker */}
@@ -343,22 +396,50 @@ function Onboarding({ expiredNotice = false }: { expiredNotice?: boolean } = {})
             <div className="mt-3 grid gap-2.5 sm:gap-3 grid-cols-2 lg:grid-cols-4">
               {BILLING_CYCLES.map((c) => {
                 const active = c.id === cycleId
+                const perMeal = selectedPlan ? pricePerMealFor(selectedPlan, c) : c.pricePerMealOverride
                 return (
                   <button
                     key={c.id}
                     type="button"
                     onClick={() => setCycleId(c.id)}
+                    aria-pressed={active}
                     className={cn(
-                      'text-left rounded-2xl border p-4 transition-all',
+                      'text-left rounded-2xl border p-4 transition-all duration-300',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saffron-400',
                       active
-                        ? 'border-saffron-400 bg-saffron-50 ring-2 ring-saffron-200'
+                        ? 'border-saffron-500 bg-saffron-50 ring-2 ring-saffron-500/40 shadow-card'
                         : 'border-cream-200 bg-paper hover:border-cream-300',
                     )}
                   >
-                    <p className="text-eyebrow text-ink-500">{c.cadence}</p>
-                    <p className="mt-1 font-display text-base text-ink-900">{c.shortLabel}</p>
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-eyebrow text-ink-500">{c.cadence}</p>
+                      {/* Promo chip — shows the per-meal rate that's actually
+                          on offer. For tier-scaled cycles (dinner-weekly)
+                          we surface the chip only when a plan is picked so
+                          the number matches what they'll pay. */}
+                      {(c.pricePerMealOverride && !c.pricePerMealByPlan) && (
+                        <span className="rounded-full bg-saffron-500 text-cream-50 px-2 py-0.5 text-[10px] font-semibold">
+                          ₹{c.pricePerMealOverride}/meal
+                        </span>
+                      )}
+                      {c.pricePerMealByPlan && selectedPlan && (
+                        <span className="rounded-full bg-saffron-500 text-cream-50 px-2 py-0.5 text-[10px] font-semibold">
+                          ₹{pricePerMealFor(selectedPlan, c)}/meal
+                        </span>
+                      )}
+                    </div>
+                    <p className={cn(
+                      'mt-1 font-display text-base tracking-tight',
+                      active ? 'text-saffron-700' : 'text-ink-900',
+                    )}>
+                      {c.shortLabel}
+                    </p>
                     <p className="mt-1 text-xs text-ink-500">{c.rhythm}</p>
+                    {perMeal !== undefined && (
+                      <p className="mt-2 text-[11px] font-medium text-ink-700">
+                        ₹{perMeal} × {mealsFor(c)} meals
+                      </p>
+                    )}
                   </button>
                 )
               })}
@@ -367,8 +448,9 @@ function Onboarding({ expiredNotice = false }: { expiredNotice?: boolean } = {})
 
           {/* Receipt + CTA */}
           {(() => {
-            const perPerson = priceFor(selectedPlan, cycle)
-            const groupSize = selectedPlan.groupMin
+            const hasPlan = !!selectedPlan
+            const perPerson = selectedPlan ? priceFor(selectedPlan, cycle) : 0
+            const groupSize = selectedPlan?.groupMin ?? 1
             const totalDue = perPerson * groupSize
             const isGroup = groupSize > 1
             return (
@@ -376,27 +458,44 @@ function Onboarding({ expiredNotice = false }: { expiredNotice?: boolean } = {})
                 <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
                   <div className="min-w-0">
                     <p className="text-eyebrow text-ink-500">
-                      {isGroup ? "Per person, you'll pay" : "You'll pay"}
+                      {hasPlan ? (isGroup ? "Per person, you'll pay" : "You'll pay") : 'No plan selected yet'}
                     </p>
                     <p className="mt-1 font-display text-2xl sm:text-3xl lg:text-4xl text-ink-900 break-words">
-                      {inr(perPerson)}
-                      <span className="ml-2 text-sm text-ink-500 font-sans">/ {cycle.cadence.toLowerCase()}</span>
+                      {hasPlan ? (
+                        <>
+                          {inr(perPerson)}
+                          <span className="ml-2 text-sm text-ink-500 font-sans">/ {cycle.cadence.toLowerCase()}</span>
+                        </>
+                      ) : (
+                        <span className="text-ink-400">—</span>
+                      )}
                     </p>
                     <p className="mt-1 text-xs text-ink-500">
-                      {selectedPlan.name} · {mealsFor(cycle)} meals · {cycle.rhythm}
+                      {hasPlan
+                        ? `${selectedPlan!.name} · ${mealsFor(cycle)} meals · ${cycle.rhythm}`
+                        : 'Pick a plan above and the receipt updates instantly.'}
                     </p>
                   </div>
+                  {/* CTA — outline (subdued) until a plan is picked, then
+                      flips to secondary (saffron + white) "active brand
+                      theme" so the user feels their selection take effect. */}
                   <Button
-                    variant="secondary"
+                    variant={hasPlan ? 'secondary' : 'outline'}
                     size="lg"
                     className="w-full sm:w-auto"
                     onClick={start}
-                    disabled={submitting}
+                    disabled={submitting || !hasPlan}
                   >
-                    {submitting ? 'Setting up…' : isGroup ? `Pay ${inr(totalDue)} & start` : 'Start my plan'}
+                    {submitting
+                      ? 'Setting up…'
+                      : !hasPlan
+                        ? 'Pick a plan to continue'
+                        : isGroup
+                          ? `Pay ${inr(totalDue)} & start`
+                          : `Start my ${selectedPlan!.name} plan`}
                   </Button>
                 </div>
-                {isGroup && (
+                {hasPlan && isGroup && (
                   <div className="mt-5 rounded-2xl bg-saffron-50 border border-saffron-200 px-4 py-3 text-sm">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="text-ink-700">
@@ -404,11 +503,11 @@ function Onboarding({ expiredNotice = false }: { expiredNotice?: boolean } = {})
                         <span className="font-display text-lg text-ink-900">{inr(totalDue)}</span>
                       </p>
                       <p className="text-xs text-ink-500">
-                        {inr(perPerson)} × {groupSize} {selectedPlan.id === 'squad' ? 'friends' : 'members'}
+                        {inr(perPerson)} × {groupSize} {selectedPlan!.id === 'squad' ? 'friends' : 'members'}
                       </p>
                     </div>
                     <p className="mt-1 text-xs text-ink-500">
-                      You pay the full {selectedPlan.name.toLowerCase()} group upfront — share the code with your {selectedPlan.id === 'squad' ? '4 friends' : '9 floormates'} and they join without paying again.
+                      You pay the full {selectedPlan!.name.toLowerCase()} group upfront — share the code with your {selectedPlan!.id === 'squad' ? '4 friends' : '9 floormates'} and they join without paying again.
                     </p>
                   </div>
                 )}

@@ -20,7 +20,7 @@ const inr = (n: number) => `₹${n.toLocaleString('en-IN')}`
 
 export function Plans() {
   const navigate = useNavigate()
-  const [cycleId, setCycleId] = useState<BillingCycleId>('monthly-no-sun')
+  const [cycleId, setCycleId] = useState<BillingCycleId>('monthly-31')
   const cycle = BILLING_CYCLES.find((c) => c.id === cycleId)!
 
   return (

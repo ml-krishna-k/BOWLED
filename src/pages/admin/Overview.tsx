@@ -9,7 +9,7 @@ import { formatSkipDate, SLOT_LABEL } from '@/lib/skip'
 import { cn } from '@/lib/cn'
 
 export function AdminOverview() {
-  const { kpis, deliveries, kitchens, subscribers, groups, menu, todayIdx, skipNotifications } = useAdmin()
+  const { kpis, deliveries, kitchens, subscribers, groups, menu, todayIdx, skipNotifications, activities } = useAdmin()
 
   const slotsBreakdown = (['breakfast', 'lunch', 'dinner'] as const).map((slot) => {
     const items = deliveries.filter((d) => d.slot === slot)
@@ -37,7 +37,7 @@ export function AdminOverview() {
 
       {/* KPI strip — 2-col on mobile (compact), 4-col at lg */}
       <div className="mt-6 sm:mt-8 grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
-        <Kpi label="Active subscribers" value={kpis.active.toString()} hint={`${kpis.paused} paused · ${kpis.totalSubscribers} total`} />
+        <Kpi label="Registered users" value={kpis.totalUsers.toString()} hint={`${kpis.totalSubscribers} subscribers`} />
         <Kpi label="Meals to deliver today" value={kpis.mealsToday.toString()} hint={`${kpis.served} served · ${kpis.pending} pending`} tone="saffron" />
         <Kpi label="Revenue this month" value={inr(kpis.monthRevenue)} hint="Across active subscriptions" tone="leaf" />
         <Kpi label="Avg subscriber rating" value={`★ ${kpis.avgRating}`} hint="Rolling 30-day average" />
@@ -194,6 +194,63 @@ export function AdminOverview() {
         )}
       </Card>
 
+      {/* User activity feed — register / login notifications */}
+      <Card className="mt-6 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-eyebrow">User activity</p>
+            <h2 className="mt-1 font-display text-xl text-ink-900">
+              Recent sign-ups & logins
+            </h2>
+          </div>
+          <Link to="/admin/users" className="text-sm font-medium text-saffron-700 hover:underline shrink-0">
+            See all →
+          </Link>
+        </div>
+
+        {activities.length === 0 ? (
+          <p className="mt-5 text-sm text-ink-500">
+            No activity yet. When a user registers or logs in, it shows up here.
+          </p>
+        ) : (
+          <ul className="mt-5 divide-y divide-cream-200">
+            {activities.slice(0, 8).map((a) => {
+              const tone =
+                a.kind === 'register' ? 'bg-leaf-100 text-leaf-700' :
+                a.kind === 'profile_completed' ? 'bg-saffron-100 text-saffron-700' :
+                'bg-cream-100 text-ink-700'
+              const label =
+                a.kind === 'register' ? 'New user' :
+                a.kind === 'profile_completed' ? 'Phone added' :
+                'Login'
+              const badge =
+                a.kind === 'register' ? 'leaf' :
+                a.kind === 'profile_completed' ? 'saffron' :
+                'cream'
+              return (
+                <li key={a.id} className="flex items-center justify-between gap-3 py-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className={cn('grid h-10 w-10 shrink-0 place-items-center rounded-full font-semibold', tone)}>
+                      {a.kind === 'register' ? '✦' : a.kind === 'profile_completed' ? '☎' : '↻'}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-medium text-ink-900 truncate">
+                        {a.name}
+                        <span className="text-ink-500 font-normal"> · {a.email}</span>
+                      </p>
+                      <p className="text-xs text-ink-500 truncate">
+                        {a.phone ? `+91 ${a.phone}` : 'No mobile yet'} · {relativeTime(a.at)}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge tone={badge as 'leaf' | 'saffron' | 'cream'}>{label}</Badge>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </Card>
+
       {/* Newest subscribers */}
       <Card className="mt-6 p-6">
         <div className="flex items-center justify-between">
@@ -226,6 +283,18 @@ export function AdminOverview() {
       </Card>
     </AppContainer>
   )
+}
+
+function relativeTime(at: number): string {
+  const diff = Date.now() - at
+  if (diff < 60_000) return 'just now'
+  const m = Math.floor(diff / 60_000)
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  const d = Math.floor(h / 24)
+  if (d < 7) return `${d}d ago`
+  return new Date(at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
 }
 
 function Kpi({

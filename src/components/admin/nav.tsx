@@ -72,6 +72,16 @@ export const ADMIN_NAV: AdminNavItem[] = [
     ),
   },
   {
+    to: '/admin/users',
+    label: 'Users',
+    icon: sv(
+      <>
+        <circle cx="12" cy="8" r="3.5" />
+        <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" />
+      </>,
+    ),
+  },
+  {
     to: '/admin/menu',
     label: 'Menu',
     icon: sv(
